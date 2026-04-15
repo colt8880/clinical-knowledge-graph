@@ -80,7 +80,7 @@ def _node_to_dict(node: neo4j.graph.Node) -> dict[str, Any]:
 
 
 def _extract_codes(props: dict[str, Any]) -> list[dict[str, str]]:
-    """Pull code-list properties into the codes[] array."""
+    """Pull code-list properties into the codes[] array and remove them from props."""
     code_systems = {
         "snomed_codes": "snomed",
         "icd10_codes": "icd10",
@@ -91,7 +91,7 @@ def _extract_codes(props: dict[str, Any]) -> list[dict[str, str]]:
     codes: list[dict[str, str]] = []
     for prop, system in code_systems.items():
         if prop in props:
-            for code in props[prop]:
+            for code in props.pop(prop):
                 codes.append({"system": system, "code": code})
     return codes
 

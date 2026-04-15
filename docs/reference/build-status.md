@@ -8,8 +8,8 @@ States: `spec-only` → `scaffolded` → `implemented` → `tested` → `live`.
 
 | Component | State | Notes |
 |---|---|---|
-| Neo4j schema (constraints, indexes) | spec-only | Spec: `specs/schema.md`. |
-| Statin seed (`seed.cypher`) | spec-only | Model: `reference/statin-model.md`. |
+| Neo4j schema (constraints, indexes) | implemented | Uniqueness constraints on `id` per label in `graph/constraints.cypher`. Indexes deferred — add when `/api` traversal needs them. |
+| Statin seed (`seed.cypher`) | implemented | Model: `reference/statin-model.md`. 23 nodes / 14 edges, fully idempotent. Fixture-level test runs against this when evaluator lands. |
 | Value-set registry | spec-only | External, keyed by (clinical_entity_id, label). Storage medium TBD. |
 
 ## API (`/api`)

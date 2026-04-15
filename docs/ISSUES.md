@@ -29,6 +29,9 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 
 ## v0 intentional deferrals
 
+- **Materialized `EXCLUDED_BY` / `TRIGGERED_BY` edges.** Schema defines both; v0 seed does not emit them. `structured_eligibility` JSON on each Rec is authoritative. The predicate evaluator (Stage 2) will regenerate these edges on demand if traversal needs graph-level visibility of hard exclusions. Re-evaluate when the first traversal primitive needs a Cypher path instead of a JSON walk.
+- **`FOR_CONDITION` edges from Recs.** Schema defines Rec → Condition as "what the rec is about." Not materialized in v0 — the statin model is a single guideline pointing at a single broad `ascvd-established` concept for the exclusion, not as the Rec's subject. Revisit when the second guideline lands and traversal needs to filter Recs by target condition.
+- **Edge provenance property naming.** v0 seed uses `provenance_guideline`, `provenance_version`, `provenance_source_section`, `provenance_publication_date` on nodes and edges per the Stage 1 task spec. `docs/specs/schema.md` documents a shorter edge-only set (`source_guideline_id`, `source_section`, `effective_date`) as convention. Reconcile in a spec+seed rename PR once the evaluator pins which names it reads.
 - **Live ASCVD / Pooled Cohort Equations calculation.** Fixtures supply `risk_scores.ascvd_10yr`. Un-defer when the PCE implementation lands; keep supplied-score path for test isolation.
 - **Cross-guideline preemption.** Single guideline in v0.
 - **Cascade (`TRIGGERS_FOLLOWUP`).** Schema supports it; evaluator doesn't exercise it.

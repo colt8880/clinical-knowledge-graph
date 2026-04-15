@@ -289,10 +289,11 @@ class TestBuildStatusConsistency:
 
         # Map feature numbers to their expected build-status component
         # keywords. A shipped feature should have moved its component
-        # beyond spec-only.
+        # beyond spec-only. When adding a new feature, add its mapping here.
         feature_component_keywords: dict[str, list[str]] = {
             "01": ["seed", "statin seed"],
             "02": ["fastapi", "skeleton"],
+            "10": ["contract alignment"],
             "11": ["github actions", "ci"],
         }
 
@@ -300,11 +301,11 @@ class TestBuildStatusConsistency:
 
         for num in shipped:
             keywords = feature_component_keywords.get(num)
-            if keywords is None:
-                # Feature doesn't have a known component mapping — skip.
-                # This is intentional: not every feature maps cleanly to a
-                # single row in build-status.md.
-                continue
+            assert keywords is not None, (
+                f"Feature {num} is 'shipped' in docs/build/README.md but has "
+                f"no keyword mapping in test_contract_alignment.py. Add an "
+                f"entry to feature_component_keywords."
+            )
 
             # Check that at least one active component matches a keyword
             found = False

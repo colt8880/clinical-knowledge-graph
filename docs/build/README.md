@@ -25,6 +25,7 @@ Every feature runs the workflow in `docs/workflow.md`: branch → implement → 
 | 07 | Dockerfile for `/api` | pending | 04 |
 | 08 | Dockerfile for `/ui` | pending | 06 |
 | 09 | `docker-compose.yml` for full stack | pending | 07, 08 |
+| 10 | Contract alignment tests | pending | 02 |
 
 Status values: `pending` → `in-progress` → `shipped`.
 

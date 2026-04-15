@@ -44,6 +44,7 @@ Each decision has a full ADR in `docs/decisions/`. Summary:
 10. Machine contracts paired with prose specs (0010).
 11. Statins as v0 guideline (0013; supersedes 0006).
 12. v0 scope, `/ui` rename, Python for `/api`, trace-first evaluator (0014).
+13. Build workflow and PR review loop (0015).
 
 ## Schema summary
 

@@ -17,8 +17,8 @@ States: `spec-only` → `scaffolded` → `implemented` → `tested` → `live`.
 | Component | State | Notes |
 |---|---|---|
 | FastAPI skeleton | tested | Python 3.12, FastAPI, Pydantic v2. `/healthz`, `/version`, `/nodes/{id}`, `/nodes/{id}/neighbors` wired to Neo4j. 10 tests (unit + integration). Shipped in PR #6. |
-| Trace-first evaluator | spec-only | Spec: `specs/eval-trace.md`. Contract: `contracts/eval-trace.schema.json`. |
-| Predicate engine (v0 subset) | spec-only | Contract: `contracts/predicate-catalog.yaml`. |
+| Trace-first evaluator | scaffolded | Spec: `specs/eval-trace.md`. Contract: `contracts/eval-trace.schema.json`. Exit-condition path working (fixture 03). Full rec evaluation in feature 04. |
+| Predicate engine (v0 subset) | scaffolded | Contract: `contracts/predicate-catalog.yaml`. Fixture 03 only: age predicates implemented; all others stub to NotImplementedError. |
 | Patient-context validator | spec-only | Contract: `contracts/patient-context.schema.json`. |
 | REST endpoints | spec-only | Contract: `contracts/api.openapi.yaml`. |
 | Contract alignment tests | tested | 10 tests: OpenAPI path/method/response alignment, predicate catalog coverage, build-status consistency. PR #8. |

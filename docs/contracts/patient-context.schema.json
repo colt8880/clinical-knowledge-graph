@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-knowledge-graph/contracts/patient-context.schema.json",
+  "title": "PatientContext",
+  "description": "v0 (ADR 0013, 0014): USPSTF statin primary prevention. Machine-readable pairing of docs/specs/patient-context.md. Source of truth for rationale is the prose spec; this file is source of truth for shape.",
+  "type": "object",
+  "required": ["evaluation_time", "patient"],
+  "additionalProperties": false,
+  "properties": {
+    "evaluation_time": { "type": "string", "format": "date-time" },
+    "patient": { "$ref": "#/$defs/Demographics" },
+    "conditions": { "type": "array", "items": { "$ref": "#/$defs/Condition" }, "default": [] },
+    "observations": { "type": "array", "items": { "$ref": "#/$defs/Observation" }, "default": [] },
+    "medications": { "type": "array", "items": { "$ref": "#/$defs/Medication" }, "default": [] },
+    "social_history": { "$ref": "#/$defs/SocialHistory" },
+    "risk_scores": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/RiskScore" },
+      "default": {}
+    },
+    "completeness": { "$ref": "#/$defs/Completeness" },
+    "policy_overrides": { "$ref": "#/$defs/PolicyOverrides" }
+  },
+  "$defs": {
+    "CodeReference": {
+      "type": "object",
+      "required": ["system", "code"],
+      "properties": {
+        "system": { "type": "string", "enum": ["snomed", "icd10", "loinc", "rxnorm", "cpt"] },
+        "code": { "type": "string" },
+        "display": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "Demographics": {
+      "type": "object",
+      "required": ["date_of_birth", "administrative_sex"],
+      "properties": {
+        "date_of_birth": { "type": "string", "format": "date" },
+        "administrative_sex": { "type": "string", "enum": ["male", "female", "other", "unknown"] },
+        "sex_assigned_at_birth": { "type": "string", "enum": ["male", "female", "intersex", "unknown"] },
+        "ancestry": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "Condition": {
+      "type": "object",
+      "required": ["id", "codes", "clinical_status", "verification_status"],
+      "properties": {
+        "id": { "type": "string" },
+        "codes": { "type": "array", "items": { "$ref": "#/$defs/CodeReference" }, "minItems": 1 },
+        "clinical_status": { "type": "string", "enum": ["active", "recurrence", "remission", "resolved", "inactive"] },
+        "verification_status": { "type": "string", "enum": ["confirmed", "unconfirmed", "refuted", "entered-in-error"] },
+        "onset_date": { "type": "string", "format": "date" },
+        "abatement_date": { "type": "string", "format": "date" }
+      },
+      "additionalProperties": false
+    },
+    "Observation": {
+      "type": "object",
+      "required": ["id", "codes", "status", "effective_date"],
+      "properties": {
+        "id": { "type": "string" },
+        "codes": { "type": "array", "items": { "$ref": "#/$defs/CodeReference" }, "minItems": 1 },
+        "status": { "type": "string", "enum": ["registered", "preliminary", "final", "amended", "corrected", "cancelled", "entered-in-error"] },
+        "effective_date": { "type": "string", "format": "date-time" },
+        "value": { "$ref": "#/$defs/Value" },
+        "interpretation": { "$ref": "#/$defs/CodeReference" },
+        "components": { "type": "array", "items": { "$ref": "#/$defs/ObservationComponent" } }
+      },
+      "additionalProperties": false
+    },
+    "Value": {
+      "oneOf": [
+        { "type": "object", "required": ["value_quantity"], "properties": { "value_quantity": { "type": "object", "required": ["value", "unit"], "properties": { "value": { "type": "number" }, "unit": { "type": "string" }, "system": { "type": "string", "format": "uri" } } } } },
+        { "type": "object", "required": ["value_coded"], "properties": { "value_coded": { "$ref": "#/$defs/CodeReference" } } },
+        { "type": "object", "required": ["value_string"], "properties": { "value_string": { "type": "string" } } },
+        { "type": "object", "required": ["value_boolean"], "properties": { "value_boolean": { "type": "boolean" } } },
+        { "type": "null" }
+      ]
+    },
+    "ObservationComponent": {
+      "type": "object",
+      "required": ["codes", "value"],
+      "properties": {
+        "codes": { "type": "array", "items": { "$ref": "#/$defs/CodeReference" }, "minItems": 1 },
+        "value": { "$ref": "#/$defs/Value" },
+        "interpretation": { "$ref": "#/$defs/CodeReference" }
+      }
+    },
+    "Medication": {
+      "type": "object",
+      "required": ["id", "codes", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "codes": { "type": "array", "items": { "$ref": "#/$defs/CodeReference" }, "minItems": 1 },
+        "status": { "type": "string", "enum": ["active", "on-hold", "stopped", "completed", "entered-in-error"] },
+        "intent": { "type": "string", "enum": ["order", "plan", "proposal", "instance-order"] },
+        "start_date": { "type": "string", "format": "date" },
+        "end_date": { "type": "string", "format": "date" }
+      },
+      "additionalProperties": false
+    },
+    "SocialHistory": {
+      "type": "object",
+      "properties": {
+        "tobacco": { "$ref": "#/$defs/TobaccoUse" }
+      },
+      "additionalProperties": false
+    },
+    "TobaccoUse": {
+      "type": "object",
+      "required": ["status", "as_of"],
+      "properties": {
+        "status": { "type": "string", "enum": ["never", "former", "current_some_day", "current_every_day", "current", "unknown"] },
+        "as_of": { "type": "string", "format": "date" }
+      },
+      "additionalProperties": false
+    },
+    "RiskScore": {
+      "type": "object",
+      "required": ["name", "value", "computed_date"],
+      "properties": {
+        "name": { "type": "string", "enum": ["ascvd_10yr"] },
+        "value": { "type": "number" },
+        "computed_date": { "type": "string", "format": "date" },
+        "inputs_as_of": { "type": "string", "format": "date" },
+        "method_version": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "Completeness": {
+      "type": "object",
+      "properties": {
+        "medications": { "$ref": "#/$defs/CompletenessEnum" },
+        "social_history": { "$ref": "#/$defs/CompletenessEnum" }
+      },
+      "additionalProperties": false
+    },
+    "CompletenessEnum": { "type": "string", "enum": ["populated", "sparse", "not_available"] },
+    "PolicyOverrides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": { "on_missing": { "type": "string", "enum": ["require", "fail_open", "fail_closed"] } }
+      }
+    }
+  }
+}

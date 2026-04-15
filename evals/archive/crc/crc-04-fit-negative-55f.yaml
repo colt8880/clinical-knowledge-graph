@@ -1,0 +1,89 @@
+id: crc-04-fit-negative-55f
+title: "55F, negative FIT 6 months ago"
+guideline_refs:
+  - uspstf-crc-2021: "Recommendation Summary, Grade A"
+  - acp-crc-2019: "Guidance Statement 1 & 2"
+clinical_rationale: |
+  Classic 'up-to-date via FIT' case. Negative FIT within the P1Y USPSTF
+  lookback and within the P2Y ACP lookback satisfies the FIT-alone strategy
+  under both guidelines. The combined flex-sig+FIT strategy is partial
+  (FIT satisfied, flex-sig missing); other strategies are due.
+
+  Exercises `expects: negative` on `INCLUDES_ACTION` with a positive outcome:
+  the resolved value-set for (obs:fit, negative) includes LOINC answer
+  LA6577-6.
+
+author: <engineer-id>
+clinician_reviewer: <pending>
+review_date: <pending>
+
+graph_version: <pending>
+evaluator_version: <pending>
+
+input:
+  evaluation_time: "2026-04-14T00:00:00Z"
+  patient:
+    date_of_birth: "1970-09-01"
+    administrative_sex: "female"
+  conditions: []
+  observations:
+    - id: "obs-1"
+      codes:
+        - { system: "loinc", code: "57905-2" }   # FIT
+      status: "final"
+      effective_date: "2025-10-14T09:00:00Z"
+      value:
+        value_coded:
+          { system: "loinc", code: "LA6577-6", display: "Negative" }
+  procedures: []
+  medications: []
+  family_history: []
+  allergies: []
+  completeness:
+    family_history: "populated"
+
+expected:
+  fires:
+    - rec_id: acp-crc:screen-50-75
+      status: up_to_date
+      strategies:
+        - id: acp-strat:hsgfobt-q2y
+          status: due
+        - id: strat:crc-colonoscopy-alone
+          status: due
+        - id: strat:crc-fit-alone
+          status: satisfied
+        - id: strat:crc-flex-sig-plus-fit
+          status: partial
+          actions:
+            - clinical_entity_id: obs:fit
+              status: satisfied
+              matched_record_id: "obs-1"
+            - clinical_entity_id: proc:flex-sig
+              status: unsatisfied
+    - rec_id: uspstf-crc-2021-screen-50-75
+      status: up_to_date
+      strategies:
+        - id: strat:crc-colonoscopy-alone
+          status: due
+        - id: strat:crc-ct-colonography-alone
+          status: due
+        - id: strat:crc-fit-alone
+          status: satisfied
+        - id: strat:crc-flex-sig-alone
+          status: due
+        - id: strat:crc-flex-sig-plus-fit
+          status: partial
+          actions:
+            - clinical_entity_id: obs:fit
+              status: satisfied
+              matched_record_id: "obs-1"
+            - clinical_entity_id: proc:flex-sig
+              status: unsatisfied
+        - id: strat:crc-gfobt-alone
+          status: due
+        - id: strat:crc-sdna-fit-alone
+          status: due
+  preemption_resolved: []
+  data_gaps: []
+  errors: []

@@ -1,0 +1,247 @@
+openapi: 3.1.0
+info:
+  title: Clinical Knowledge Graph API
+  version: 0.1.0
+  description: |
+    v0 (ADR 0013, 0014). Internal REST API between the UI, downstream agents, and the Neo4j
+    knowledge graph. Two concern areas:
+      - /evaluate — deterministic evaluator. Accepts a PatientContext, returns an EvalTrace.
+      - /nodes, /nodes/{id}/neighbors, /search — read-only graph query for the Explore UI.
+
+    No direct Cypher passthrough (ADR 0005). New traversal capabilities become new endpoints.
+
+servers:
+  - url: http://localhost:8080
+    description: Local dev
+
+tags:
+  - name: evaluate
+    description: Trace-producing evaluator.
+  - name: query
+    description: Read-only graph queries for the Explore UI.
+  - name: meta
+    description: Version and health.
+
+paths:
+  /healthz:
+    get:
+      tags: [meta]
+      summary: Liveness probe.
+      responses:
+        "200":
+          description: OK
+
+  /version:
+    get:
+      tags: [meta]
+      summary: Version stamps currently served.
+      responses:
+        "200":
+          description: Versions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VersionStamp"
+
+  /evaluate:
+    post:
+      tags: [evaluate]
+      summary: Run the evaluator against a PatientContext, return the EvalTrace.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluateRequest"
+      responses:
+        "200":
+          description: Completed evaluation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvalTrace"
+        "400":
+          description: Invalid PatientContext.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+
+  /nodes/{id}:
+    get:
+      tags: [query]
+      summary: Fetch one node by stable id.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Node payload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphNode"
+        "404":
+          description: Not found.
+
+  /nodes/{id}/neighbors:
+    get:
+      tags: [query]
+      summary: Fetch a node plus its inbound and outbound neighbors.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: depth
+          description: Traversal depth. v0 accepts 1 only.
+          schema: { type: integer, minimum: 1, maximum: 1, default: 1 }
+        - in: query
+          name: edge_types
+          description: Optional filter to these edge labels.
+          schema:
+            type: array
+            items: { type: string }
+      responses:
+        "200":
+          description: Neighborhood subgraph.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subgraph"
+        "404":
+          description: Not found.
+
+  /search:
+    get:
+      tags: [query]
+      summary: Search nodes by label prefix or code.
+      parameters:
+        - in: query
+          name: q
+          description: Free-text match against node labels and human-readable names.
+          schema: { type: string }
+        - in: query
+          name: code
+          description: Exact-match on any code in the node's code list.
+          schema:
+            type: object
+            properties:
+              system: { type: string, enum: [snomed, icd10, loinc, rxnorm, cpt] }
+              code: { type: string }
+        - in: query
+          name: node_types
+          description: Restrict to these node labels.
+          schema:
+            type: array
+            items: { type: string, enum: [Guideline, Recommendation, Strategy, Condition, Observation, Medication, Procedure] }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+      responses:
+        "200":
+          description: Matching nodes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [results]
+                properties:
+                  results:
+                    type: array
+                    items: { $ref: "#/components/schemas/GraphNode" }
+
+components:
+  schemas:
+    VersionStamp:
+      type: object
+      required: [spec_tag, graph_version, evaluator_version]
+      properties:
+        spec_tag: { type: string }
+        graph_version: { type: string }
+        evaluator_version: { type: string }
+
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path: { type: string }
+              message: { type: string }
+
+    EvaluateRequest:
+      type: object
+      required: [patient_context]
+      properties:
+        patient_context:
+          description: Must validate against patient-context.schema.json.
+          $ref: "./patient-context.schema.json"
+        options:
+          type: object
+          properties:
+            recompute_risk_scores:
+              type: boolean
+              default: false
+              description: Force recomputation even when a recent supplied score exists.
+
+    EvalTrace:
+      description: Must validate against eval-trace.schema.json.
+      $ref: "./eval-trace.schema.json"
+
+    GraphNode:
+      type: object
+      required: [id, labels, properties]
+      properties:
+        id: { type: string, description: "Stable node id, e.g., med:atorvastatin." }
+        labels:
+          type: array
+          items: { type: string }
+          description: "Neo4j labels, e.g., [Medication]."
+        properties:
+          type: object
+          additionalProperties: true
+        codes:
+          type: array
+          description: Optional surfacing of the node's code list for quick display.
+          items:
+            type: object
+            required: [system, code]
+            properties:
+              system: { type: string }
+              code: { type: string }
+              display: { type: string }
+
+    GraphEdge:
+      type: object
+      required: [id, type, start, end, properties]
+      properties:
+        id: { type: string }
+        type: { type: string, description: "Edge label, e.g., INCLUDES_ACTION." }
+        start: { type: string, description: "Start node id." }
+        end: { type: string, description: "End node id." }
+        properties:
+          type: object
+          additionalProperties: true
+
+    Subgraph:
+      type: object
+      required: [center, nodes, edges]
+      properties:
+        center: { type: string }
+        nodes:
+          type: array
+          items: { $ref: "#/components/schemas/GraphNode" }
+        edges:
+          type: array
+          items: { $ref: "#/components/schemas/GraphEdge" }

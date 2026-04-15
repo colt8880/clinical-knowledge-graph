@@ -1,0 +1,55 @@
+id: crc-02-avg-risk-47m-grade-b
+title: "47M, average risk, 45-49 band (Grade B)"
+guideline_refs:
+  - uspstf-crc-2021: "Recommendation Summary, Grade B"
+clinical_rationale: |
+  Average-risk adult in the 45-49 band. USPSTF 2021 extended CRC screening
+  to age 45 with Grade B evidence. Grade A (50-75) does not apply; Grade B
+  does. ACP 2019 starts at 50, so it does not fire here — coverage gap is
+  the expected finding and should be visible to the consumer.
+
+  All seven USPSTF strategies are offered and due.
+
+author: <engineer-id>
+clinician_reviewer: <pending>
+review_date: <pending>
+
+graph_version: <pending>
+evaluator_version: <pending>
+
+input:
+  evaluation_time: "2026-04-14T00:00:00Z"
+  patient:
+    date_of_birth: "1978-11-02"
+    administrative_sex: "male"
+  conditions: []
+  observations: []
+  procedures: []
+  medications: []
+  family_history: []
+  allergies: []
+  completeness:
+    family_history: "populated"
+
+expected:
+  fires:
+    - rec_id: uspstf-crc-2021-screen-45-49
+      status: due
+      strategies:
+        - id: strat:crc-colonoscopy-alone
+          status: due
+        - id: strat:crc-ct-colonography-alone
+          status: due
+        - id: strat:crc-fit-alone
+          status: due
+        - id: strat:crc-flex-sig-alone
+          status: due
+        - id: strat:crc-flex-sig-plus-fit
+          status: due
+        - id: strat:crc-gfobt-alone
+          status: due
+        - id: strat:crc-sdna-fit-alone
+          status: due
+  preemption_resolved: []
+  data_gaps: []
+  errors: []

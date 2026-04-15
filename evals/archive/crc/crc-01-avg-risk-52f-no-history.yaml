@@ -1,0 +1,68 @@
+id: crc-01-avg-risk-52f-no-history
+title: "52F, average risk, no prior screening"
+guideline_refs:
+  - uspstf-crc-2021: "Recommendation Summary, Grade A"
+  - acp-crc-2019: "Guidance Statement 1 & 2"
+clinical_rationale: |
+  Average-risk adult in the 50-75 band with no prior screening. Both USPSTF
+  Grade A and ACP 2019 screen-50-75 fire. All strategies offered by each
+  guideline are due (no satisfying actions in history).
+
+  Sanity check: no preemption (no higher-risk indicators), no cascade
+  (no positive screening result), no data gaps (family_history completeness
+  is 'populated').
+
+author: <engineer-id>
+clinician_reviewer: <pending>
+review_date: <pending>
+
+graph_version: <pending>
+evaluator_version: <pending>
+
+input:
+  evaluation_time: "2026-04-14T00:00:00Z"
+  patient:
+    date_of_birth: "1973-08-15"
+    administrative_sex: "female"
+  conditions: []
+  observations: []
+  procedures: []
+  medications: []
+  family_history: []
+  allergies: []
+  completeness:
+    family_history: "populated"
+
+expected:
+  fires:
+    - rec_id: acp-crc:screen-50-75
+      status: due
+      strategies:
+        - id: acp-strat:hsgfobt-q2y
+          status: due
+        - id: strat:crc-colonoscopy-alone
+          status: due
+        - id: strat:crc-fit-alone
+          status: due
+        - id: strat:crc-flex-sig-plus-fit
+          status: due
+    - rec_id: uspstf-crc-2021-screen-50-75
+      status: due
+      strategies:
+        - id: strat:crc-colonoscopy-alone
+          status: due
+        - id: strat:crc-ct-colonography-alone
+          status: due
+        - id: strat:crc-fit-alone
+          status: due
+        - id: strat:crc-flex-sig-alone
+          status: due
+        - id: strat:crc-flex-sig-plus-fit
+          status: due
+        - id: strat:crc-gfobt-alone
+          status: due
+        - id: strat:crc-sdna-fit-alone
+          status: due
+  preemption_resolved: []
+  data_gaps: []
+  errors: []

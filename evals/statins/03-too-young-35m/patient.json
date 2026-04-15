@@ -1,0 +1,62 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1990-09-21",
+    "administrative_sex": "male",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-htn",
+      "codes": [
+        { "system": "snomed", "code": "38341003" },
+        { "system": "icd10", "code": "I10" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2025-02-18"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-tc-2026-02",
+      "codes": [{ "system": "loinc", "code": "2093-3" }],
+      "status": "final",
+      "effective_date": "2026-02-02T09:00:00Z",
+      "value": { "value_quantity": { "value": 215, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-hdl-2026-02",
+      "codes": [{ "system": "loinc", "code": "2085-9" }],
+      "status": "final",
+      "effective_date": "2026-02-02T09:00:00Z",
+      "value": { "value_quantity": { "value": 41, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-ldl-2026-02",
+      "codes": [{ "system": "loinc", "code": "13457-7" }],
+      "status": "final",
+      "effective_date": "2026-02-02T09:00:00Z",
+      "value": { "value_quantity": { "value": 148, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-bp-2026-03",
+      "codes": [{ "system": "loinc", "code": "85354-9" }],
+      "status": "final",
+      "effective_date": "2026-03-10T11:20:00Z",
+      "value": null,
+      "components": [
+        { "codes": [{ "system": "loinc", "code": "8480-6" }], "value": { "value_quantity": { "value": 144, "unit": "mm[Hg]" } } },
+        { "codes": [{ "system": "loinc", "code": "8462-4" }], "value": { "value_quantity": { "value": 90, "unit": "mm[Hg]" } } }
+      ]
+    }
+  ],
+  "medications": [],
+  "social_history": {
+    "tobacco": { "status": "current_every_day", "as_of": "2026-03-10" }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

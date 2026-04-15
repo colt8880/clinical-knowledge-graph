@@ -1,0 +1,40 @@
+id: crc-03-below-age-42f
+title: "42F, below all CRC screening age bands"
+guideline_refs:
+  - uspstf-crc-2021: "Recommendation Summary"
+  - acp-crc-2019: "Guidance Statement"
+clinical_rationale: |
+  42yo is below all v0 CRC screening age bands (Grade A 50-75, Grade B 45-49,
+  Grade C 76-85, ACP 50-75). No Rec should fire. This is the negative test
+  that protects against a 'fires for everyone' evaluator bug.
+
+  Note: USPSTF addresses high-risk screening under 45 implicitly via exclusion
+  from avg-risk; actual higher-risk guidelines (USMSTF for Lynch, etc.) are
+  out of v0 scope.
+
+author: <engineer-id>
+clinician_reviewer: <pending>
+review_date: <pending>
+
+graph_version: <pending>
+evaluator_version: <pending>
+
+input:
+  evaluation_time: "2026-04-14T00:00:00Z"
+  patient:
+    date_of_birth: "1983-04-22"
+    administrative_sex: "female"
+  conditions: []
+  observations: []
+  procedures: []
+  medications: []
+  family_history: []
+  allergies: []
+  completeness:
+    family_history: "populated"
+
+expected:
+  fires: []
+  preemption_resolved: []
+  data_gaps: []
+  errors: []

@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-knowledge-graph/contracts/eval-trace.schema.json",
+  "title": "EvalTrace",
+  "description": "v0 (ADR 0013, 0014). Machine-readable pairing of docs/specs/eval-trace.md. The evaluator's primary output.",
+  "type": "object",
+  "required": ["envelope", "events", "recommendations"],
+  "additionalProperties": false,
+  "properties": {
+    "envelope": { "$ref": "#/$defs/Envelope" },
+    "events": { "type": "array", "items": { "$ref": "#/$defs/Event" }, "minItems": 2 },
+    "recommendations": { "type": "array", "items": { "$ref": "#/$defs/Recommendation" }, "default": [] }
+  },
+  "$defs": {
+    "Envelope": {
+      "type": "object",
+      "required": ["spec_tag", "graph_version", "evaluator_version", "evaluation_time", "patient_fingerprint"],
+      "properties": {
+        "spec_tag": { "type": "string" },
+        "graph_version": { "type": "string" },
+        "evaluator_version": { "type": "string" },
+        "evaluation_time": { "type": "string", "format": "date-time" },
+        "patient_fingerprint": { "type": "string" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "TriState": { "type": "string", "enum": ["true", "false", "unknown"] },
+    "InputRead": {
+      "type": "object",
+      "required": ["source", "locator", "present"],
+      "properties": {
+        "source": { "type": "string", "enum": ["patient.demographics", "patient.conditions", "patient.observations", "patient.medications", "patient.social_history", "patient.risk_scores", "patient.completeness", "derived"] },
+        "locator": { "type": "string" },
+        "value": {},
+        "present": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "Event": {
+      "oneOf": [
+        { "$ref": "#/$defs/EvaluationStarted" },
+        { "$ref": "#/$defs/GuidelineEntered" },
+        { "$ref": "#/$defs/RecommendationConsidered" },
+        { "$ref": "#/$defs/EligibilityEvaluationStarted" },
+        { "$ref": "#/$defs/PredicateEvaluated" },
+        { "$ref": "#/$defs/CompositeResolved" },
+        { "$ref": "#/$defs/EligibilityEvaluationCompleted" },
+        { "$ref": "#/$defs/StrategyConsidered" },
+        { "$ref": "#/$defs/ActionChecked" },
+        { "$ref": "#/$defs/StrategyResolved" },
+        { "$ref": "#/$defs/RiskScoreLookup" },
+        { "$ref": "#/$defs/ExitConditionTriggered" },
+        { "$ref": "#/$defs/RecommendationEmitted" },
+        { "$ref": "#/$defs/EvaluationCompleted" }
+      ]
+    },
+    "BaseEvent": {
+      "type": "object",
+      "required": ["seq", "type"],
+      "properties": {
+        "seq": { "type": "integer", "minimum": 1 },
+        "type": { "type": "string" },
+        "at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "EvaluationStarted": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "patient_age_years", "patient_sex", "guidelines_in_scope"],
+      "properties": {
+        "type": { "const": "evaluation_started" },
+        "patient_age_years": { "type": "integer" },
+        "patient_sex": { "type": "string" },
+        "guidelines_in_scope": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "GuidelineEntered": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "guideline_id", "guideline_title"],
+      "properties": {
+        "type": { "const": "guideline_entered" },
+        "guideline_id": { "type": "string" },
+        "guideline_title": { "type": "string" }
+      }
+    },
+    "RecommendationConsidered": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "recommendation_title", "evidence_grade", "intent", "trigger"],
+      "properties": {
+        "type": { "const": "recommendation_considered" },
+        "recommendation_id": { "type": "string" },
+        "recommendation_title": { "type": "string" },
+        "evidence_grade": { "type": "string" },
+        "intent": { "type": "string" },
+        "trigger": { "type": "string" }
+      }
+    },
+    "EligibilityEvaluationStarted": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id"],
+      "properties": {
+        "type": { "const": "eligibility_evaluation_started" },
+        "recommendation_id": { "type": "string" }
+      }
+    },
+    "PredicateEvaluated": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "path", "predicate", "args", "inputs_read", "result"],
+      "properties": {
+        "type": { "const": "predicate_evaluated" },
+        "recommendation_id": { "type": "string" },
+        "path": { "type": "array", "items": { "type": ["string", "integer"] } },
+        "predicate": { "type": "string" },
+        "args": { "type": "object" },
+        "inputs_read": { "type": "array", "items": { "$ref": "#/$defs/InputRead" } },
+        "result": { "$ref": "#/$defs/TriState" },
+        "missing_data_policy_applied": { "type": ["string", "null"], "enum": ["require", "fail_open", "fail_closed", null] },
+        "note": { "type": ["string", "null"] }
+      }
+    },
+    "CompositeResolved": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "path", "operator", "result", "short_circuited"],
+      "properties": {
+        "type": { "const": "composite_resolved" },
+        "recommendation_id": { "type": "string" },
+        "path": { "type": "array", "items": { "type": ["string", "integer"] } },
+        "operator": { "type": "string", "enum": ["all_of", "any_of", "none_of"] },
+        "result": { "$ref": "#/$defs/TriState" },
+        "short_circuited": { "type": "boolean" }
+      }
+    },
+    "EligibilityEvaluationCompleted": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "result", "final_value"],
+      "properties": {
+        "type": { "const": "eligibility_evaluation_completed" },
+        "recommendation_id": { "type": "string" },
+        "result": { "type": "string", "enum": ["eligible", "ineligible", "unknown"] },
+        "final_value": { "$ref": "#/$defs/TriState" }
+      }
+    },
+    "StrategyConsidered": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "strategy_id", "strategy_name"],
+      "properties": {
+        "type": { "const": "strategy_considered" },
+        "recommendation_id": { "type": "string" },
+        "strategy_id": { "type": "string" },
+        "strategy_name": { "type": "string" }
+      }
+    },
+    "ActionChecked": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "strategy_id", "action_node_id", "action_entity_type", "inputs_read", "satisfied"],
+      "properties": {
+        "type": { "const": "action_checked" },
+        "recommendation_id": { "type": "string" },
+        "strategy_id": { "type": "string" },
+        "action_node_id": { "type": "string" },
+        "action_entity_type": { "type": "string", "enum": ["Medication", "Procedure", "Observation"] },
+        "cadence": { "type": ["string", "null"] },
+        "lookback": { "type": ["string", "null"] },
+        "inputs_read": { "type": "array", "items": { "$ref": "#/$defs/InputRead" } },
+        "satisfied": { "type": "boolean" },
+        "note": { "type": ["string", "null"] }
+      }
+    },
+    "StrategyResolved": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "strategy_id", "satisfied"],
+      "properties": {
+        "type": { "const": "strategy_resolved" },
+        "recommendation_id": { "type": "string" },
+        "strategy_id": { "type": "string" },
+        "satisfied": { "type": "boolean" }
+      }
+    },
+    "RiskScoreLookup": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "score_name", "resolution"],
+      "properties": {
+        "type": { "const": "risk_score_lookup" },
+        "score_name": { "type": "string" },
+        "resolution": { "type": "string", "enum": ["supplied", "computed", "unavailable"] },
+        "supplied_value": { "type": ["number", "null"] },
+        "supplied_computed_date": { "type": ["string", "null"] },
+        "inputs_read": { "type": "array", "items": { "$ref": "#/$defs/InputRead" } },
+        "computed_value": { "type": ["number", "null"] },
+        "method": { "type": ["string", "null"] },
+        "note": { "type": ["string", "null"] }
+      }
+    },
+    "ExitConditionTriggered": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "exit", "rationale"],
+      "properties": {
+        "type": { "const": "exit_condition_triggered" },
+        "recommendation_id": { "type": "string" },
+        "exit": { "type": "string" },
+        "rationale": { "type": "string" }
+      }
+    },
+    "RecommendationEmitted": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendation_id", "status", "evidence_grade", "reason"],
+      "properties": {
+        "type": { "const": "recommendation_emitted" },
+        "recommendation_id": { "type": "string" },
+        "status": { "type": "string", "enum": ["due", "up_to_date", "not_applicable", "insufficient_evidence"] },
+        "evidence_grade": { "type": "string" },
+        "offered_strategies": { "type": "array", "items": { "type": "string" } },
+        "satisfying_strategy": { "type": ["string", "null"] },
+        "reason": { "type": "string" }
+      }
+    },
+    "EvaluationCompleted": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "recommendations_emitted", "duration_ms"],
+      "properties": {
+        "type": { "const": "evaluation_completed" },
+        "recommendations_emitted": { "type": "integer", "minimum": 0 },
+        "duration_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "Recommendation": {
+      "type": "object",
+      "required": ["recommendation_id", "status", "evidence_grade", "reason"],
+      "properties": {
+        "recommendation_id": { "type": "string" },
+        "status": { "type": "string", "enum": ["due", "up_to_date", "not_applicable", "insufficient_evidence"] },
+        "evidence_grade": { "type": "string" },
+        "offered_strategies": { "type": "array", "items": { "type": "string" } },
+        "satisfying_strategy": { "type": ["string", "null"] },
+        "reason": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

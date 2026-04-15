@@ -1,0 +1,87 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1947-12-08",
+    "administrative_sex": "female",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-htn",
+      "codes": [
+        { "system": "snomed", "code": "38341003" },
+        { "system": "icd10", "code": "I10" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2012-05-14"
+    },
+    {
+      "id": "cond-dm2",
+      "codes": [
+        { "system": "snomed", "code": "73211009", "display": "Diabetes mellitus" },
+        { "system": "icd10", "code": "E11.9", "display": "Type 2 diabetes mellitus without complications" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2016-08-02"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-tc-2026-01",
+      "codes": [{ "system": "loinc", "code": "2093-3" }],
+      "status": "final",
+      "effective_date": "2026-01-15T08:30:00Z",
+      "value": { "value_quantity": { "value": 196, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-hdl-2026-01",
+      "codes": [{ "system": "loinc", "code": "2085-9" }],
+      "status": "final",
+      "effective_date": "2026-01-15T08:30:00Z",
+      "value": { "value_quantity": { "value": 58, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-ldl-2026-01",
+      "codes": [{ "system": "loinc", "code": "13457-7" }],
+      "status": "final",
+      "effective_date": "2026-01-15T08:30:00Z",
+      "value": { "value_quantity": { "value": 118, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-bp-2026-03",
+      "codes": [{ "system": "loinc", "code": "85354-9" }],
+      "status": "final",
+      "effective_date": "2026-03-22T09:55:00Z",
+      "value": null,
+      "components": [
+        { "codes": [{ "system": "loinc", "code": "8480-6" }], "value": { "value_quantity": { "value": 138, "unit": "mm[Hg]" } } },
+        { "codes": [{ "system": "loinc", "code": "8462-4" }], "value": { "value_quantity": { "value": 78, "unit": "mm[Hg]" } } }
+      ]
+    }
+  ],
+  "medications": [
+    {
+      "id": "med-losartan",
+      "codes": [{ "system": "rxnorm", "code": "52175", "display": "Losartan" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2015-01-10"
+    },
+    {
+      "id": "med-metformin",
+      "codes": [{ "system": "rxnorm", "code": "6809", "display": "Metformin" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2016-08-15"
+    }
+  ],
+  "social_history": {
+    "tobacco": { "status": "former", "as_of": "2026-03-22" }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

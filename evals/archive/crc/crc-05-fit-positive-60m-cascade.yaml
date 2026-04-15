@@ -1,0 +1,89 @@
+id: crc-05-fit-positive-60m-cascade
+title: "60M, positive FIT 2 weeks ago"
+guideline_refs:
+  - uspstf-crc-2021: "Recommendation Summary, Grade A"
+  - uspstf-crc-2021: "Clinical Considerations, Screening Test Follow-up"
+clinical_rationale: |
+  Cascade case. A positive FIT does NOT satisfy the screening Strategy
+  (`expects: negative` fails because the value-set for (obs:fit, negative)
+  does not include LA6576-8 Positive). Screening Rec stays due. The
+  diagnostic-followup Rec fires via `TRIGGERED_BY` on obs:fit with a positive
+  value inside P30D.
+
+  Exercises: (1) result-conditional satisfaction failing for positive result,
+  (2) cascade firing via observation_result trigger, (3) the combined
+  flex-sig+FIT strategy correctly reporting 'unsatisfied' on the FIT action
+  (not 'satisfied' just because a FIT record exists).
+
+  ACP fires identically for the screening Rec; for brevity the Rec-level
+  output is included below.
+
+author: <engineer-id>
+clinician_reviewer: <pending>
+review_date: <pending>
+
+graph_version: <pending>
+evaluator_version: <pending>
+
+input:
+  evaluation_time: "2026-04-14T00:00:00Z"
+  patient:
+    date_of_birth: "1965-12-10"
+    administrative_sex: "male"
+  conditions: []
+  observations:
+    - id: "obs-1"
+      codes:
+        - { system: "loinc", code: "57905-2" }   # FIT
+      status: "final"
+      effective_date: "2026-04-01T11:30:00Z"
+      value:
+        value_coded:
+          { system: "loinc", code: "LA6576-8", display: "Positive" }
+  procedures: []
+  medications: []
+  family_history: []
+  allergies: []
+  completeness:
+    family_history: "populated"
+
+expected:
+  fires:
+    - rec_id: acp-crc:screen-50-75
+      status: due
+      strategies:
+        - id: acp-strat:hsgfobt-q2y
+          status: due
+        - id: strat:crc-colonoscopy-alone
+          status: due
+        - id: strat:crc-fit-alone
+          status: due
+        - id: strat:crc-flex-sig-plus-fit
+          status: due
+    - rec_id: uspstf-crc-2021-positive-noncolo-followup
+      status: triggered
+      triggered_by:
+        - "obs-1"
+      strategies:
+        - id: strat:crc-diagnostic-colonoscopy
+          status: due
+    - rec_id: uspstf-crc-2021-screen-50-75
+      status: due
+      strategies:
+        - id: strat:crc-colonoscopy-alone
+          status: due
+        - id: strat:crc-ct-colonography-alone
+          status: due
+        - id: strat:crc-fit-alone
+          status: due
+        - id: strat:crc-flex-sig-alone
+          status: due
+        - id: strat:crc-flex-sig-plus-fit
+          status: due
+        - id: strat:crc-gfobt-alone
+          status: due
+        - id: strat:crc-sdna-fit-alone
+          status: due
+  preemption_resolved: []
+  data_gaps: []
+  errors: []

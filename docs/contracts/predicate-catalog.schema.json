@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinical-knowledge-graph/contracts/predicate-catalog.schema.json",
+  "title": "Predicate Catalog Meta-Schema",
+  "description": "Validates the shape of docs/contracts/predicate-catalog.yaml. Pairs docs/specs/predicate-dsl.md.",
+  "type": "object",
+  "required": ["composites", "value_filters", "predicates"],
+  "additionalProperties": false,
+  "properties": {
+    "composites": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/composite" }
+    },
+    "value_filters": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/value_filter" }
+    },
+    "predicates": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/predicate" }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "snake_case identifier"
+    },
+    "args_map": {
+      "type": "object",
+      "description": "Arg name -> type descriptor string. Free-form human/machine readable.",
+      "additionalProperties": { "type": "string", "minLength": 1 },
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" }
+    },
+    "policy_enum": {
+      "type": "string",
+      "enum": ["require", "fail_open", "fail_closed"]
+    },
+    "composite": {
+      "type": "object",
+      "required": ["name", "args", "empty_semantics"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/identifier" },
+        "args": { "$ref": "#/$defs/args_map" },
+        "empty_semantics": {
+          "description": "Truth value (or description) when the composite's operand list is empty.",
+          "oneOf": [
+            { "type": "boolean" },
+            { "type": "string", "minLength": 1 }
+          ]
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "value_filter": {
+      "type": "object",
+      "required": ["name", "args"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/identifier" },
+        "args": { "$ref": "#/$defs/args_map" },
+        "notes": { "type": "string" }
+      }
+    },
+    "predicate": {
+      "type": "object",
+      "required": ["name", "category", "args"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/identifier" },
+        "category": { "$ref": "#/$defs/identifier" },
+        "args": { "$ref": "#/$defs/args_map" },
+        "default_policy": { "$ref": "#/$defs/policy_enum" },
+        "default_policy_split": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/policy_enum" },
+          "description": "Branch-specific policy. Keys are descriptive branch labels (e.g., not_pregnant, pregnant_missing_ga)."
+        },
+        "semantics": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "oneOf": [
+        { "required": ["default_policy"], "not": { "required": ["default_policy_split"] } },
+        { "required": ["default_policy_split"], "not": { "required": ["default_policy"] } }
+      ]
+    }
+  }
+}

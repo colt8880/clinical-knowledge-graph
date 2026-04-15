@@ -1,0 +1,18 @@
+{
+  "description": "78F with HTN and T2DM, on lisinopril+metformin. No established ASCVD. Age >= 76 hits Grade I (insufficient evidence). USPSTF does not recommend for or against initiating a statin in this age band.",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "status": "insufficient_evidence",
+      "evidence_grade": "I"
+    }
+  ],
+  "expected_trace_contains": [
+    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-insufficient-evidence-grade-i", "status": "insufficient_evidence", "evidence_grade": "I" }
+  ],
+  "must_not_contain": [
+    { "type": "exit_condition_triggered" },
+    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-initiate-grade-b" },
+    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-selective-grade-c" }
+  ]
+}

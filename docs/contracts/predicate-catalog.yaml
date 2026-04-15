@@ -1,0 +1,119 @@
+# Predicate catalog v0 (statin scope)
+#
+# Machine-readable pairing of docs/specs/predicate-dsl.md, pruned to the
+# predicates exercised by the v0 statin model and the 5 v0 patient fixtures.
+# Per ADR 0014, predicates are removed from the active catalog when no in-scope
+# guideline uses them. The pre-prune catalog (pregnancy, screening instruments,
+# FRAX, family history matching, etc.) is preserved in git history and can be
+# restored when a guideline that needs those predicates enters scope.
+#
+# When editing: update the prose spec (predicate-dsl.md) first, then this file.
+# A predicate listed here but not in the spec, or vice versa, is a validation error.
+
+composites:
+  - name: all_of
+    args: { of: "list[Expression]" }
+    empty_semantics: true
+  - name: any_of
+    args: { of: "list[Expression]" }
+    empty_semantics: false
+  - name: none_of
+    args: { of: "list[Expression]" }
+    empty_semantics: true
+
+value_filters:
+  # Forms accepted by predicates that compare Observation result values.
+  # Exactly one must be provided per predicate invocation.
+  - name: value_above
+    args: { value: "number", unit: "string (UCUM)" }
+  - name: value_below
+    args: { value: "number", unit: "string (UCUM)" }
+  - name: value_between
+    args: { min: "number", max: "number", unit: "string (UCUM)", inclusive: "bool, default true" }
+
+predicates:
+
+  # --- Demographics --------------------------------------------------------
+  - name: age_between
+    category: demographics
+    args: { min: "int", max: "int" }
+    default_policy: require
+    semantics: "floor((evaluation_time - date_of_birth)/P1Y) in [min, max] inclusive"
+
+  - name: age_greater_than_or_equal
+    category: demographics
+    args: { value: "int" }
+    default_policy: require
+    semantics: "computed age >= value"
+
+  - name: age_less_than
+    category: demographics
+    args: { value: "int" }
+    default_policy: require
+    semantics: "computed age < value"
+
+  - name: administrative_sex_is
+    category: demographics
+    args: { value: "enum[male, female, other, unknown]" }
+    default_policy: require
+
+  - name: has_ancestry_matching
+    category: demographics
+    args: { populations: "list[string]" }
+    default_policy: fail_open
+    notes: "Tokens from the ancestry-population registry. For statins, 'black' is the only token v0 reads (input to Pooled Cohort Equations)."
+
+  # --- Conditions ----------------------------------------------------------
+  - name: has_condition_history
+    category: conditions
+    args: { codes: "list[graph_node_id]" }
+    default_policy: fail_open
+    semantics: "Any Condition with verification_status=confirmed, clinical_status in {active,recurrence,remission,resolved,inactive}, codes intersecting referenced nodes."
+
+  - name: has_active_condition
+    category: conditions
+    args: { codes: "list[graph_node_id]" }
+    default_policy: fail_open
+    semantics: "has_condition_history restricted to clinical_status in {active, recurrence}."
+
+  # --- Tobacco exposure ----------------------------------------------------
+  - name: smoking_status_is
+    category: tobacco
+    args: { values: "list[enum[never, former, current_some_day, current_every_day, current, unknown]]" }
+    default_policy: fail_closed
+    notes: "Derived token 'current_smoker' = {current, current_some_day, current_every_day} is resolved in-predicate when passed."
+
+  # --- Observations --------------------------------------------------------
+  - name: most_recent_observation_value
+    category: observations
+    args:
+      code: "graph_node_id"
+      window: "ISO 8601 duration"
+      comparator: "enum[eq, ne, gt, lt, gte, lte]"
+      threshold: "number"
+      unit: "string (UCUM)"
+      component: "code, optional"
+    default_policy: fail_open
+    notes: "Reads latest final/amended/corrected observation matching code within window. 'component' selects a specific component (e.g., SBP within a BP panel)."
+
+  # --- Medications ---------------------------------------------------------
+  - name: has_medication_active
+    category: medications
+    args: { codes: "list[graph_node_id]" }
+    default_policy: fail_open
+    notes: "status = active, class-level matching via graph node code list. Class-level Medication nodes (e.g., antihypertensive_class, statin_class) list the full member RxNorm code set."
+
+  # --- Risk scores ---------------------------------------------------------
+  - name: risk_score_compares
+    category: risk_scores
+    args:
+      name: "string (controlled; v0 supports: ascvd_10yr)"
+      comparator: "enum[eq, gt, lt, gte, lte]"
+      threshold: "number"
+    default_policy: fail_closed
+    notes: |
+      Evaluator resolution order:
+      1. If patient_context.risk_scores[name] present and computed_date within P1Y of evaluation_time, use supplied value.
+      2. Else compute the score using the named calculator (v0: ascvd_10yr = Pooled Cohort Equations) from patient_context inputs.
+      3. If inputs are insufficient to compute, emit trace event risk_score_unavailable and return false (fail_closed).
+      The trace records: resolution path taken, inputs read, computed value (if computed), comparator, threshold, result.

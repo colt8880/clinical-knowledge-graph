@@ -1,0 +1,21 @@
+{
+  "description": "55F with dyslipidemia + HTN on lisinopril, never smoker. ASCVD 8.4% (7.5\u2013<10% band). Exercises Grade C shared-decision path.",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "status": "due",
+      "evidence_grade": "C",
+      "offered_strategies": ["strategy:statin-shared-decision-discussion", "strategy:statin-moderate-intensity"]
+    }
+  ],
+  "expected_trace_contains": [
+    { "type": "risk_score_lookup", "resolution": "supplied", "supplied_value": 8.4 },
+    { "type": "recommendation_considered", "recommendation_id": "rec:statin-initiate-grade-b" },
+    { "type": "eligibility_evaluation_completed", "recommendation_id": "rec:statin-initiate-grade-b", "result": "ineligible" },
+    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-selective-grade-c", "status": "due", "evidence_grade": "C" }
+  ],
+  "must_not_contain": [
+    { "type": "exit_condition_triggered" },
+    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-initiate-grade-b" }
+  ]
+}

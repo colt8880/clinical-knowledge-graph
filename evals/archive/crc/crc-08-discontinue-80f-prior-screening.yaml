@@ -1,0 +1,66 @@
+id: crc-08-discontinue-80f-prior-screening
+title: "80F with two prior colonoscopies"
+guideline_refs:
+  - uspstf-crc-2021: "Recommendation Summary, Grade C"
+  - acp-crc-2019: "Guidance Statement 3"
+clinical_rationale: |
+  80yo in the Grade C band (76-85) with documented prior screening history.
+  Both USPSTF Grade C ('selectively offer, shared decision') and ACP
+  discontinue-over-75 fire. Neither preempts the other; both surface for the
+  consumer to weigh.
+
+  Exercises: (1) both shared-decision Recs coexisting, (2) `has_any_prior_screening`
+  predicate returning true against completed colonoscopies, (3) null-cadence
+  strategies correctly reported as due (no prior SDM/discontinuation
+  discussion recorded).
+
+  Grade A (50-75) and Grade B (45-49) do not fire (age); ACP screen-50-75
+  does not fire (age >75).
+
+author: <engineer-id>
+clinician_reviewer: <pending>
+review_date: <pending>
+
+graph_version: <pending>
+evaluator_version: <pending>
+
+input:
+  evaluation_time: "2026-04-14T00:00:00Z"
+  patient:
+    date_of_birth: "1946-02-28"
+    administrative_sex: "female"
+  conditions: []
+  observations: []
+  procedures:
+    - id: "proc-1"
+      codes:
+        - { system: "cpt", code: "45378" }
+        - { system: "snomed", code: "73761001" }
+      status: "completed"
+      performed_date: "2020-05-15"
+    - id: "proc-2"
+      codes:
+        - { system: "cpt", code: "45378" }
+      status: "completed"
+      performed_date: "2010-04-10"
+  medications: []
+  family_history: []
+  allergies: []
+  completeness:
+    family_history: "populated"
+
+expected:
+  fires:
+    - rec_id: acp-crc:discontinue-over-75
+      status: due
+      strategies:
+        - id: acp-strat:discuss-discontinuation
+          status: due
+    - rec_id: uspstf-crc-2021-screen-76-85
+      status: due
+      strategies:
+        - id: strat:crc-shared-decision-76-85
+          status: due
+  preemption_resolved: []
+  data_gaps: []
+  errors: []

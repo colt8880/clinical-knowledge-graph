@@ -1,0 +1,56 @@
+id: crc-07-fdr-crc-under-60-55m
+title: "55M, mother diagnosed with CRC at age 52"
+guideline_refs:
+  - uspstf-crc-2021: "Recommendation Summary, Grade A (exclusions)"
+  - acp-crc-2019: "Guidance Statement 1 & 2 (exclusions)"
+clinical_rationale: |
+  First-degree relative (mother) with CRC diagnosed before age 60. Triggers
+  the `has_family_history_matching` exclusion with `relationship:
+  [first_degree_relative], onset_age_below: 60, min_count: 1` — the
+  operational 'strong family hx CRC' rule per USMSTF/ACG.
+
+  Exercises: (1) structured family history predicate evaluating against a
+  populated record, (2) `onset_age_below` filter (here 52 < 60), (3)
+  relationship token expansion (`first_degree_relative` includes SNOMED
+  72705000 Mother).
+
+  Clinically, this patient should receive earlier and more frequent screening
+  (colonoscopy starting at age 40 or 10 years before the relative's dx age,
+  whichever is earlier, every 5 years) per USMSTF — out of v0 scope. Empty
+  `fires` is the correct avg-risk graph output; the higher-risk pathway
+  lives in a future guideline.
+
+author: <engineer-id>
+clinician_reviewer: <pending>
+review_date: <pending>
+
+graph_version: <pending>
+evaluator_version: <pending>
+
+input:
+  evaluation_time: "2026-04-14T00:00:00Z"
+  patient:
+    date_of_birth: "1971-01-15"
+    administrative_sex: "male"
+  conditions: []
+  observations: []
+  procedures: []
+  medications: []
+  family_history:
+    - id: "fmh-1"
+      relationship:
+        { system: "snomed", code: "72705000", display: "Mother" }
+      deceased: false
+      conditions:
+        - codes:
+            - { system: "snomed", code: "363346000" }   # Malignant neoplasm of colon
+          onset_age: 52
+  allergies: []
+  completeness:
+    family_history: "populated"
+
+expected:
+  fires: []
+  preemption_resolved: []
+  data_gaps: []
+  errors: []

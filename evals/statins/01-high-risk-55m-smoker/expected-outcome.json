@@ -1,0 +1,18 @@
+{
+  "description": "55M current smoker with HTN and dyslipidemic panel. ASCVD 18.2%. Exercises Grade B initiate path.",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "status": "due",
+      "evidence_grade": "B",
+      "offered_strategies": ["strategy:statin-moderate-intensity"]
+    }
+  ],
+  "expected_trace_contains": [
+    { "type": "risk_score_lookup", "resolution": "supplied", "supplied_value": 18.2 },
+    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-initiate-grade-b", "status": "due", "evidence_grade": "B" }
+  ],
+  "must_not_contain": [
+    { "type": "exit_condition_triggered" }
+  ]
+}

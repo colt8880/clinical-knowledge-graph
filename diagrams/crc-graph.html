@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CRC Knowledge Graph — USPSTF 2021</title>
+<script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+<script src="https://unpkg.com/layout-base/layout-base.js"></script>
+<script src="https://unpkg.com/cose-base/cose-base.js"></script>
+<script src="https://unpkg.com/cytoscape-fcose@2.2.0/cytoscape-fcose.js"></script>
+<script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+<script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; }
+  body { display: flex; flex-direction: column; background: #f8fafc; }
+  header { padding: 12px 20px; background: #0f172a; color: #f1f5f9; border-bottom: 1px solid #1e293b; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  header h1 { font-size: 16px; font-weight: 600; }
+  header .meta { font-size: 12px; color: #94a3b8; }
+  .controls { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+  .controls label { font-size: 12px; color: #cbd5e1; }
+  .controls select, .controls button { padding: 4px 10px; font-size: 12px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #f1f5f9; cursor: pointer; }
+  .controls button:hover { background: #334155; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 8px 20px; background: #e2e8f0; border-bottom: 1px solid #cbd5e1; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid; }
+  main { flex: 1; display: flex; min-height: 0; }
+  #cy { flex: 1; background: #ffffff; }
+  aside { width: 520px; background: #f1f5f9; border-left: 1px solid #cbd5e1; overflow-y: auto; padding: 20px; }
+  aside h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 10px; font-weight: 600; }
+  aside h3 { font-size: 17px; margin-bottom: 4px; color: #0f172a; word-break: break-word; }
+  aside .type-badge { display: inline-block; padding: 3px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.03em; }
+  aside .section { margin-top: 18px; padding-top: 18px; border-top: 1px solid #cbd5e1; }
+  aside .section:first-of-type { border-top: none; padding-top: 0; }
+  aside .attr-list { display: flex; flex-direction: column; gap: 10px; }
+  aside .attr-row { display: flex; flex-direction: column; gap: 4px; }
+  aside .attr-key { color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  aside .attr-val { color: #0f172a; word-break: break-word; font-size: 14px; line-height: 1.5; }
+  aside table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  aside td { padding: 4px 0; vertical-align: top; }
+  aside td.key { color: #64748b; width: 110px; font-weight: 500; padding-right: 8px; }
+  aside td.value { color: #0f172a; word-break: break-word; }
+  aside .empty { color: #94a3b8; font-style: italic; font-size: 13px; padding: 40px 0; text-align: center; }
+  aside pre { background: #ffffff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; font-size: 12.5px; line-height: 1.55; white-space: pre; overflow-x: auto; max-height: 420px; overflow-y: auto; font-family: "SF Mono", Monaco, Consolas, monospace; color: #0f172a; }
+  aside .nuance { background: #fefce8; border: 1px solid #fde047; padding: 12px; border-radius: 6px; font-size: 13.5px; line-height: 1.55; white-space: pre-wrap; }
+  .chip { display: inline-block; background: #e2e8f0; padding: 3px 10px; border-radius: 10px; font-size: 12px; margin-right: 4px; margin-bottom: 4px; }
+
+  /* Filter panel */
+  .filters { padding: 10px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; gap: 24px; flex-wrap: wrap; font-size: 12px; align-items: center; }
+  .filters .group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .filters .group-label { font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px; }
+  .filters label.chk { display: flex; align-items: center; gap: 4px; cursor: pointer; user-select: none; padding: 3px 8px; border-radius: 4px; background: #fff; border: 1px solid #e2e8f0; }
+  .filters label.chk input { margin: 0; cursor: pointer; }
+  .filters label.chk.off { opacity: 0.45; background: #f1f5f9; }
+  .filters .mini-btn { padding: 3px 8px; font-size: 11px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; color: #475569; }
+  .filters .mini-btn:hover { background: #e2e8f0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CRC Knowledge Graph</h1>
+  <span class="meta">USPSTF 2021 + ACP 2019 · 6 Recs · 11 Strategies · 13 entities · 75 edges</span>
+  <div class="controls">
+    <label>Layout:</label>
+    <select id="layout-select">
+      <option value="dagre">Hierarchical (dagre)</option>
+      <option value="fcose">Force-directed (fcose)</option>
+      <option value="breadthfirst">Breadth-first</option>
+      <option value="concentric">Concentric</option>
+    </select>
+    <button id="fit-btn">Fit to screen</button>
+  </div>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><span class="legend-dot" style="background:#f3e8ff; border-color:#6b21a8"></span>Guideline</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#dbeafe; border-color:#1e40af"></span>Recommendation</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#fef3c7; border-color:#92400e"></span>Strategy</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#fee2e2; border-color:#991b1b"></span>Condition</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#dcfce7; border-color:#166534"></span>Procedure</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#e0e7ff; border-color:#3730a3"></span>Observation</div>
+</div>
+
+<div class="filters">
+  <div class="group">
+    <span class="group-label">Guidelines:</span>
+    <div id="guideline-filters" class="group"></div>
+  </div>
+  <div class="group">
+    <span class="group-label">Nodes:</span>
+    <div id="node-filters" class="group"></div>
+  </div>
+  <div class="group">
+    <span class="group-label">Edges:</span>
+    <div id="edge-filters" class="group"></div>
+  </div>
+  <div class="group" style="margin-left:auto">
+    <button class="mini-btn" id="filters-all">All</button>
+    <button class="mini-btn" id="filters-none">None</button>
+    <button class="mini-btn" id="clear-focus">Clear focus</button>
+  </div>
+</div>
+
+<main>
+  <div id="cy"></div>
+  <aside id="details">
+    <div class="empty">Click any node or edge to see details.</div>
+  </aside>
+</main>
+
+<script>
+// ======================= GRAPH DATA =======================
+
+const nodes = [
+  // Guideline
+  { data: { id: 'uspstf-crc-2021', type: 'Guideline', label: 'USPSTF CRC 2021',
+      attrs: { publisher: 'USPSTF', version: '2021', effective_date: '2021-05-18',
+        url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening',
+        status: 'active' } } },
+
+  // Recommendations
+  { data: { id: 'rec:screen-50-75', type: 'Recommendation', label: 'Screen 50-75\n(Grade A)',
+      attrs: { evidence_grade: 'A', intent: 'screening', trigger: 'patient_state',
+        source_section: 'Recommendation Summary, Grade A',
+        structured_eligibility: {
+          all_of: [{ predicate: 'age_between', min: 50, max: 75 }],
+          none_of: [
+            { predicate: 'has_condition_history', codes: ['cond:crc','cond:high-risk-adenoma','cond:ibd','cond:lynch-syndrome','cond:fap'] },
+            { predicate: 'has_family_history_flag', flag: 'strong_family_hx_crc' },
+            { predicate: 'has_family_history_flag', flag: 'hereditary_crc_syndrome' }
+          ]
+        },
+        clinical_nuance: 'Any listed strategy is acceptable; there is no preferred approach. Modality choice should reflect patient preference, access, and prior screening history. Do not re-recommend a modality already satisfied within its cadence.'
+      } } },
+
+  { data: { id: 'rec:screen-45-49', type: 'Recommendation', label: 'Screen 45-49\n(Grade B)',
+      attrs: { evidence_grade: 'B', intent: 'screening', trigger: 'patient_state',
+        source_section: 'Recommendation Summary, Grade B',
+        structured_eligibility: {
+          all_of: [{ predicate: 'age_between', min: 45, max: 49 }],
+          none_of: [
+            { predicate: 'has_condition_history', codes: ['cond:crc','cond:high-risk-adenoma','cond:ibd','cond:lynch-syndrome','cond:fap'] },
+            { predicate: 'has_family_history_flag', flag: 'strong_family_hx_crc' },
+            { predicate: 'has_family_history_flag', flag: 'hereditary_crc_syndrome' }
+          ]
+        },
+        clinical_nuance: 'Evidence for net benefit in 45-49 is moderate (Grade B). Counsel patients that screening at this age is reasonable though the incremental benefit is smaller than at 50+. All strategies acceptable for Grade A are acceptable here.'
+      } } },
+
+  { data: { id: 'rec:screen-76-85', type: 'Recommendation', label: 'Screen 76-85\n(Grade C)',
+      attrs: { evidence_grade: 'C', intent: 'shared_decision', trigger: 'patient_state',
+        source_section: 'Recommendation Summary, Grade C',
+        structured_eligibility: {
+          all_of: [{ predicate: 'age_between', min: 76, max: 85 }],
+          none_of: [
+            { predicate: 'has_condition_history', codes: ['cond:crc','cond:high-risk-adenoma','cond:ibd','cond:lynch-syndrome','cond:fap'] },
+            { predicate: 'has_family_history_flag', flag: 'strong_family_hx_crc' },
+            { predicate: 'has_family_history_flag', flag: 'hereditary_crc_syndrome' }
+          ]
+        },
+        clinical_nuance: 'Do NOT routinely screen. Selectively offer screening based on: patient\'s overall health and competing life expectancy; prior screening history; patient values and preferences. If frail or life expectancy < 10y, do not offer screening. Avoid initiating screening in patients never screened at 85+.'
+      } } },
+
+  { data: { id: 'rec:positive-followup', type: 'Recommendation', label: 'Positive screen\nfollowup (A)',
+      attrs: { evidence_grade: 'A', intent: 'diagnostic', trigger: 'observation_result',
+        source_section: 'Clinical Considerations, Screening Test Follow-up',
+        trigger_criteria: {
+          any_of: [
+            { observation: 'obs:gfobt', value: 'positive', window: 'P30D' },
+            { observation: 'obs:fit', value: 'positive', window: 'P30D' },
+            { observation: 'obs:sdna-fit', value: 'positive', window: 'P30D' }
+          ]
+        },
+        structured_eligibility: {
+          none_of: [
+            { predicate: 'has_active_condition', codes: ['cond:crc'] },
+            { predicate: 'has_procedure_in_window', code: 'proc:colonoscopy', window: 'P90D' }
+          ]
+        },
+        clinical_nuance: 'A positive stool-based or imaging-based screening test requires diagnostic colonoscopy. Repeat stool testing is NOT appropriate follow-up. Target colonoscopy within 30-60 days.'
+      } } },
+
+  // Strategies
+  { data: { id: 'strat:gfobt', type: 'Strategy', label: 'gFOBT\nscreening', attrs: { name: 'gFOBT screening' } } },
+  { data: { id: 'strat:fit', type: 'Strategy', label: 'FIT\nscreening', attrs: { name: 'FIT screening' } } },
+  { data: { id: 'strat:sdna-fit', type: 'Strategy', label: 'sDNA-FIT\nscreening', attrs: { name: 'Stool DNA-FIT screening' } } },
+  { data: { id: 'strat:ct-colonography', type: 'Strategy', label: 'CT\ncolonography', attrs: { name: 'CT colonography screening' } } },
+  { data: { id: 'strat:flex-sig', type: 'Strategy', label: 'Flex sig\nscreening', attrs: { name: 'Flexible sigmoidoscopy screening' } } },
+  { data: { id: 'strat:flex-sig-plus-fit', type: 'Strategy', label: 'Flex sig\n+ FIT', attrs: { name: 'Flexible sigmoidoscopy plus FIT screening', evidence_note: 'Combined strategy improves sensitivity for right-sided lesions that flex sig alone misses.' } } },
+  { data: { id: 'strat:colonoscopy', type: 'Strategy', label: 'Colonoscopy\nscreening', attrs: { name: 'Colonoscopy screening' } } },
+  { data: { id: 'strat:shared-decision', type: 'Strategy', label: 'Shared\ndecision', attrs: { name: 'CRC screening shared decision discussion', evidence_note: 'Grade C individualized decision. If decision is to screen, reference Grade A/B strategies for modality.' } } },
+  { data: { id: 'strat:diagnostic-colonoscopy', type: 'Strategy', label: 'Diagnostic\ncolonoscopy', attrs: { name: 'Diagnostic colonoscopy' } } },
+
+  // Conditions
+  { data: { id: 'cond:crc', type: 'Condition', label: 'CRC', attrs: { display_name: 'Colorectal cancer', icd10_codes: ['C18','C19','C20'], snomed_codes: ['363346000'] } } },
+  { data: { id: 'cond:high-risk-adenoma', type: 'Condition', label: 'High-risk\nadenoma', attrs: { display_name: 'High-risk adenomatous polyps', snomed_codes: ['428471009'] } } },
+  { data: { id: 'cond:ibd', type: 'Condition', label: 'IBD', attrs: { display_name: 'Inflammatory bowel disease', icd10_codes: ['K50','K51'], snomed_codes: ['24526004','34000006','64766004'] } } },
+  { data: { id: 'cond:lynch-syndrome', type: 'Condition', label: 'Lynch\nsyndrome', attrs: { display_name: 'Lynch syndrome', icd10_codes: ['Z15.09'], snomed_codes: ['315058005'] } } },
+  { data: { id: 'cond:fap', type: 'Condition', label: 'FAP', attrs: { display_name: 'Familial adenomatous polyposis', icd10_codes: ['D12.6'], snomed_codes: ['72900001'] } } },
+
+  // Procedures
+  { data: { id: 'proc:colonoscopy', type: 'Procedure', label: 'Colonoscopy', attrs: { display_name: 'Colonoscopy', cpt_codes: ['45378'], snomed_codes: ['73761001'] } } },
+  { data: { id: 'proc:flex-sig', type: 'Procedure', label: 'Flex sig', attrs: { display_name: 'Flexible sigmoidoscopy', cpt_codes: ['45330'], snomed_codes: ['44441009'] } } },
+  { data: { id: 'proc:ct-colonography', type: 'Procedure', label: 'CT\ncolonography', attrs: { display_name: 'CT colonography', cpt_codes: ['74263'], snomed_codes: ['418714002'] } } },
+  { data: { id: 'proc:shared-decision', type: 'Procedure', label: 'SDM\ndiscussion', attrs: { display_name: 'CRC screening shared decision discussion', snomed_codes: ['410225008'] } } },
+
+  // Observations
+  { data: { id: 'obs:gfobt', type: 'Observation', label: 'gFOBT', attrs: { display_name: 'Guaiac fecal occult blood test', loinc_codes: ['12503-9'] } } },
+  { data: { id: 'obs:fit', type: 'Observation', label: 'FIT', attrs: { display_name: 'Fecal immunochemical test', loinc_codes: ['57905-2'] } } },
+  { data: { id: 'obs:sdna-fit', type: 'Observation', label: 'sDNA-FIT', attrs: { display_name: 'Stool DNA-FIT (Cologuard)', loinc_codes: ['77353-1'] } } },
+
+  // ======================= ACP 2019 =======================
+
+  // Guideline
+  { data: { id: 'acp-crc-2019', type: 'Guideline', label: 'ACP CRC 2019\n(Guidance)',
+      attrs: { publisher: 'ACP', version: '2019', effective_date: '2019-11-05',
+        url: 'https://www.acpjournals.org/doi/full/10.7326/M19-0642',
+        status: 'active',
+        document_type: 'Guidance Statement (not a GRADE clinical practice guideline)' } } },
+
+  // Recommendations
+  { data: { id: 'acp-crc:screen-50-75', type: 'Recommendation', label: 'ACP Screen\n50-75',
+      source_guideline_id: 'acp-crc-2019',
+      attrs: { evidence_grade: null, intent: 'screening', trigger: 'patient_state',
+        source_section: 'Guidance Statements 1 & 2',
+        structured_eligibility: {
+          all_of: [{ predicate: 'age_between', min: 50, max: 75 }],
+          none_of: [
+            { predicate: 'has_condition_history', codes: ['cond:crc','cond:high-risk-adenoma','cond:ibd','cond:lynch-syndrome','cond:fap'] },
+            { predicate: 'has_family_history_flag', flag: 'strong_family_hx_crc' },
+            { predicate: 'has_family_history_flag', flag: 'hereditary_crc_syndrome' }
+          ]
+        },
+        clinical_nuance: 'ACP 2019 guidance statement, not a formal clinical practice guideline and not derived from a systematic evidence review (does not use GRADE). Select test through shared discussion of benefits, harms, cost, availability, frequency, and patient values.\n\nACP explicitly does NOT endorse CT colonography (insufficient direct mortality evidence), sDNA-FIT / Cologuard (no RCT data; higher false-positive rates), or capsule colonoscopy. If a patient asks about these, surface that ACP does not consider them acceptable but USPSTF does.\n\nACP does not endorse flex sig alone; it must be combined with FIT q2y.'
+      } } },
+
+  { data: { id: 'acp-crc:discontinue-over-75', type: 'Recommendation', label: 'ACP Discontinue\n>75',
+      source_guideline_id: 'acp-crc-2019',
+      attrs: { evidence_grade: null, intent: 'shared_decision', trigger: 'patient_state',
+        source_section: 'Guidance Statement 3',
+        structured_eligibility: {
+          all_of: [
+            { predicate: 'age_greater_than', value: 75 },
+            { predicate: 'has_any_prior_screening', domain: 'crc' }
+          ],
+          none_of: [
+            { predicate: 'has_condition_history', codes: ['cond:crc'] }
+          ]
+        },
+        clinical_nuance: 'ACP strongly recommends discontinuing CRC screening in avg-risk adults older than 75 OR with a life expectancy of 10 years or less. The life-expectancy clause is not expressible in the predicate DSL and requires clinical judgment; apply it through shared decision making.\n\nIf the patient has never been screened, ACP does not explicitly address this case; defer to clinician judgment and patient values.'
+      } } },
+
+  // Strategies (ACP-only; shared Strategies are reused from the USPSTF block above
+  // and get additional provenance via ACP-scoped OFFERS_STRATEGY / INCLUDES_ACTION edges)
+  { data: { id: 'acp-strat:hsgfobt-q2y', type: 'Strategy', label: 'HSgFOBT\nscreening',
+      attrs: { name: 'High-sensitivity gFOBT screening',
+        evidence_note: 'ACP requires the high-sensitivity gFOBT variant specifically; a prior plain gFOBT does not satisfy this Strategy.' } } },
+  { data: { id: 'acp-strat:discuss-discontinuation', type: 'Strategy', label: 'Discuss\ndiscontinuation',
+      attrs: { name: 'Discussion of CRC screening discontinuation',
+        evidence_note: 'Shared-decision conversation about stopping screening, distinct from the USPSTF Grade C individualized shared-decision Strategy for 76-85.' } } },
+
+  // New clinical entity (ACP-required, shared reference layer)
+  { data: { id: 'obs:hsgfobt', type: 'Observation', label: 'HSgFOBT',
+      attrs: { display_name: 'High-sensitivity guaiac fecal occult blood test',
+        loinc_codes: ['14563-1', '58453-2'],
+        note: 'Distinct semantic concept from standard gFOBT. ACP requires this variant; a prior plain gFOBT does not satisfy the ACP requirement.' } } }
+];
+
+// Helpers for edge provenance (attached to every edge)
+const P = { source_guideline_id: 'uspstf-crc-2021', effective_date: '2021-05-18' };
+const PACP = { source_guideline_id: 'acp-crc-2019', effective_date: '2019-11-05' };
+
+const edges = [
+  // FROM_GUIDELINE
+  { data: { id: 'e1', source: 'rec:screen-50-75', target: 'uspstf-crc-2021', type: 'FROM_GUIDELINE', attrs: { ...P, source_section: 'Recommendation Summary, Grade A' } } },
+  { data: { id: 'e2', source: 'rec:screen-45-49', target: 'uspstf-crc-2021', type: 'FROM_GUIDELINE', attrs: { ...P, source_section: 'Recommendation Summary, Grade B' } } },
+  { data: { id: 'e3', source: 'rec:screen-76-85', target: 'uspstf-crc-2021', type: 'FROM_GUIDELINE', attrs: { ...P, source_section: 'Recommendation Summary, Grade C' } } },
+  { data: { id: 'e4', source: 'rec:positive-followup', target: 'uspstf-crc-2021', type: 'FROM_GUIDELINE', attrs: { ...P, source_section: 'Clinical Considerations, Screening Test Follow-up' } } },
+
+  // FOR_CONDITION
+  { data: { id: 'e5', source: 'rec:screen-50-75', target: 'cond:crc', type: 'FOR_CONDITION', attrs: P } },
+  { data: { id: 'e6', source: 'rec:screen-45-49', target: 'cond:crc', type: 'FOR_CONDITION', attrs: P } },
+  { data: { id: 'e7', source: 'rec:screen-76-85', target: 'cond:crc', type: 'FOR_CONDITION', attrs: P } },
+  { data: { id: 'e8', source: 'rec:positive-followup', target: 'cond:crc', type: 'FOR_CONDITION', attrs: P } },
+
+  // EXCLUDED_BY (Grade A)
+  { data: { id: 'e9',  source: 'rec:screen-50-75', target: 'cond:crc', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e10', source: 'rec:screen-50-75', target: 'cond:high-risk-adenoma', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e11', source: 'rec:screen-50-75', target: 'cond:ibd', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e12', source: 'rec:screen-50-75', target: 'cond:lynch-syndrome', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e13', source: 'rec:screen-50-75', target: 'cond:fap', type: 'EXCLUDED_BY', attrs: P } },
+
+  // EXCLUDED_BY (Grade B)
+  { data: { id: 'e14', source: 'rec:screen-45-49', target: 'cond:crc', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e15', source: 'rec:screen-45-49', target: 'cond:high-risk-adenoma', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e16', source: 'rec:screen-45-49', target: 'cond:ibd', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e17', source: 'rec:screen-45-49', target: 'cond:lynch-syndrome', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e18', source: 'rec:screen-45-49', target: 'cond:fap', type: 'EXCLUDED_BY', attrs: P } },
+
+  // EXCLUDED_BY (Grade C)
+  { data: { id: 'e19', source: 'rec:screen-76-85', target: 'cond:crc', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e20', source: 'rec:screen-76-85', target: 'cond:high-risk-adenoma', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e21', source: 'rec:screen-76-85', target: 'cond:ibd', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e22', source: 'rec:screen-76-85', target: 'cond:lynch-syndrome', type: 'EXCLUDED_BY', attrs: P } },
+  { data: { id: 'e23', source: 'rec:screen-76-85', target: 'cond:fap', type: 'EXCLUDED_BY', attrs: P } },
+
+  // EXCLUDED_BY (Followup)
+  { data: { id: 'e24', source: 'rec:positive-followup', target: 'cond:crc', type: 'EXCLUDED_BY', attrs: { ...P, note: 'Excluded when active CRC; already in treatment' } } },
+
+  // OFFERS_STRATEGY (Grade A → 7 strategies)
+  { data: { id: 'e25', source: 'rec:screen-50-75', target: 'strat:gfobt', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e26', source: 'rec:screen-50-75', target: 'strat:fit', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e27', source: 'rec:screen-50-75', target: 'strat:sdna-fit', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e28', source: 'rec:screen-50-75', target: 'strat:ct-colonography', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e29', source: 'rec:screen-50-75', target: 'strat:flex-sig', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e30', source: 'rec:screen-50-75', target: 'strat:flex-sig-plus-fit', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e31', source: 'rec:screen-50-75', target: 'strat:colonoscopy', type: 'OFFERS_STRATEGY', attrs: P } },
+
+  // OFFERS_STRATEGY (Grade B → same 7)
+  { data: { id: 'e32', source: 'rec:screen-45-49', target: 'strat:gfobt', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e33', source: 'rec:screen-45-49', target: 'strat:fit', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e34', source: 'rec:screen-45-49', target: 'strat:sdna-fit', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e35', source: 'rec:screen-45-49', target: 'strat:ct-colonography', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e36', source: 'rec:screen-45-49', target: 'strat:flex-sig', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e37', source: 'rec:screen-45-49', target: 'strat:flex-sig-plus-fit', type: 'OFFERS_STRATEGY', attrs: P } },
+  { data: { id: 'e38', source: 'rec:screen-45-49', target: 'strat:colonoscopy', type: 'OFFERS_STRATEGY', attrs: P } },
+
+  // OFFERS_STRATEGY (Grade C)
+  { data: { id: 'e39', source: 'rec:screen-76-85', target: 'strat:shared-decision', type: 'OFFERS_STRATEGY', attrs: P } },
+
+  // OFFERS_STRATEGY (Followup)
+  { data: { id: 'e40', source: 'rec:positive-followup', target: 'strat:diagnostic-colonoscopy', type: 'OFFERS_STRATEGY', attrs: P } },
+
+  // INCLUDES_ACTION
+  { data: { id: 'e41', source: 'strat:gfobt', target: 'obs:gfobt', type: 'INCLUDES_ACTION', attrs: { cadence: 'P1Y', lookback: 'P1Y', priority: 'routine', intent: 'screening', ...P } } },
+  { data: { id: 'e42', source: 'strat:fit', target: 'obs:fit', type: 'INCLUDES_ACTION', attrs: { cadence: 'P1Y', lookback: 'P1Y', priority: 'routine', intent: 'screening', ...P } } },
+  { data: { id: 'e43', source: 'strat:sdna-fit', target: 'obs:sdna-fit', type: 'INCLUDES_ACTION', attrs: { cadence: 'P3Y', lookback: 'P3Y', priority: 'routine', intent: 'screening', ...P } } },
+  { data: { id: 'e44', source: 'strat:ct-colonography', target: 'proc:ct-colonography', type: 'INCLUDES_ACTION', attrs: { cadence: 'P5Y', lookback: 'P5Y', priority: 'routine', intent: 'screening', ...P } } },
+  { data: { id: 'e45', source: 'strat:flex-sig', target: 'proc:flex-sig', type: 'INCLUDES_ACTION', attrs: { cadence: 'P5Y', lookback: 'P5Y', priority: 'routine', intent: 'screening', ...P } } },
+  { data: { id: 'e46', source: 'strat:flex-sig-plus-fit', target: 'proc:flex-sig', type: 'INCLUDES_ACTION', attrs: { cadence: 'P10Y', lookback: 'P10Y', priority: 'routine', intent: 'screening', ...P } } },
+  { data: { id: 'e47', source: 'strat:flex-sig-plus-fit', target: 'obs:fit', type: 'INCLUDES_ACTION', attrs: { cadence: 'P1Y', lookback: 'P1Y', priority: 'routine', intent: 'screening', ...P } } },
+  { data: { id: 'e48', source: 'strat:colonoscopy', target: 'proc:colonoscopy', type: 'INCLUDES_ACTION', attrs: { cadence: 'P10Y', lookback: 'P10Y', priority: 'routine', intent: 'screening', ...P } } },
+  { data: { id: 'e49', source: 'strat:shared-decision', target: 'proc:shared-decision', type: 'INCLUDES_ACTION', attrs: { cadence: null, lookback: null, priority: 'routine', intent: 'shared_decision', ...P } } },
+  { data: { id: 'e50', source: 'strat:diagnostic-colonoscopy', target: 'proc:colonoscopy', type: 'INCLUDES_ACTION', attrs: { cadence: null, lookback: null, priority: 'urgent', intent: 'diagnostic', ...P } } },
+
+  // TRIGGERED_BY (positive-followup ← 3 observations)
+  { data: { id: 'e51', source: 'rec:positive-followup', target: 'obs:gfobt', type: 'TRIGGERED_BY', attrs: { criteria: { value: 'positive', window: 'P30D' }, ...P } } },
+  { data: { id: 'e52', source: 'rec:positive-followup', target: 'obs:fit', type: 'TRIGGERED_BY', attrs: { criteria: { value: 'positive', window: 'P30D' }, ...P } } },
+  { data: { id: 'e53', source: 'rec:positive-followup', target: 'obs:sdna-fit', type: 'TRIGGERED_BY', attrs: { criteria: { value: 'positive', window: 'P30D' }, ...P } } },
+
+  // TRIGGERS_FOLLOWUP
+  { data: { id: 'e54', source: 'rec:screen-50-75', target: 'rec:positive-followup', type: 'TRIGGERS_FOLLOWUP', attrs: { on: 'positive_screen', ...P } } },
+  { data: { id: 'e55', source: 'rec:screen-45-49', target: 'rec:positive-followup', type: 'TRIGGERS_FOLLOWUP', attrs: { on: 'positive_screen', ...P } } },
+
+  // ======================= ACP 2019 edges =======================
+  // FROM_GUIDELINE
+  { data: { id: 'e56', source: 'acp-crc:screen-50-75', target: 'acp-crc-2019', type: 'FROM_GUIDELINE', attrs: { ...PACP, source_section: 'Guidance Statements 1 & 2' } } },
+  { data: { id: 'e57', source: 'acp-crc:discontinue-over-75', target: 'acp-crc-2019', type: 'FROM_GUIDELINE', attrs: { ...PACP, source_section: 'Guidance Statement 3' } } },
+
+  // FOR_CONDITION
+  { data: { id: 'e58', source: 'acp-crc:screen-50-75', target: 'cond:crc', type: 'FOR_CONDITION', attrs: PACP } },
+  { data: { id: 'e59', source: 'acp-crc:discontinue-over-75', target: 'cond:crc', type: 'FOR_CONDITION', attrs: PACP } },
+
+  // EXCLUDED_BY (screen-50-75)
+  { data: { id: 'e60', source: 'acp-crc:screen-50-75', target: 'cond:crc', type: 'EXCLUDED_BY', attrs: PACP } },
+  { data: { id: 'e61', source: 'acp-crc:screen-50-75', target: 'cond:high-risk-adenoma', type: 'EXCLUDED_BY', attrs: PACP } },
+  { data: { id: 'e62', source: 'acp-crc:screen-50-75', target: 'cond:ibd', type: 'EXCLUDED_BY', attrs: PACP } },
+  { data: { id: 'e63', source: 'acp-crc:screen-50-75', target: 'cond:lynch-syndrome', type: 'EXCLUDED_BY', attrs: PACP } },
+  { data: { id: 'e64', source: 'acp-crc:screen-50-75', target: 'cond:fap', type: 'EXCLUDED_BY', attrs: PACP } },
+
+  // OFFERS_STRATEGY (screen-50-75 → 4 strategies)
+  { data: { id: 'e65', source: 'acp-crc:screen-50-75', target: 'strat:fit', type: 'OFFERS_STRATEGY', attrs: { ...PACP, source_section: 'Guidance Statement 2' } } },
+  { data: { id: 'e66', source: 'acp-crc:screen-50-75', target: 'acp-strat:hsgfobt-q2y', type: 'OFFERS_STRATEGY', attrs: { ...PACP, source_section: 'Guidance Statement 2' } } },
+  { data: { id: 'e67', source: 'acp-crc:screen-50-75', target: 'strat:colonoscopy', type: 'OFFERS_STRATEGY', attrs: { ...PACP, source_section: 'Guidance Statement 2' } } },
+  { data: { id: 'e68', source: 'acp-crc:screen-50-75', target: 'strat:flex-sig-plus-fit', type: 'OFFERS_STRATEGY', attrs: { ...PACP, source_section: 'Guidance Statement 2' } } },
+
+  // OFFERS_STRATEGY (discontinue)
+  { data: { id: 'e69', source: 'acp-crc:discontinue-over-75', target: 'acp-strat:discuss-discontinuation', type: 'OFFERS_STRATEGY', attrs: PACP } },
+
+  // INCLUDES_ACTION
+  // Shared Strategies carry parallel INCLUDES_ACTION edges per guideline so each guideline's
+  // cadence/lookback is preserved on its own provenanced edge. When cadence matches across
+  // guidelines we still add a second edge so the provenance trace is complete.
+  { data: { id: 'e70', source: 'strat:fit', target: 'obs:fit', type: 'INCLUDES_ACTION', attrs: { cadence: 'P2Y', lookback: 'P2Y', priority: 'routine', intent: 'screening', ...PACP } } },
+  { data: { id: 'e71', source: 'acp-strat:hsgfobt-q2y', target: 'obs:hsgfobt', type: 'INCLUDES_ACTION', attrs: { cadence: 'P2Y', lookback: 'P2Y', priority: 'routine', intent: 'screening', ...PACP } } },
+  { data: { id: 'e72', source: 'strat:colonoscopy', target: 'proc:colonoscopy', type: 'INCLUDES_ACTION', attrs: { cadence: 'P10Y', lookback: 'P10Y', priority: 'routine', intent: 'screening', ...PACP } } },
+  { data: { id: 'e73', source: 'strat:flex-sig-plus-fit', target: 'proc:flex-sig', type: 'INCLUDES_ACTION', attrs: { cadence: 'P10Y', lookback: 'P10Y', priority: 'routine', intent: 'screening', ...PACP } } },
+  { data: { id: 'e74', source: 'strat:flex-sig-plus-fit', target: 'obs:fit', type: 'INCLUDES_ACTION', attrs: { cadence: 'P2Y', lookback: 'P2Y', priority: 'routine', intent: 'screening', ...PACP } } },
+  { data: { id: 'e75', source: 'acp-strat:discuss-discontinuation', target: 'proc:shared-decision', type: 'INCLUDES_ACTION', attrs: { cadence: null, lookback: null, priority: 'routine', intent: 'shared_decision', ...PACP } } }
+];
+
+// ======================= STYLES =======================
+
+const typeColors = {
+  Guideline:      { bg: '#f3e8ff', border: '#6b21a8' },
+  Recommendation: { bg: '#dbeafe', border: '#1e40af' },
+  Strategy:       { bg: '#fef3c7', border: '#92400e' },
+  Condition:      { bg: '#fee2e2', border: '#991b1b' },
+  Procedure:      { bg: '#dcfce7', border: '#166534' },
+  Observation:    { bg: '#e0e7ff', border: '#3730a3' }
+};
+
+const edgeColors = {
+  FROM_GUIDELINE:     '#6b21a8',
+  FOR_CONDITION:      '#64748b',
+  OFFERS_STRATEGY:    '#92400e',
+  INCLUDES_ACTION:    '#166534',
+  EXCLUDED_BY:        '#991b1b',
+  TRIGGERED_BY:       '#3730a3',
+  TRIGGERS_FOLLOWUP:  '#1e40af',
+  PREEMPTED_BY:       '#b91c1c'
+};
+
+const cyStyle = [
+  {
+    selector: 'node',
+    style: {
+      'label': 'data(label)',
+      'text-wrap': 'wrap',
+      'text-valign': 'center',
+      'text-halign': 'center',
+      'font-size': 10,
+      'font-weight': 500,
+      'width': 90,
+      'height': 50,
+      'shape': 'round-rectangle',
+      'border-width': 2,
+      'color': '#0f172a',
+      'background-color': ele => typeColors[ele.data('type')]?.bg || '#e2e8f0',
+      'border-color': ele => typeColors[ele.data('type')]?.border || '#64748b'
+    }
+  },
+  {
+    selector: 'node[type = "Guideline"]',
+    style: { 'width': 130, 'height': 55, 'font-weight': 600 }
+  },
+  {
+    selector: 'node[type = "Recommendation"]',
+    style: { 'width': 110, 'height': 60 }
+  },
+  {
+    selector: 'edge',
+    style: {
+      'label': 'data(type)',
+      'font-size': 8,
+      'color': '#64748b',
+      'text-background-color': '#ffffff',
+      'text-background-opacity': 0.9,
+      'text-background-padding': 2,
+      'width': 1.5,
+      'line-color': ele => edgeColors[ele.data('type')] || '#94a3b8',
+      'target-arrow-color': ele => edgeColors[ele.data('type')] || '#94a3b8',
+      'target-arrow-shape': 'triangle',
+      'curve-style': 'bezier',
+      'arrow-scale': 0.8
+    }
+  },
+  {
+    selector: 'edge[type = "EXCLUDED_BY"]',
+    style: { 'line-style': 'dashed' }
+  },
+  {
+    selector: 'edge[type = "TRIGGERS_FOLLOWUP"]',
+    style: { 'line-style': 'dotted', 'width': 2 }
+  },
+  {
+    selector: 'node:selected',
+    style: {
+      'overlay-color': '#0ea5e9',
+      'overlay-opacity': 0.18,
+      'overlay-padding': 6
+    }
+  },
+  {
+    selector: 'edge:selected',
+    style: {
+      'line-color': '#0ea5e9',
+      'target-arrow-color': '#0ea5e9',
+      'width': 3
+    }
+  },
+  {
+    selector: '.focus-root',
+    style: {
+      'overlay-color': '#0ea5e9',
+      'overlay-opacity': 0.22,
+      'overlay-padding': 8
+    }
+  },
+  {
+    selector: '.faded',
+    style: { 'opacity': 0.12, 'text-opacity': 0.15 }
+  },
+  {
+    selector: '.hidden',
+    style: { 'display': 'none' }
+  }
+];
+
+// ======================= INIT =======================
+
+const cy = cytoscape({
+  container: document.getElementById('cy'),
+  elements: { nodes, edges },
+  style: cyStyle,
+  layout: { name: 'dagre', rankDir: 'LR', nodeSep: 30, rankSep: 120, edgeSep: 10 },
+  wheelSensitivity: 0.2,
+  minZoom: 0.1,
+  maxZoom: 3
+});
+
+// ======================= INTERACTIONS =======================
+
+const details = document.getElementById('details');
+
+function renderEmpty() {
+  details.innerHTML = '<div class="empty">Click any node or edge to see details.</div>';
+}
+
+function renderAttrRow(key, value) {
+  let display;
+  if (value === null || value === undefined) {
+    display = '<span style="color:#94a3b8">null</span>';
+  } else if (Array.isArray(value)) {
+    if (value.length === 0) display = '<span style="color:#94a3b8">[]</span>';
+    else if (typeof value[0] === 'object') display = '<pre>' + escapeHtml(JSON.stringify(value, null, 2)) + '</pre>';
+    else display = value.map(v => '<span class="chip">' + escapeHtml(v) + '</span>').join('');
+  } else if (typeof value === 'object') {
+    display = '<pre>' + escapeHtml(JSON.stringify(value, null, 2)) + '</pre>';
+  } else if (key === 'clinical_nuance') {
+    display = '<div class="nuance">' + escapeHtml(value) + '</div>';
+  } else if (typeof value === 'string' && value.startsWith('http')) {
+    display = '<a href="' + escapeHtml(value) + '" target="_blank" style="color:#1e40af; word-break:break-all">' + escapeHtml(value) + '</a>';
+  } else {
+    display = escapeHtml(String(value));
+  }
+  return '<div class="attr-row"><div class="attr-key">' + escapeHtml(key) + '</div><div class="attr-val">' + display + '</div></div>';
+}
+
+function renderAttrBlock(attrs) {
+  if (!attrs || Object.keys(attrs).length === 0) return '<div class="empty" style="padding:12px 0; text-align:left">No attributes</div>';
+  return '<div class="attr-list">' + Object.entries(attrs).map(([k, v]) => renderAttrRow(k, v)).join('') + '</div>';
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
+
+function renderNode(node) {
+  const d = node.data();
+  const color = typeColors[d.type];
+  details.innerHTML = `
+    <h2>Node</h2>
+    <h3>${escapeHtml(d.id)}</h3>
+    <div class="type-badge" style="background:${color.bg}; color:${color.border}; border:1px solid ${color.border}">${escapeHtml(d.type)}</div>
+    <div class="section">
+      <h2>Attributes</h2>
+      ${renderAttrBlock(d.attrs)}
+    </div>
+    <div class="section">
+      <h2>Connections</h2>
+      <div class="attr-list">
+        <div class="attr-row"><div class="attr-key">Incoming</div><div class="attr-val">${node.incomers('edge').length} edges</div></div>
+        <div class="attr-row"><div class="attr-key">Outgoing</div><div class="attr-val">${node.outgoers('edge').length} edges</div></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEdge(edge) {
+  const d = edge.data();
+  const color = edgeColors[d.type] || '#64748b';
+  const src = cy.getElementById(d.source).data();
+  const tgt = cy.getElementById(d.target).data();
+  details.innerHTML = `
+    <h2>Edge</h2>
+    <h3>${escapeHtml(d.type)}</h3>
+    <div class="type-badge" style="background:${color}20; color:${color}; border:1px solid ${color}">${escapeHtml(d.type)}</div>
+    <div class="section">
+      <h2>Source → Target</h2>
+      <div class="attr-list">
+        <div class="attr-row"><div class="attr-key">From</div><div class="attr-val"><strong>${escapeHtml(src.label.replace(/\n/g,' '))}</strong><br><span style="color:#64748b; font-size:12px">${escapeHtml(src.id)} (${escapeHtml(src.type)})</span></div></div>
+        <div class="attr-row"><div class="attr-key">To</div><div class="attr-val"><strong>${escapeHtml(tgt.label.replace(/\n/g,' '))}</strong><br><span style="color:#64748b; font-size:12px">${escapeHtml(tgt.id)} (${escapeHtml(tgt.type)})</span></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Attributes</h2>
+      ${renderAttrBlock(d.attrs)}
+    </div>
+  `;
+}
+
+// Focus: root node + all descendants (outgoing successors, recursive) and edges between them.
+// Everything else is faded (not hidden — hidden is reserved for the filter controls).
+function focusOnNode(n) {
+  cy.elements().removeClass('faded focus-root');
+  const subtree = n.successors().union(n);
+  // Only include edges that connect two nodes inside the subtree (avoids edges to incoming parents).
+  const subtreeNodes = subtree.nodes();
+  const internalEdges = subtreeNodes.connectedEdges().filter(e =>
+    subtreeNodes.contains(e.source()) && subtreeNodes.contains(e.target())
+  );
+  const focusSet = subtreeNodes.union(internalEdges);
+  cy.elements().not(focusSet).addClass('faded');
+  n.addClass('focus-root');
+}
+
+cy.on('tap', 'node', evt => {
+  focusOnNode(evt.target);
+  renderNode(evt.target);
+});
+
+cy.on('tap', 'edge', evt => {
+  cy.elements().removeClass('faded focus-root');
+  const e = evt.target;
+  const ends = e.connectedNodes().union(e);
+  cy.elements().not(ends).addClass('faded');
+  renderEdge(e);
+});
+
+cy.on('tap', evt => {
+  if (evt.target === cy) {
+    cy.elements().removeClass('faded focus-root');
+    renderEmpty();
+  }
+});
+
+// Controls
+document.getElementById('layout-select').addEventListener('change', e => {
+  const name = e.target.value;
+  const opts = {
+    dagre: { name: 'dagre', rankDir: 'LR', nodeSep: 30, rankSep: 120, edgeSep: 10 },
+    fcose: { name: 'fcose', animate: false, idealEdgeLength: 100, nodeRepulsion: 6000 },
+    breadthfirst: { name: 'breadthfirst', directed: true, spacingFactor: 1.2 },
+    concentric: { name: 'concentric', spacingFactor: 1.2, concentric: n => {
+      const order = { Guideline: 5, Recommendation: 4, Strategy: 3, Procedure: 2, Observation: 2, Condition: 1 };
+      return order[n.data('type')] || 0;
+    }, levelWidth: () => 1 }
+  };
+  cy.layout(opts[name]).run();
+});
+
+document.getElementById('fit-btn').addEventListener('click', () => cy.fit(null, 30));
+
+// ======================= FILTERS =======================
+
+const nodeTypes = ['Guideline', 'Recommendation', 'Strategy', 'Condition', 'Procedure', 'Observation'];
+const edgeTypes = ['FROM_GUIDELINE', 'FOR_CONDITION', 'OFFERS_STRATEGY', 'INCLUDES_ACTION', 'EXCLUDED_BY', 'TRIGGERED_BY', 'TRIGGERS_FOLLOWUP', 'PREEMPTED_BY', 'SUPERSEDES'];
+const guidelines = [
+  { id: 'uspstf-crc-2021', label: 'USPSTF 2021', color: '#6b21a8' },
+  { id: 'acp-crc-2019', label: 'ACP 2019', color: '#0891b2' }
+];
+const nodeVisible = Object.fromEntries(nodeTypes.map(t => [t, true]));
+const edgeVisible = Object.fromEntries(edgeTypes.map(t => [t, true]));
+const guidelineVisible = Object.fromEntries(guidelines.map(g => [g.id, true]));
+
+// Derive source guideline(s) for Rec and Strategy nodes.
+// Rec: single source (FROM_GUIDELINE outgoing edge target).
+// Strategy: can belong to multiple guidelines; derive a set from all incoming OFFERS_STRATEGY edges.
+cy.nodes('[type = "Recommendation"]').forEach(n => {
+  if (n.data('source_guideline_id')) return;
+  const e = n.outgoers('edge[type = "FROM_GUIDELINE"]').first();
+  if (e.nonempty()) n.data('source_guideline_id', e.target().id());
+});
+cy.nodes('[type = "Strategy"]').forEach(n => {
+  const sources = new Set();
+  n.incomers('edge[type = "OFFERS_STRATEGY"]').forEach(inEdge => {
+    const rec = inEdge.source();
+    const e = rec.outgoers('edge[type = "FROM_GUIDELINE"]').first();
+    if (e.nonempty()) sources.add(e.target().id());
+  });
+  n.data('source_guideline_ids', Array.from(sources));
+});
+
+function buildFilterCheckbox(type, visibilityMap, kind) {
+  const colorObj = kind === 'node' ? typeColors[type] : null;
+  const swatch = kind === 'node'
+    ? `<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${colorObj.bg}; border:2px solid ${colorObj.border}"></span>`
+    : `<span style="display:inline-block; width:14px; height:2px; background:${edgeColors[type] || '#94a3b8'}"></span>`;
+  const label = document.createElement('label');
+  label.className = 'chk';
+  label.innerHTML = `<input type="checkbox" checked data-type="${type}" data-kind="${kind}"> ${swatch} ${type}`;
+  const input = label.querySelector('input');
+  input.addEventListener('change', () => {
+    visibilityMap[type] = input.checked;
+    label.classList.toggle('off', !input.checked);
+    applyFilters();
+  });
+  return label;
+}
+
+const nodeFilterEl = document.getElementById('node-filters');
+const edgeFilterEl = document.getElementById('edge-filters');
+const guidelineFilterEl = document.getElementById('guideline-filters');
+nodeTypes.forEach(t => nodeFilterEl.appendChild(buildFilterCheckbox(t, nodeVisible, 'node')));
+edgeTypes.forEach(t => edgeFilterEl.appendChild(buildFilterCheckbox(t, edgeVisible, 'edge')));
+
+// Guideline filter checkboxes (custom builder so we can show publisher color swatches)
+guidelines.forEach(g => {
+  const label = document.createElement('label');
+  label.className = 'chk';
+  label.innerHTML = `<input type="checkbox" checked data-type="${g.id}" data-kind="guideline">
+    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${g.color}"></span> ${g.label}`;
+  const input = label.querySelector('input');
+  input.addEventListener('change', () => {
+    guidelineVisible[g.id] = input.checked;
+    label.classList.toggle('off', !input.checked);
+    applyFilters();
+  });
+  guidelineFilterEl.appendChild(label);
+});
+
+function nodeMatchesGuidelineFilter(n) {
+  const t = n.data('type');
+  // Guideline node: match its own id
+  if (t === 'Guideline') return guidelineVisible[n.id()];
+  // Rec: single source_guideline_id
+  if (t === 'Recommendation') {
+    const src = n.data('source_guideline_id');
+    if (src) return guidelineVisible[src];
+  }
+  // Strategy: visible if ANY of its source guidelines is on (shared Strategies
+  // belong to multiple guidelines via parallel OFFERS_STRATEGY edges)
+  if (t === 'Strategy') {
+    const srcs = n.data('source_guideline_ids') || [];
+    if (srcs.length === 0) return true;
+    return srcs.some(g => guidelineVisible[g]);
+  }
+  // Clinical entities (Condition, Procedure, Observation): shared; only hide if ALL guidelines are off
+  return Object.values(guidelineVisible).some(v => v);
+}
+
+function applyFilters() {
+  cy.batch(() => {
+    cy.nodes().forEach(n => {
+      const typeOk = nodeVisible[n.data('type')];
+      const gOk = nodeMatchesGuidelineFilter(n);
+      if (typeOk && gOk) n.removeClass('hidden');
+      else n.addClass('hidden');
+    });
+    cy.edges().forEach(e => {
+      const typeOk = edgeVisible[e.data('type')];
+      const endpointsOk = !e.source().hasClass('hidden') && !e.target().hasClass('hidden');
+      if (typeOk && endpointsOk) e.removeClass('hidden');
+      else e.addClass('hidden');
+    });
+  });
+}
+
+function setAllFilters(on) {
+  nodeTypes.forEach(t => nodeVisible[t] = on);
+  edgeTypes.forEach(t => edgeVisible[t] = on);
+  guidelines.forEach(g => guidelineVisible[g.id] = on);
+  document.querySelectorAll('.filters input[type="checkbox"]').forEach(cb => {
+    cb.checked = on;
+    cb.parentElement.classList.toggle('off', !on);
+  });
+  applyFilters();
+}
+
+document.getElementById('filters-all').addEventListener('click', () => setAllFilters(true));
+document.getElementById('filters-none').addEventListener('click', () => setAllFilters(false));
+document.getElementById('clear-focus').addEventListener('click', () => {
+  cy.elements().removeClass('faded focus-root');
+  cy.$(':selected').unselect();
+  renderEmpty();
+});
+</script>
+
+</body>
+</html>

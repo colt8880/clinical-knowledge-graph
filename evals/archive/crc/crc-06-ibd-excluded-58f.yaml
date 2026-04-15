@@ -1,0 +1,50 @@
+id: crc-06-ibd-excluded-58f
+title: "58F with active ulcerative colitis"
+guideline_refs:
+  - uspstf-crc-2021: "Recommendation Summary, Grade A (exclusions)"
+  - acp-crc-2019: "Guidance Statement 1 & 2 (exclusions)"
+clinical_rationale: |
+  Patient has active ulcerative colitis, coded as cond:ibd. USPSTF Grade A
+  and ACP screen-50-75 both exclude this population via
+  `has_condition_history: [cond:ibd]` in structured_eligibility.none_of.
+  No avg-risk CRC Rec should fire.
+
+  Clinically, this patient should receive IBD-specific surveillance
+  colonoscopy per ACG / AGA / USMSTF guidance — out of v0 scope. Consuming
+  agents see an empty result and should route to the appropriate higher-risk
+  pathway. This fixture asserts that the avg-risk graph correctly
+  self-excludes; it does NOT assert the presence of an IBD surveillance Rec.
+
+author: <engineer-id>
+clinician_reviewer: <pending>
+review_date: <pending>
+
+graph_version: <pending>
+evaluator_version: <pending>
+
+input:
+  evaluation_time: "2026-04-14T00:00:00Z"
+  patient:
+    date_of_birth: "1968-03-20"
+    administrative_sex: "female"
+  conditions:
+    - id: "cond-1"
+      codes:
+        - { system: "icd10", code: "K51.90" }         # Ulcerative colitis, unspecified
+        - { system: "snomed", code: "64766004" }       # Ulcerative colitis
+      clinical_status: "active"
+      verification_status: "confirmed"
+      onset_date: "2015-06-01"
+  observations: []
+  procedures: []
+  medications: []
+  family_history: []
+  allergies: []
+  completeness:
+    family_history: "populated"
+
+expected:
+  fires: []
+  preemption_resolved: []
+  data_gaps: []
+  errors: []

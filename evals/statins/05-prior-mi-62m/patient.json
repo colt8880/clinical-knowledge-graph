@@ -1,0 +1,87 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1963-07-29",
+    "administrative_sex": "male",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-mi-2024",
+      "codes": [
+        { "system": "snomed", "code": "22298006", "display": "Myocardial infarction" },
+        { "system": "icd10", "code": "I21.9", "display": "Acute myocardial infarction, unspecified" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2024-11-03"
+    },
+    {
+      "id": "cond-htn",
+      "codes": [
+        { "system": "snomed", "code": "38341003" },
+        { "system": "icd10", "code": "I10" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2018-02-14"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-tc-2026-02",
+      "codes": [{ "system": "loinc", "code": "2093-3" }],
+      "status": "final",
+      "effective_date": "2026-02-10T09:15:00Z",
+      "value": { "value_quantity": { "value": 172, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-hdl-2026-02",
+      "codes": [{ "system": "loinc", "code": "2085-9" }],
+      "status": "final",
+      "effective_date": "2026-02-10T09:15:00Z",
+      "value": { "value_quantity": { "value": 42, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-ldl-2026-02",
+      "codes": [{ "system": "loinc", "code": "13457-7" }],
+      "status": "final",
+      "effective_date": "2026-02-10T09:15:00Z",
+      "value": { "value_quantity": { "value": 92, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-bp-2026-03",
+      "codes": [{ "system": "loinc", "code": "85354-9" }],
+      "status": "final",
+      "effective_date": "2026-03-01T08:50:00Z",
+      "value": null,
+      "components": [
+        { "codes": [{ "system": "loinc", "code": "8480-6" }], "value": { "value_quantity": { "value": 128, "unit": "mm[Hg]" } } },
+        { "codes": [{ "system": "loinc", "code": "8462-4" }], "value": { "value_quantity": { "value": 78, "unit": "mm[Hg]" } } }
+      ]
+    }
+  ],
+  "medications": [
+    {
+      "id": "med-atorvastatin",
+      "codes": [{ "system": "rxnorm", "code": "83367", "display": "Atorvastatin" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2024-11-07"
+    },
+    {
+      "id": "med-metoprolol",
+      "codes": [{ "system": "rxnorm", "code": "6918", "display": "Metoprolol" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2024-11-07"
+    }
+  ],
+  "social_history": {
+    "tobacco": { "status": "former", "as_of": "2026-03-01" }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "description": "62M with prior MI (2024-11), already on atorvastatin + metoprolol. Established ASCVD means the USPSTF primary prevention guideline does not apply; evaluator must exit before emitting any primary-prevention recommendation. Secondary prevention is out of v0 scope.",
+  "expected_recommendations": [],
+  "expected_trace_contains": [
+    { "type": "exit_condition_triggered", "exit": "out_of_scope_secondary_prevention" }
+  ],
+  "must_not_contain": [
+    { "type": "recommendation_emitted" },
+    { "type": "risk_score_lookup" }
+  ]
+}

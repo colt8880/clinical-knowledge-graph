@@ -1,0 +1,76 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1970-08-12",
+    "administrative_sex": "male",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-htn",
+      "codes": [
+        { "system": "snomed", "code": "38341003", "display": "Essential hypertension" },
+        { "system": "icd10", "code": "I10", "display": "Essential (primary) hypertension" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2021-06-04"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-tc-2026-02",
+      "codes": [{ "system": "loinc", "code": "2093-3", "display": "Cholesterol [Mass/volume] in Serum or Plasma" }],
+      "status": "final",
+      "effective_date": "2026-02-18T09:12:00Z",
+      "value": { "value_quantity": { "value": 228, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-hdl-2026-02",
+      "codes": [{ "system": "loinc", "code": "2085-9", "display": "HDL Cholesterol [Mass/volume] in Serum or Plasma" }],
+      "status": "final",
+      "effective_date": "2026-02-18T09:12:00Z",
+      "value": { "value_quantity": { "value": 38, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-ldl-2026-02",
+      "codes": [{ "system": "loinc", "code": "13457-7", "display": "LDL Cholesterol (calculated) in Serum or Plasma" }],
+      "status": "final",
+      "effective_date": "2026-02-18T09:12:00Z",
+      "value": { "value_quantity": { "value": 158, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-bp-2026-03",
+      "codes": [{ "system": "loinc", "code": "85354-9", "display": "Blood pressure panel" }],
+      "status": "final",
+      "effective_date": "2026-03-02T08:40:00Z",
+      "value": null,
+      "components": [
+        {
+          "codes": [{ "system": "loinc", "code": "8480-6", "display": "Systolic blood pressure" }],
+          "value": { "value_quantity": { "value": 148, "unit": "mm[Hg]" } }
+        },
+        {
+          "codes": [{ "system": "loinc", "code": "8462-4", "display": "Diastolic blood pressure" }],
+          "value": { "value_quantity": { "value": 92, "unit": "mm[Hg]" } }
+        }
+      ]
+    }
+  ],
+  "medications": [],
+  "social_history": {
+    "tobacco": { "status": "current_every_day", "as_of": "2026-03-02" }
+  },
+  "risk_scores": {
+    "ascvd_10yr": {
+      "name": "ascvd_10yr",
+      "value": 18.2,
+      "computed_date": "2026-03-02",
+      "method_version": "pooled_cohort_equations_2013_goff"
+    }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

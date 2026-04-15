@@ -134,6 +134,7 @@ Each code directory has its own `CLAUDE.md` with load order, scope, and DoD.
 - Every feature has tests: unit where it makes sense, at least one fixture- or integration-level test that exercises the user-visible behavior.
 - Run the test suite locally before opening a PR. It must pass — do not open a PR on a red suite. Paste the output into the PR body.
 - Every PR body includes: **Scope** (what this does), **Manual Test Steps** (numbered, reproducible), **Manual Test Output** (the actual output of running those steps).
+- If this PR moves a component's state forward (spec-only → scaffolded, scaffolded → implemented, implemented → tested, etc.), update the relevant row in `docs/reference/build-status.md` in the same PR.
 - After opening the PR, invoke the `pr-reviewer` subagent and post its output as a PR comment. If the subagent flags blocking issues or actionable suggestions, address them (push fixes to the same branch, re-run the reviewer) before handing the PR to the human. The human only reviews after the subagent's feedback has been resolved.
 - If the human requests changes, push fixes to the same branch. Do not open a new PR.
 - After merge: `git checkout main && git pull && git branch -d <branch>`.

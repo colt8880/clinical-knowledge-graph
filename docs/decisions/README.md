@@ -65,3 +65,4 @@ Do **not** write an ADR for:
 | 0010 | Machine contracts paired with prose specs | Accepted |
 | 0013 | Statins (USPSTF 2022) replaces CRC as v0 guideline | Accepted |
 | 0014 | v0 scope reduction, repo restructure, Python for /api | Accepted |
+| 0015 | Build workflow and PR review loop | Accepted |

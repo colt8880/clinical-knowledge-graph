@@ -44,6 +44,7 @@ Each decision has a full ADR in `docs/decisions/`. Summary:
 10. Machine contracts paired with prose specs (0010).
 11. Statins as v0 guideline (0013; supersedes 0006).
 12. v0 scope, `/ui` rename, Python for `/api`, trace-first evaluator (0014).
+13. Build workflow and PR review loop (0015).
 
 ## Schema summary
 
@@ -124,6 +125,21 @@ Each code directory has its own `CLAUDE.md` with load order, scope, and DoD.
 - Cite the guideline in code comments and commit messages.
 - Prefer Cypher over app-layer joins.
 - Colton is a senior healthcare PM with an engineering background. Skip 101-level explanations; surface tradeoffs.
+
+## Build workflow
+
+- Every feature goes on its own branch off `main`. Branch names: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`.
+- Never push directly to `main`. Never merge your own PR. The human merges.
+- Commit in logical chunks. Each commit message explains the *why*, not just the *what*.
+- Every feature has tests: unit where it makes sense, at least one fixture- or integration-level test that exercises the user-visible behavior.
+- Run the test suite locally before opening a PR. It must pass — do not open a PR on a red suite. Paste the output into the PR body.
+- Every PR body includes: **Scope** (what this does), **Manual Test Steps** (numbered, reproducible), **Manual Test Output** (the actual output of running those steps).
+- After opening the PR, invoke the `pr-reviewer` subagent and post its output as a PR comment. If the subagent flags blocking issues or actionable suggestions, address them (push fixes to the same branch, re-run the reviewer) before handing the PR to the human. The human only reviews after the subagent's feedback has been resolved.
+- If the human requests changes, push fixes to the same branch. Do not open a new PR.
+- After merge: `git checkout main && git pull && git branch -d <branch>`.
+- CI is deliberately not wired yet. Add it in a separate PR after the first feature merges cleanly under this workflow.
+
+See `docs/workflow.md` for the full runbook.
 
 ## Out of scope for v0
 

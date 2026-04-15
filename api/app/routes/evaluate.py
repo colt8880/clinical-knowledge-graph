@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
@@ -39,5 +40,19 @@ async def post_evaluate(request: EvaluateRequest) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail="patient.administrative_sex is required")
 
     graph = await load_graph()
+
+    # Wall-clock timing is the route handler's responsibility, not the
+    # pure evaluator's. Stamp before/after and inject into the trace.
+    started_at = datetime.now(timezone.utc)
     trace = evaluate(pc, graph)
+    completed_at = datetime.now(timezone.utc)
+
+    duration_ms = int((completed_at - started_at).total_seconds() * 1000)
+    trace["envelope"]["started_at"] = started_at.isoformat().replace("+00:00", "Z")
+    trace["envelope"]["completed_at"] = completed_at.isoformat().replace("+00:00", "Z")
+    # Overwrite the placeholder duration_ms on the final evaluation_completed event
+    for event in trace["events"]:
+        if event["type"] == "evaluation_completed":
+            event["duration_ms"] = duration_ms
+
     return trace

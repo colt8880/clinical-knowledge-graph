@@ -10,8 +10,6 @@ Out-of-scope exits.
 
 from __future__ import annotations
 
-import time
-from datetime import datetime, timezone
 from typing import Any
 
 from app.config import settings
@@ -144,11 +142,12 @@ _EXIT_CHECKERS = {
 def evaluate(patient_context: dict[str, Any], graph: GraphSnapshot) -> dict[str, Any]:
     """Run the trace-first evaluator.
 
-    Pure function: same (patient_context, graph) -> same trace (excluding
-    wall-clock fields: envelope.started_at, envelope.completed_at,
-    evaluation_completed.duration_ms).
+    Pure function: same (patient_context, graph) -> same trace.
+    Wall-clock fields (envelope.started_at, envelope.completed_at,
+    evaluation_completed.duration_ms) are NOT set here — the caller
+    (route handler) stamps them after evaluate() returns. This keeps
+    evaluate() free of datetime.now() calls.
     """
-    started_at = datetime.now(timezone.utc)
     trace = TraceBuilder()
 
     # Compute patient demographics
@@ -189,20 +188,18 @@ def evaluate(patient_context: dict[str, Any], graph: GraphSnapshot) -> dict[str,
         for rec in graph.recommendations:
             pass  # TODO: feature 04
 
-    # Final event
-    completed_at = datetime.now(timezone.utc)
-    duration_ms = int((completed_at - started_at).total_seconds() * 1000)
-    trace.evaluation_completed(recommendations_emitted, duration_ms)
+    # Final event — duration_ms is set to 0 here; the route handler
+    # overwrites it with the actual wall-clock duration after evaluate() returns.
+    trace.evaluation_completed(recommendations_emitted, duration_ms=0)
 
-    # Build the envelope
+    # Build the envelope — wall-clock fields (started_at, completed_at)
+    # are injected by the route handler, not by the pure evaluator.
     envelope: dict[str, Any] = {
         "spec_tag": settings.spec_tag,
         "graph_version": settings.graph_version,
         "evaluator_version": settings.evaluator_version,
         "evaluation_time": eval_time,
         "patient_fingerprint": fingerprint,
-        "started_at": started_at.isoformat().replace("+00:00", "Z"),
-        "completed_at": completed_at.isoformat().replace("+00:00", "Z"),
     }
 
     # Derive recommendation list from trace events (empty for exit paths)

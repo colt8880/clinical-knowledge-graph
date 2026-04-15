@@ -11,7 +11,7 @@ info:
     No direct Cypher passthrough (ADR 0005). New traversal capabilities become new endpoints.
 
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8000
     description: Local dev
 
 tags:

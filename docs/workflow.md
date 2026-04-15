@@ -16,6 +16,7 @@ Each feature has a self-contained spec in `docs/build/`. In a fresh Claude Code 
    git checkout -b feat/<slug>
    ```
 3. Do the work in logical chunks. Commit as you go — do not save one giant commit for the end.
+   - **Contract alignment rule:** if your changes touch API routes, evaluator events, patient context handling, or predicates, the corresponding contract file (`api.openapi.yaml`, `eval-trace.schema.json`, `patient-context.schema.json`, `predicate-catalog.yaml`) must be updated in the same diff. If you're shipping a feature from `docs/build/`, the matching rows in `docs/build/README.md` and `docs/reference/build-status.md` must also move to `shipped` in the same diff. The `pr-reviewer` subagent will block if these are missing. See `.claude/agents/pr-reviewer.md` § Contract alignment for the full list.
 4. Before opening a PR:
    - Run the test suite locally. It **must pass**. Do not open a PR on a red suite.
    - Run the manual test steps you plan to put in the PR body. Capture the real output.

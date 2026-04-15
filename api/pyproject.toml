@@ -1,0 +1,30 @@
+[project]
+name = "ckg-api"
+version = "0.1.0"
+description = "Clinical Knowledge Graph — FastAPI evaluator and graph query service"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.34,<1",
+    "pydantic>=2,<3",
+    "pydantic-settings>=2,<3",
+    "neo4j>=5,<6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+    "httpx>=0.28,<1",
+    "pytest-asyncio>=0.25,<1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

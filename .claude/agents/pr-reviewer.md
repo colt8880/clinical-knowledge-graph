@@ -30,20 +30,31 @@ Go through every item below. For each, state what you looked at and what you fou
 - Any ADR under `docs/decisions/` must be append-only. Edits to existing ADRs (other than typo fixes explicitly called out) are a blocking issue — reversals go in a new ADR that supersedes.
 - If the PR changes schema shape, predicate signatures, API shape, or fixture shape without updating the paired contract file, flag it.
 
-### 3. Test coverage at the right layers
+### 3. Contract alignment
+
+Implementation changes must ship with their contract updates in the same diff. Check each rule below and block if violated.
+
+- **API routes ↔ OpenAPI:** If the diff touches files under `api/app/routes/**`, then `docs/contracts/api.openapi.yaml` must also appear in the diff. Block if missing.
+- **Evaluator events ↔ trace schema:** If the diff touches evaluator event emission (new event types, changed event fields, trace construction), then `docs/contracts/eval-trace.schema.json` must also appear in the diff. Block if missing.
+- **Patient context handling ↔ context schema:** If the diff touches patient context parsing, validation, or field access, then `docs/contracts/patient-context.schema.json` must also appear in the diff. Block if missing.
+- **Predicate implementations ↔ predicate catalog:** If the diff adds, removes, or changes predicate evaluators, then `docs/contracts/predicate-catalog.yaml` must also appear in the diff. Block if missing.
+- **Feature ship ↔ status tracking:** If the PR body or commits claim to ship a feature from `docs/build/NN-*.md`, then the matching row in `docs/build/README.md` must be moved to `shipped` and the corresponding row in `docs/reference/build-status.md` must reflect the shipped state — both in the same diff. Block if either is missing.
+- **No deferred contract fixes:** If the PR body contains deferral language ("align later", "in a later commit", "will fix in follow-up", "can update after", or similar) referencing any file under `docs/contracts/`, `docs/specs/`, or `docs/reference/`, block. The fix must land in this PR, or a concrete entry must be added to `docs/ISSUES.md` in the same diff explaining what is deferred and why.
+
+### 4. Test coverage at the right layers
 
 - Root `CLAUDE.md` requires: unit where it makes sense, plus at least one fixture- or integration-level test exercising user-visible behavior.
 - Check: does the PR add tests? Are they at the right layer? A pure data change (fixture, seed) may only need an integration assertion; a new evaluator primitive needs unit tests AND a fixture test.
 - Flag PRs that add code paths with zero test coverage.
 
-### 4. Manual test steps present with output
+### 5. Manual test steps present with output
 
 - PR body must include: Scope, Manual Test Steps (numbered, reproducible), Manual Test Output (actual output).
 - Missing any of these is blocking.
 - Output that is obviously fake or copy-pasted from a different run is blocking.
 - **Carve-out for no test harness yet:** if the repo does not yet have an automated test runner in the component this PR touches (Stage 0 and very early Stage 1), the "Test suite" section may say so explicitly and Manual Test Steps + Output alone are sufficient. Once a runner exists in a component, a later PR touching that component without suite output is blocking.
 
-### 5. Determinism in evaluator code
+### 6. Determinism in evaluator code
 
 The evaluator must be deterministic: same `PatientContext` + same graph version + same evaluator version produces a byte-identical trace. For any change under `/api` or anything that builds an `EvalTrace`, grep the diff for:
 
@@ -54,7 +65,7 @@ The evaluator must be deterministic: same `PatientContext` + same graph version 
 
 Any of these in evaluator code paths is blocking unless the PR explicitly justifies it (e.g., trace timestamps may come from an injected clock).
 
-### 6. Other things worth checking
+### 7. Other things worth checking
 
 - Commit hygiene: are commits logical chunks with "why" messages, or is it one giant dump?
 - Branch naming: `feat/`, `fix/`, or `chore/` prefix per workflow.
@@ -84,6 +95,7 @@ Post your review as a PR comment. Use this exact structure:
 ### Things checked
 - DoD: <what you checked, what you found>
 - Contracts/ADRs: <...>
+- Contract alignment: <...>
 - Tests: <...>
 - Manual test steps: <...>
 - Determinism: <...>

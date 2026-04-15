@@ -1,6 +1,6 @@
 # 10: Contract alignment tests
 
-**Status**: in-progress
+**Status**: shipped
 **Depends on**: 02
 **Branch**: `feat/contract-alignment-tests`
 

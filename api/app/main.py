@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.db import init_driver, close_driver
-from app.routes import health, nodes
+from app.routes import health, nodes, evaluate
 
 
 @asynccontextmanager
@@ -32,3 +32,4 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(nodes.router)
+app.include_router(evaluate.router)

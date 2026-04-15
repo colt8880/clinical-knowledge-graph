@@ -1,0 +1,38 @@
+{
+  "envelope": {
+    "spec_tag": "v0.1.0",
+    "graph_version": "2022-08-23",
+    "evaluator_version": "0.1.0",
+    "evaluation_time": "2026-04-15T10:00:00Z",
+    "patient_fingerprint": "2a95262269d11772673559bb46fe4dfd6aeb6c5fdc30348c420686c29a3b4f9b"
+  },
+  "events": [
+    {
+      "seq": 1,
+      "type": "evaluation_started",
+      "patient_age_years": 35,
+      "patient_sex": "male",
+      "guidelines_in_scope": ["guideline:uspstf-statin-2022"]
+    },
+    {
+      "seq": 2,
+      "type": "guideline_entered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "guideline_title": "Statin Use for the Primary Prevention of Cardiovascular Disease in Adults: Preventive Medication"
+    },
+    {
+      "seq": 3,
+      "type": "exit_condition_triggered",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "exit": "out_of_scope_age_below_range",
+      "rationale": "USPSTF statin primary prevention does not address adults under 40."
+    },
+    {
+      "seq": 4,
+      "type": "evaluation_completed",
+      "recommendations_emitted": 0,
+      "duration_ms": 0
+    }
+  ],
+  "recommendations": []
+}

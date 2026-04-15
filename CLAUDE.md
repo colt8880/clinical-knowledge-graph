@@ -128,6 +128,7 @@ Each code directory has its own `CLAUDE.md` with load order, scope, and DoD.
 
 ## Build workflow
 
+- Features are specified in `docs/build/`. To build one, use `/build NN` (or read `docs/build/NN-*.md` and follow this workflow end to end). One feature per session.
 - Every feature goes on its own branch off `main`. Branch names: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`.
 - Never push directly to `main`. Never merge your own PR. The human merges.
 - Commit in logical chunks. Each commit message explains the *why*, not just the *what*.

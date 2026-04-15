@@ -2,6 +2,8 @@
 
 The per-feature runbook. Read once; follow every time. The short version lives in root `CLAUDE.md`; this document is the full detail.
 
+Each feature has a self-contained spec in `docs/build/`. In a fresh Claude Code session, prompt `/build NN` to run that feature through this workflow end to end. One feature per session. **One Claude Code session per repo at a time** — two sessions racing the same `.git` directory causes lock contention and lost work.
+
 ## Per-feature loop
 
 1. Start from a clean `main`:

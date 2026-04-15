@@ -16,7 +16,7 @@ States: `spec-only` → `scaffolded` → `implemented` → `tested` → `live`.
 
 | Component | State | Notes |
 |---|---|---|
-| FastAPI skeleton | implemented | Python 3.12, FastAPI, Pydantic v2. `/healthz`, `/version`, `/nodes/{id}`, `/nodes/{id}/neighbors` wired to Neo4j. |
+| FastAPI skeleton | tested | Python 3.12, FastAPI, Pydantic v2. `/healthz`, `/version`, `/nodes/{id}`, `/nodes/{id}/neighbors` wired to Neo4j. 10 tests (unit + integration). Shipped in PR #6. |
 | Trace-first evaluator | spec-only | Spec: `specs/eval-trace.md`. Contract: `contracts/eval-trace.schema.json`. |
 | Predicate engine (v0 subset) | spec-only | Contract: `contracts/predicate-catalog.yaml`. |
 | Patient-context validator | spec-only | Contract: `contracts/patient-context.schema.json`. |

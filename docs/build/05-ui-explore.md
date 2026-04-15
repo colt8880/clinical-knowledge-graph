@@ -6,7 +6,7 @@
 
 ## Context
 
-Stand up the Next.js app with the Explore tab: manual graph traversal backed by the live `/nodes/{id}` endpoint. This replaces the static `diagrams/crc-graph.html` demo with something that reflects the real Neo4j state. Eval tab (feature 06) will reuse the GraphCanvas component built here.
+Stand up the Next.js app with the Explore tab: manual graph traversal backed by the live `/nodes/{id}` and `/nodes/{id}/neighbors` endpoints. This replaces the static `diagrams/crc-graph.html` demo with something that reflects the real Neo4j state. Eval tab (feature 06) will reuse the GraphCanvas component built here.
 
 ## Required reading
 

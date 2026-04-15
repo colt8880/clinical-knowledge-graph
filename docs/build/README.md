@@ -17,7 +17,7 @@ Every feature runs the workflow in `docs/workflow.md`: branch → implement → 
 | # | Feature | Status | Depends on |
 |---|---|---|---|
 | 01 | Graph seed (statin model loaded into Neo4j) | shipped | — |
-| 02 | API skeleton (FastAPI, `/healthz`, `/version`, `/nodes/{id}`) | in-progress | 01 |
+| 02 | API skeleton (FastAPI, `/healthz`, `/version`, `/nodes/{id}`) | shipped | 01 |
 | 03 | Evaluator vertical slice (fixture 03: age-below-range exit) | pending | 02 |
 | 04 | Evaluator full (remaining predicates, fixtures 01/02/04/05) | pending | 03 |
 | 05 | UI Explore tab | pending | 02 |

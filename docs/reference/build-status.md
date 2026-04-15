@@ -21,6 +21,7 @@ States: `spec-only` → `scaffolded` → `implemented` → `tested` → `live`.
 | Predicate engine (v0 subset) | spec-only | Contract: `contracts/predicate-catalog.yaml`. |
 | Patient-context validator | spec-only | Contract: `contracts/patient-context.schema.json`. |
 | REST endpoints | spec-only | Contract: `contracts/api.openapi.yaml`. |
+| Contract alignment tests | tested | 10 tests: OpenAPI path/method/response alignment, predicate catalog coverage, build-status consistency. Shipped in PR #8. |
 
 ## UI (`/ui`)
 

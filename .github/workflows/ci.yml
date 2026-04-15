@@ -123,11 +123,22 @@ jobs:
       - name: Validate OpenAPI spec
         run: |
           python - <<'PYEOF'
+          import yaml, json, sys
           from openapi_spec_validator import validate
-          from openapi_spec_validator.readers import read_from_filename
 
-          spec_dict, spec_url = read_from_filename("docs/contracts/api.openapi.yaml")
-          validate(spec_dict, spec_url=spec_url)
+          with open("docs/contracts/api.openapi.yaml") as f:
+              spec = yaml.safe_load(f)
+
+          # Inline external $refs before validation so the validator doesn't
+          # try to fetch them as URLs. We validate these files separately below.
+          if "components" in spec and "schemas" in spec["components"]:
+              for name, schema in spec["components"]["schemas"].items():
+                  if "$ref" in schema and schema["$ref"].startswith("./"):
+                      ref_path = "docs/contracts/" + schema["$ref"][2:]
+                      with open(ref_path) as rf:
+                          spec["components"]["schemas"][name] = json.load(rf)
+
+          validate(spec)
           print("OpenAPI spec is valid")
           PYEOF
 
@@ -230,12 +241,35 @@ jobs:
 
           driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
 
+          def split_cypher(text):
+              """Split Cypher text on semicolons, respecting quoted strings."""
+              stmts, current, in_quote = [], [], None
+              for ch in text:
+                  if in_quote:
+                      current.append(ch)
+                      if ch == in_quote:
+                          in_quote = None
+                  elif ch in ("'", '"'):
+                      current.append(ch)
+                      in_quote = ch
+                  elif ch == ";":
+                      s = "".join(current).strip()
+                      if s:
+                          stmts.append(s)
+                      current = []
+                  else:
+                      current.append(ch)
+              s = "".join(current).strip()
+              if s:
+                  stmts.append(s)
+              return stmts
+
           for cypher_file in ["graph/constraints.cypher", "graph/seed.cypher"]:
               with open(cypher_file) as f:
-                  content = f.read()
-              statements = [s.strip() for s in content.split(";") if s.strip() and not all(
-                  line.strip().startswith("//") or line.strip() == "" for line in s.strip().splitlines()
-              )]
+                  lines = f.readlines()
+              # Strip comment lines, then split on unquoted semicolons
+              clean = "".join(l for l in lines if not l.lstrip().startswith("//"))
+              statements = split_cypher(clean)
               with driver.session() as session:
                   for stmt in statements:
                       session.run(stmt)

@@ -65,12 +65,35 @@ jobs:
 
           driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
 
+          def split_cypher(text):
+              """Split Cypher text on semicolons, respecting quoted strings."""
+              stmts, current, in_quote = [], [], None
+              for ch in text:
+                  if in_quote:
+                      current.append(ch)
+                      if ch == in_quote:
+                          in_quote = None
+                  elif ch in ("'", '"'):
+                      current.append(ch)
+                      in_quote = ch
+                  elif ch == ";":
+                      s = "".join(current).strip()
+                      if s:
+                          stmts.append(s)
+                      current = []
+                  else:
+                      current.append(ch)
+              s = "".join(current).strip()
+              if s:
+                  stmts.append(s)
+              return stmts
+
           for cypher_file in ["graph/constraints.cypher", "graph/seed.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
-              # Strip comment lines before splitting to avoid semicolons in comments
+              # Strip comment lines, then split on unquoted semicolons
               clean = "".join(l for l in lines if not l.lstrip().startswith("//"))
-              statements = [s.strip() for s in clean.split(";") if s.strip()]
+              statements = split_cypher(clean)
               with driver.session() as session:
                   for stmt in statements:
                       session.run(stmt)
@@ -100,15 +123,11 @@ jobs:
       - name: Validate OpenAPI spec
         run: |
           python - <<'PYEOF'
-          import yaml
-          from pathlib import Path
           from openapi_spec_validator import validate
+          from openapi_spec_validator.readers import read_from_filename
 
-          spec_path = Path("docs/contracts/api.openapi.yaml").resolve()
-          with open(spec_path) as f:
-              spec = yaml.safe_load(f)
-          # spec_url lets the validator resolve relative $refs (e.g. ./patient-context.schema.json)
-          validate(spec, spec_url=spec_path.as_uri())
+          spec_dict, spec_url = read_from_filename("docs/contracts/api.openapi.yaml")
+          validate(spec_dict, spec_url=spec_url)
           print("OpenAPI spec is valid")
           PYEOF
 

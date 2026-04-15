@@ -26,7 +26,7 @@ Go through every item below. For each, state what you looked at and what you fou
 
 ### 2. Contracts and ADRs not silently modified
 
-- Any change under `docs/contracts/` must be paired with a matching change under `docs/specs/` in the same PR (root CLAUDE.md rule). Flag violations.
+- Any change under `docs/contracts/` must be paired with a matching change under `docs/specs/` in the same PR (root CLAUDE.md rule, per ADR 0010). Flag violations.
 - Any ADR under `docs/decisions/` must be append-only. Edits to existing ADRs (other than typo fixes explicitly called out) are a blocking issue — reversals go in a new ADR that supersedes.
 - If the PR changes schema shape, predicate signatures, API shape, or fixture shape without updating the paired contract file, flag it.
 
@@ -41,15 +41,16 @@ Go through every item below. For each, state what you looked at and what you fou
 - PR body must include: Scope, Manual Test Steps (numbered, reproducible), Manual Test Output (actual output).
 - Missing any of these is blocking.
 - Output that is obviously fake or copy-pasted from a different run is blocking.
+- **Carve-out for no test harness yet:** if the repo does not yet have an automated test runner in the component this PR touches (Stage 0 and very early Stage 1), the "Test suite" section may say so explicitly and Manual Test Steps + Output alone are sufficient. Once a runner exists in a component, a later PR touching that component without suite output is blocking.
 
 ### 5. Determinism in evaluator code
 
 The evaluator must be deterministic: same `PatientContext` + same graph version + same evaluator version produces a byte-identical trace. For any change under `/api` or anything that builds an `EvalTrace`, grep the diff for:
 
-- Wall-clock reads: `datetime.now`, `time.time`, `Date.now`, `new Date()` without a frozen input.
-- RNG: `random.`, `uuid.uuid4`, `Math.random`, unseeded samplers.
+- Wall-clock reads: `datetime.now`, `datetime.today`, `time.time`, `time.monotonic`, `Date.now`, `new Date()` without a frozen input.
+- RNG: `random.`, `secrets.`, `os.urandom`, `uuid.uuid1`, `uuid.uuid4`, `numpy.random` / `np.random`, `Math.random`, unseeded samplers.
 - External I/O during evaluation: network calls, non-graph DB reads, filesystem reads of mutable state.
-- Dict/set iteration order reliance in Python <3.7 patterns, or any code that assumes iteration order without sorting.
+- Dict/set iteration order reliance in Python <3.7 patterns, or any code that assumes iteration order without sorting. Python `set` ordering is never stable across runs even in 3.7+.
 
 Any of these in evaluator code paths is blocking unless the PR explicitly justifies it (e.g., trace timestamps may come from an injected clock).
 

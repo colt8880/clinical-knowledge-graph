@@ -10,8 +10,6 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 - **Most-recent ordering tiebreaker when two observations share `effective_date`.** Proposed: deterministic lexicographic tiebreak by `id`. Pin in `predicate-dsl.md` before evaluator writes the first event.
 - **Unit coercion for value quantities.** `mm[Hg]` vs `mmHg`, `mg/dL` casing. Lean evaluator-side normalization over strict adapter validation.
 - **`risk_score_lookup` when supplied value is stale.** v0 has no freshness check; `risk_scores.ascvd_10yr` is trusted as-of `evaluation_time`. Document the assumption.
-- **Guideline node missing `title` property.** `seed.cypher` has no `title` on the Guideline node; evaluator falls back to `publisher`. Add a title to the seed so `guideline_entered` trace events carry a descriptive title.
-- **400-error response shape.** `POST /evaluate` currently returns FastAPI's default `{"detail": "..."}` on validation errors. The OpenAPI contract specifies a `Problem` schema (`type`/`title`/`status`). Align in a follow-up.
 
 ### Patient context
 

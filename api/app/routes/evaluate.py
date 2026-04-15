@@ -5,7 +5,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.evaluator.engine import evaluate
@@ -14,13 +15,26 @@ from app.evaluator.graph import load_graph
 router = APIRouter(tags=["evaluate"])
 
 
+def _problem(status: int, title: str, detail: str, errors: list[dict] | None = None) -> JSONResponse:
+    """Return an RFC 7807-style Problem response matching api.openapi.yaml."""
+    body: dict[str, Any] = {
+        "type": "about:blank",
+        "title": title,
+        "status": status,
+        "detail": detail,
+    }
+    if errors:
+        body["errors"] = errors
+    return JSONResponse(status_code=status, content=body)
+
+
 class EvaluateRequest(BaseModel):
     patient_context: dict[str, Any]
     options: dict[str, Any] = Field(default_factory=dict)
 
 
 @router.post("/evaluate")
-async def post_evaluate(request: EvaluateRequest) -> dict[str, Any]:
+async def post_evaluate(request: EvaluateRequest) -> Any:
     """Run the evaluator against a PatientContext, return the EvalTrace.
 
     Loads the graph snapshot from Neo4j, then calls the pure evaluate()
@@ -28,16 +42,25 @@ async def post_evaluate(request: EvaluateRequest) -> dict[str, Any]:
     """
     pc = request.patient_context
 
-    # Validate required top-level fields
+    # Validate required top-level fields per patient-context.schema.json.
+    missing: list[dict[str, str]] = []
     if "evaluation_time" not in pc:
-        raise HTTPException(status_code=400, detail="evaluation_time is required")
+        missing.append({"path": "evaluation_time", "message": "required"})
     if "patient" not in pc:
-        raise HTTPException(status_code=400, detail="patient is required")
-    patient = pc["patient"]
-    if "date_of_birth" not in patient:
-        raise HTTPException(status_code=400, detail="patient.date_of_birth is required")
-    if "administrative_sex" not in patient:
-        raise HTTPException(status_code=400, detail="patient.administrative_sex is required")
+        missing.append({"path": "patient", "message": "required"})
+    else:
+        patient = pc["patient"]
+        if "date_of_birth" not in patient:
+            missing.append({"path": "patient.date_of_birth", "message": "required"})
+        if "administrative_sex" not in patient:
+            missing.append({"path": "patient.administrative_sex", "message": "required"})
+    if missing:
+        return _problem(
+            400,
+            "Invalid PatientContext",
+            "Required fields are missing from the patient context.",
+            errors=missing,
+        )
 
     graph = await load_graph()
 

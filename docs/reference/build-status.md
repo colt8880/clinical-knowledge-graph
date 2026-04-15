@@ -40,6 +40,12 @@ States: `spec-only` → `scaffolded` → `implemented` → `tested` → `live`.
 | Statin fixtures (5) | implemented | `evals/statins/01..05`. Awaiting evaluator to run against. |
 | Eval runner | spec-only | Runs each fixture, asserts trace + recommendation expectations. |
 
+## CI
+
+| Component | State | Notes |
+|---|---|---|
+| GitHub Actions workflow (`ci.yml`) | implemented | Three jobs: `api-tests`, `contract-lint`, `graph-smoke`. Branch protection pending human enablement. |
+
 ## Archived
 
 | Component | State | Notes |

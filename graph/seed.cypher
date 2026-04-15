@@ -43,6 +43,7 @@
 
 MERGE (g:Guideline {id: 'guideline:uspstf-statin-2022'})
 ON CREATE SET
+  g.title = 'Statin Use for the Primary Prevention of Cardiovascular Disease in Adults: Preventive Medication',
   g.publisher = 'US Preventive Services Task Force',
   g.version = '2022-08-23',
   g.effective_date = date('2022-08-23'),

@@ -83,7 +83,7 @@ async def load_graph(guideline_id: str = "guideline:uspstf-statin-2022") -> Grap
         if g_record is None:
             raise ValueError(f"Guideline {guideline_id} not found in graph")
         g_props = dict(g_record["g"].items())
-        guideline_title = g_props.get("title", g_props.get("publisher", guideline_id))
+        guideline_title = g_props.get("title") or g_props.get("publisher") or guideline_id
 
         # Load recommendations linked to guideline, ordered by id
         result = await session.run(

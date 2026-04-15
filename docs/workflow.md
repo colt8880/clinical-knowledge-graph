@@ -68,9 +68,9 @@ Rule of thumb: no code path ships without at least one test that would catch it 
 
 ## PR template
 
-Open every PR with this body. Copy it verbatim and fill in.
+Open every PR with this body. Copy it verbatim and fill in. The outer fence here is four backticks so the nested triple-backtick blocks render correctly.
 
-```markdown
+````markdown
 ## Scope
 
 <One paragraph: what this PR does and why. Link the ADR or issue if applicable.>
@@ -100,17 +100,23 @@ Open every PR with this body. Copy it verbatim and fill in.
 ## Notes
 
 <anything the reviewer should know: tradeoffs, deferred work, linked ISSUES.md entries>
-```
+````
 
 ## Subagent review
 
 Every PR gets reviewed by the `pr-reviewer` subagent before a human looks at it.
 
-Invoke pattern:
+Invoke pattern: use the `Task` tool with `subagent_type: "pr-reviewer"` and a prompt naming the PR number, e.g.:
+
 ```
-Use the Agent tool with subagent_type=pr-reviewer and a prompt like:
-"Review PR #<n>. Fetch the diff and body via gh, check against the workflow in
-docs/workflow.md and the component DoDs, and post your review as a PR comment."
+Task(
+  subagent_type: "pr-reviewer",
+  description: "Review PR #<n>",
+  prompt: "Review PR #<n> in this repo. Fetch the diff and body via gh,
+           follow .claude/agents/pr-reviewer.md, check against the
+           workflow in docs/workflow.md and the component DoDs, and
+           post your review as a PR comment via gh pr comment."
+)
 ```
 
 The subagent posts its review as a PR comment via `gh pr comment`. It must:
@@ -163,6 +169,8 @@ Conflicts in ADRs or contracts are almost always semantic. Escalate by default.
 ## Worked example: adding a new predicate to the v0 catalog
 
 Concrete run-through. Task: add `predicate_age_range` to the v0 predicate catalog, because the statin model needs `age in [40, 75]` as one event instead of a `gte`+`lte` pair.
+
+The commands below assume the Stage 1+ harness is in place (`api/`, `evals/statins/tests/`, seed loaded into Neo4j). Until then, substitute whatever test runner exists at the time — and if nothing exists yet, the PR needs manual-test evidence only, per the carve-out in `.claude/agents/pr-reviewer.md`.
 
 1. **Branch from main:**
    ```sh

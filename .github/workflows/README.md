@@ -17,15 +17,29 @@ docker run -d --name neo4j-test \
   -p 7687:7687 -p 7474:7474 \
   neo4j:5-community
 
-# Wait for it to be ready
-until docker exec neo4j-test cypher-shell -u neo4j -p password123 "RETURN 1" 2>/dev/null; do sleep 2; done
+# Wait for it to be ready (uses the neo4j Python driver, not cypher-shell)
+pip install -e "api[dev]"
+python -c "
+from neo4j import GraphDatabase
+d = GraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', 'password123'))
+d.verify_connectivity(); d.close(); print('Ready')
+"
 
-# Load seed
-docker exec -i neo4j-test cypher-shell -u neo4j -p password123 < graph/constraints.cypher
-docker exec -i neo4j-test cypher-shell -u neo4j -p password123 < graph/seed.cypher
+# Load seed via Python driver
+python -c "
+from neo4j import GraphDatabase
+driver = GraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', 'password123'))
+for f in ['graph/constraints.cypher', 'graph/seed.cypher']:
+    stmts = [s.strip() for s in open(f).read().split(';') if s.strip() and not all(
+        l.strip().startswith('//') or l.strip() == '' for l in s.strip().splitlines())]
+    with driver.session() as session:
+        for s in stmts: session.run(s)
+    print(f'Loaded {f}')
+driver.close()
+"
 
 # Run tests
-cd api && pip install -e ".[dev]" && pytest tests/ -v
+cd api && pytest tests/ -v
 
 # Cleanup
 docker rm -f neo4j-test
@@ -73,28 +87,22 @@ print('OK')
 
 ### `graph-smoke`
 
-Loads `graph/constraints.cypher` and `graph/seed.cypher` into a fresh Neo4j 5 Community container, then asserts the expected node and edge counts (currently 23 nodes, 14 edges from the statin model). Prints a detailed per-label breakdown on failure.
+Loads `graph/constraints.cypher` and `graph/seed.cypher` into a fresh Neo4j 5 Community container using the Python `neo4j` driver, then asserts the expected node and edge counts (currently 23 nodes, 14 edges from the statin model) via exact integer comparison. Prints a detailed per-label breakdown on failure.
 
 **Reproduce locally:**
 
 ```sh
-# Start Neo4j (same as api-tests above)
-docker run -d --name neo4j-test \
-  -e NEO4J_AUTH=neo4j/password123 \
-  -p 7687:7687 -p 7474:7474 \
-  neo4j:5-community
-
-until docker exec neo4j-test cypher-shell -u neo4j -p password123 "RETURN 1" 2>/dev/null; do sleep 2; done
-
-docker exec -i neo4j-test cypher-shell -u neo4j -p password123 < graph/constraints.cypher
-docker exec -i neo4j-test cypher-shell -u neo4j -p password123 < graph/seed.cypher
-
-# Check counts
-docker exec neo4j-test cypher-shell -u neo4j -p password123 --format plain \
-  "MATCH (n) RETURN count(n)"  # expect 23
-
-docker exec neo4j-test cypher-shell -u neo4j -p password123 --format plain \
-  "MATCH ()-[r]->() RETURN count(r)"  # expect 14
+# Start Neo4j (same as api-tests above), then load seed (see api-tests repro)
+# Check counts via Python
+pip install neo4j
+python -c "
+from neo4j import GraphDatabase
+d = GraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', 'password123'))
+with d.session() as s:
+    print('Nodes:', s.run('MATCH (n) RETURN count(n) AS c').single()['c'])  # expect 23
+    print('Edges:', s.run('MATCH ()-[r]->() RETURN count(r) AS c').single()['c'])  # expect 14
+d.close()
+"
 
 docker rm -f neo4j-test
 ```

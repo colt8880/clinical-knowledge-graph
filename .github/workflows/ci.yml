@@ -41,21 +41,44 @@ jobs:
 
       - name: Wait for Neo4j
         run: |
-          for i in $(seq 1 30); do
-            if cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 "RETURN 1" 2>/dev/null; then
-              echo "Neo4j is ready"
-              exit 0
-            fi
-            echo "Waiting for Neo4j... ($i/30)"
-            sleep 2
-          done
-          echo "Neo4j did not become ready"
-          exit 1
+          python - <<'PYEOF'
+          import time, sys
+          from neo4j import GraphDatabase
+          for attempt in range(30):
+              try:
+                  driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+                  driver.verify_connectivity()
+                  driver.close()
+                  print("Neo4j is ready")
+                  sys.exit(0)
+              except Exception:
+                  print(f"Waiting for Neo4j... ({attempt+1}/30)")
+                  time.sleep(2)
+          print("Neo4j did not become ready")
+          sys.exit(1)
+          PYEOF
 
       - name: Load constraints and seed
         run: |
-          cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 -f graph/constraints.cypher
-          cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 -f graph/seed.cypher
+          python - <<'PYEOF'
+          from neo4j import GraphDatabase
+
+          driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+
+          for cypher_file in ["graph/constraints.cypher", "graph/seed.cypher"]:
+              with open(cypher_file) as f:
+                  content = f.read()
+              # Split on semicolons, filter blank/comment-only statements
+              statements = [s.strip() for s in content.split(";") if s.strip() and not all(
+                  line.strip().startswith("//") or line.strip() == "" for line in s.strip().splitlines()
+              )]
+              with driver.session() as session:
+                  for stmt in statements:
+                      session.run(stmt)
+              print(f"Loaded {cypher_file} ({len(statements)} statements)")
+
+          driver.close()
+          PYEOF
 
       - name: Run API tests
         working-directory: api
@@ -90,13 +113,12 @@ jobs:
         run: |
           python - <<'PYEOF'
           import json, glob, sys
-          from jsonschema import Draft202012Validator, Draft7Validator
+          from jsonschema import Draft7Validator
 
           errors = 0
           for path in sorted(glob.glob("docs/contracts/*.schema.json")):
               with open(path) as f:
                   schema = json.load(f)
-              # Check it parses as valid JSON Schema
               try:
                   Draft7Validator.check_schema(schema)
                   print(f"  OK: {path}")
@@ -153,62 +175,92 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Neo4j driver
+        run: pip install neo4j
+
       - name: Wait for Neo4j
         run: |
-          for i in $(seq 1 30); do
-            if cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 "RETURN 1" 2>/dev/null; then
-              echo "Neo4j is ready"
-              exit 0
-            fi
-            echo "Waiting for Neo4j... ($i/30)"
-            sleep 2
-          done
-          echo "Neo4j did not become ready"
-          exit 1
+          python - <<'PYEOF'
+          import time, sys
+          from neo4j import GraphDatabase
+          for attempt in range(30):
+              try:
+                  driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+                  driver.verify_connectivity()
+                  driver.close()
+                  print("Neo4j is ready")
+                  sys.exit(0)
+              except Exception:
+                  print(f"Waiting for Neo4j... ({attempt+1}/30)")
+                  time.sleep(2)
+          print("Neo4j did not become ready")
+          sys.exit(1)
+          PYEOF
 
       - name: Load constraints and seed
         run: |
-          cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 -f graph/constraints.cypher
-          cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 -f graph/seed.cypher
+          python - <<'PYEOF'
+          from neo4j import GraphDatabase
+
+          driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+
+          for cypher_file in ["graph/constraints.cypher", "graph/seed.cypher"]:
+              with open(cypher_file) as f:
+                  content = f.read()
+              statements = [s.strip() for s in content.split(";") if s.strip() and not all(
+                  line.strip().startswith("//") or line.strip() == "" for line in s.strip().splitlines()
+              )]
+              with driver.session() as session:
+                  for stmt in statements:
+                      session.run(stmt)
+              print(f"Loaded {cypher_file} ({len(statements)} statements)")
+
+          driver.close()
+          PYEOF
 
       - name: Assert node and edge counts
         run: |
-          echo "Checking node counts..."
-          ACTUAL_NODES=$(cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 --format plain "MATCH (n) RETURN count(n)")
-          echo "Total nodes: $ACTUAL_NODES"
+          python - <<'PYEOF'
+          import sys
+          from neo4j import GraphDatabase
 
-          ACTUAL_EDGES=$(cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 --format plain "MATCH ()-[r]->() RETURN count(r)")
-          echo "Total edges: $ACTUAL_EDGES"
+          driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
 
           # Expected counts from seed.cypher:
           # Nodes: 1 Guideline + 3 Recommendation + 2 Strategy + 5 Condition + 4 Observation + 7 Medication + 1 Procedure = 23
           # Edges: 3 FROM_GUIDELINE + 3 OFFERS_STRATEGY + 8 INCLUDES_ACTION = 14
-          EXPECTED_NODES=23
-          EXPECTED_EDGES=14
+          EXPECTED_NODES = 23
+          EXPECTED_EDGES = 14
 
-          FAIL=0
+          with driver.session() as session:
+              actual_nodes = session.run("MATCH (n) RETURN count(n) AS c").single()["c"]
+              actual_edges = session.run("MATCH ()-[r]->() RETURN count(r) AS c").single()["c"]
 
-          if echo "$ACTUAL_NODES" | grep -q "$EXPECTED_NODES"; then
-            echo "Node count OK: $EXPECTED_NODES"
-          else
-            echo "MISMATCH: expected $EXPECTED_NODES nodes, got: $ACTUAL_NODES"
-            FAIL=1
-          fi
+          print(f"Nodes: expected={EXPECTED_NODES}, actual={actual_nodes}")
+          print(f"Edges: expected={EXPECTED_EDGES}, actual={actual_edges}")
 
-          if echo "$ACTUAL_EDGES" | grep -q "$EXPECTED_EDGES"; then
-            echo "Edge count OK: $EXPECTED_EDGES"
-          else
-            echo "MISMATCH: expected $EXPECTED_EDGES edges, got: $ACTUAL_EDGES"
-            FAIL=1
-          fi
+          fail = False
+          if actual_nodes != EXPECTED_NODES:
+              print(f"MISMATCH: expected {EXPECTED_NODES} nodes, got {actual_nodes}")
+              fail = True
+          if actual_edges != EXPECTED_EDGES:
+              print(f"MISMATCH: expected {EXPECTED_EDGES} edges, got {actual_edges}")
+              fail = True
 
-          if [ "$FAIL" -eq 1 ]; then
-            echo ""
-            echo "Detailed breakdown:"
-            cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 --format plain "MATCH (n) RETURN labels(n)[0] AS label, count(n) AS count ORDER BY label"
-            cypher-shell -a bolt://localhost:7687 -u neo4j -p password123 --format plain "MATCH ()-[r]->() RETURN type(r) AS type, count(r) AS count ORDER BY type"
-            exit 1
-          fi
+          if fail:
+              print("\nDetailed breakdown:")
+              with driver.session() as session:
+                  for record in session.run("MATCH (n) RETURN labels(n)[0] AS label, count(n) AS count ORDER BY label"):
+                      print(f"  {record['label']}: {record['count']}")
+                  for record in session.run("MATCH ()-[r]->() RETURN type(r) AS type, count(r) AS count ORDER BY type"):
+                      print(f"  {record['type']}: {record['count']}")
+              driver.close()
+              sys.exit(1)
 
-          echo ""
-          echo "Graph smoke test passed: $EXPECTED_NODES nodes, $EXPECTED_EDGES edges"
+          driver.close()
+          print(f"\nGraph smoke test passed: {EXPECTED_NODES} nodes, {EXPECTED_EDGES} edges")
+          PYEOF

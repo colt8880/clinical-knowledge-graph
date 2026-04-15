@@ -129,17 +129,19 @@ jobs:
           with open("docs/contracts/api.openapi.yaml") as f:
               spec = yaml.safe_load(f)
 
-          # Replace external $refs with a placeholder so the validator doesn't
-          # try to resolve them as URLs. These JSON Schema files are validated
-          # independently in the next step.
-          if "components" in spec and "schemas" in spec["components"]:
-              for name, schema in list(spec["components"]["schemas"].items()):
-                  if "$ref" in schema and schema["$ref"].startswith("./"):
-                      spec["components"]["schemas"][name] = {
-                          "type": "object",
-                          "description": f"Placeholder for {schema['$ref']} (validated separately)"
-                      }
+          # Recursively stub external $refs so the validator doesn't try to
+          # resolve them as URLs. The referenced JSON Schema files are
+          # validated independently in the next step.
+          def stub_external_refs(obj):
+              if isinstance(obj, dict):
+                  if "$ref" in obj and isinstance(obj["$ref"], str) and obj["$ref"].startswith("./"):
+                      return {"type": "object", "description": "external ref (validated separately)"}
+                  return {k: stub_external_refs(v) for k, v in obj.items()}
+              if isinstance(obj, list):
+                  return [stub_external_refs(item) for item in obj]
+              return obj
 
+          spec = stub_external_refs(spec)
           validate(spec)
           print("OpenAPI spec is valid")
           PYEOF

@@ -137,6 +137,20 @@ If the subagent requests changes:
 
 The subagent spec lives at `.claude/agents/pr-reviewer.md`. Update it as the repo matures — new components get new DoD items to check.
 
+## CI
+
+GitHub Actions runs three jobs on every push to `main` and every pull request. All three must pass before merge (once branch protection is enabled).
+
+| Job | What it does |
+|---|---|
+| `api-tests` | Loads the graph seed into a Neo4j 5 service container, runs `pytest api/tests/`. |
+| `contract-lint` | Validates `api.openapi.yaml` (OpenAPI 3), `*.schema.json` (JSON Schema), and `predicate-catalog.yaml` (against its schema). |
+| `graph-smoke` | Loads the seed and asserts expected node/edge counts (23 nodes, 14 edges for the statin model). |
+
+Workflow file: `.github/workflows/ci.yml`. Local reproduction instructions: `.github/workflows/README.md`.
+
+CI complements the `pr-reviewer` subagent — it catches mechanical breakage (tests fail, contracts don't parse, seed is incomplete), while the subagent catches semantic issues (missing contract updates, DoD compliance, test coverage gaps).
+
 ## Merging and cleanup
 
 The human merges. Never merge your own PR. Never push directly to `main`.

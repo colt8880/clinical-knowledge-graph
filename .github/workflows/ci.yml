@@ -1,0 +1,326 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  api-tests:
+    name: api-tests
+    runs-on: ubuntu-latest
+
+    services:
+      neo4j:
+        image: neo4j:5-community
+        env:
+          NEO4J_AUTH: neo4j/password123
+        ports:
+          - 7687:7687
+          - 7474:7474
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p password123 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      NEO4J_URI: bolt://localhost:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: password123
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install API dependencies
+        run: pip install -e "api[dev]"
+
+      - name: Wait for Neo4j
+        run: |
+          python - <<'PYEOF'
+          import time, sys
+          from neo4j import GraphDatabase
+          for attempt in range(30):
+              try:
+                  driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+                  driver.verify_connectivity()
+                  driver.close()
+                  print("Neo4j is ready")
+                  sys.exit(0)
+              except Exception:
+                  print(f"Waiting for Neo4j... ({attempt+1}/30)")
+                  time.sleep(2)
+          print("Neo4j did not become ready")
+          sys.exit(1)
+          PYEOF
+
+      - name: Load constraints and seed
+        run: |
+          python - <<'PYEOF'
+          from neo4j import GraphDatabase
+
+          driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+
+          def split_cypher(text):
+              """Split Cypher text on semicolons, respecting quoted strings."""
+              stmts, current, in_quote = [], [], None
+              for ch in text:
+                  if in_quote:
+                      current.append(ch)
+                      if ch == in_quote:
+                          in_quote = None
+                  elif ch in ("'", '"'):
+                      current.append(ch)
+                      in_quote = ch
+                  elif ch == ";":
+                      s = "".join(current).strip()
+                      if s:
+                          stmts.append(s)
+                      current = []
+                  else:
+                      current.append(ch)
+              s = "".join(current).strip()
+              if s:
+                  stmts.append(s)
+              return stmts
+
+          for cypher_file in ["graph/constraints.cypher", "graph/seed.cypher"]:
+              with open(cypher_file) as f:
+                  lines = f.readlines()
+              # Strip comment lines, then split on unquoted semicolons
+              clean = "".join(l for l in lines if not l.lstrip().startswith("//"))
+              statements = split_cypher(clean)
+              with driver.session() as session:
+                  for stmt in statements:
+                      session.run(stmt)
+              print(f"Loaded {cypher_file} ({len(statements)} statements)")
+
+          driver.close()
+          PYEOF
+
+      - name: Run API tests
+        working-directory: api
+        run: pytest tests/ -v
+
+  contract-lint:
+    name: contract-lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install linting tools
+        run: pip install jsonschema pyyaml openapi-spec-validator
+
+      - name: Validate OpenAPI spec
+        run: |
+          python - <<'PYEOF'
+          import yaml
+          from openapi_spec_validator import validate
+
+          with open("docs/contracts/api.openapi.yaml") as f:
+              spec = yaml.safe_load(f)
+
+          # Recursively stub external $refs so the validator doesn't try to
+          # resolve them as URLs. The referenced JSON Schema files are
+          # validated independently in the next step.
+          def stub_external_refs(obj):
+              if isinstance(obj, dict):
+                  if "$ref" in obj and isinstance(obj["$ref"], str) and obj["$ref"].startswith("./"):
+                      return {"type": "object", "description": "external ref (validated separately)"}
+                  return {k: stub_external_refs(v) for k, v in obj.items()}
+              if isinstance(obj, list):
+                  return [stub_external_refs(item) for item in obj]
+              return obj
+
+          spec = stub_external_refs(spec)
+          validate(spec)
+          print("OpenAPI spec is valid")
+          PYEOF
+
+      - name: Validate JSON Schemas
+        run: |
+          python - <<'PYEOF'
+          import json, glob, sys
+          from jsonschema import Draft7Validator
+
+          errors = 0
+          for path in sorted(glob.glob("docs/contracts/*.schema.json")):
+              with open(path) as f:
+                  schema = json.load(f)
+              try:
+                  Draft7Validator.check_schema(schema)
+                  print(f"  OK: {path}")
+              except Exception as e:
+                  print(f"  FAIL: {path} — {e}")
+                  errors += 1
+
+          if errors:
+              print(f"\n{errors} schema(s) invalid")
+              sys.exit(1)
+          else:
+              print(f"\nAll JSON Schemas valid")
+          PYEOF
+
+      - name: Validate predicate catalog
+        run: |
+          python - <<'PYEOF'
+          import json, yaml, sys
+          from jsonschema import validate, ValidationError
+
+          with open("docs/contracts/predicate-catalog.yaml") as f:
+              catalog = yaml.safe_load(f)
+          print("predicate-catalog.yaml parses as valid YAML")
+
+          with open("docs/contracts/predicate-catalog.schema.json") as f:
+              schema = json.load(f)
+
+          try:
+              validate(instance=catalog, schema=schema)
+              print("predicate-catalog.yaml validates against its JSON Schema")
+          except ValidationError as e:
+              print(f"Validation error: {e.message}")
+              sys.exit(1)
+          PYEOF
+
+  graph-smoke:
+    name: graph-smoke
+    runs-on: ubuntu-latest
+
+    services:
+      neo4j:
+        image: neo4j:5-community
+        env:
+          NEO4J_AUTH: neo4j/password123
+        ports:
+          - 7687:7687
+          - 7474:7474
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p password123 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Neo4j driver
+        run: pip install neo4j
+
+      - name: Wait for Neo4j
+        run: |
+          python - <<'PYEOF'
+          import time, sys
+          from neo4j import GraphDatabase
+          for attempt in range(30):
+              try:
+                  driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+                  driver.verify_connectivity()
+                  driver.close()
+                  print("Neo4j is ready")
+                  sys.exit(0)
+              except Exception:
+                  print(f"Waiting for Neo4j... ({attempt+1}/30)")
+                  time.sleep(2)
+          print("Neo4j did not become ready")
+          sys.exit(1)
+          PYEOF
+
+      - name: Load constraints and seed
+        run: |
+          python - <<'PYEOF'
+          from neo4j import GraphDatabase
+
+          driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+
+          def split_cypher(text):
+              """Split Cypher text on semicolons, respecting quoted strings."""
+              stmts, current, in_quote = [], [], None
+              for ch in text:
+                  if in_quote:
+                      current.append(ch)
+                      if ch == in_quote:
+                          in_quote = None
+                  elif ch in ("'", '"'):
+                      current.append(ch)
+                      in_quote = ch
+                  elif ch == ";":
+                      s = "".join(current).strip()
+                      if s:
+                          stmts.append(s)
+                      current = []
+                  else:
+                      current.append(ch)
+              s = "".join(current).strip()
+              if s:
+                  stmts.append(s)
+              return stmts
+
+          for cypher_file in ["graph/constraints.cypher", "graph/seed.cypher"]:
+              with open(cypher_file) as f:
+                  lines = f.readlines()
+              # Strip comment lines, then split on unquoted semicolons
+              clean = "".join(l for l in lines if not l.lstrip().startswith("//"))
+              statements = split_cypher(clean)
+              with driver.session() as session:
+                  for stmt in statements:
+                      session.run(stmt)
+              print(f"Loaded {cypher_file} ({len(statements)} statements)")
+
+          driver.close()
+          PYEOF
+
+      - name: Assert node and edge counts
+        run: |
+          python - <<'PYEOF'
+          import sys
+          from neo4j import GraphDatabase
+
+          driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
+
+          # Expected counts from seed.cypher:
+          # Nodes: 1 Guideline + 3 Recommendation + 2 Strategy + 5 Condition + 4 Observation + 7 Medication + 1 Procedure = 23
+          # Edges: 3 FROM_GUIDELINE + 3 OFFERS_STRATEGY + 8 INCLUDES_ACTION = 14
+          EXPECTED_NODES = 23
+          EXPECTED_EDGES = 14
+
+          with driver.session() as session:
+              actual_nodes = session.run("MATCH (n) RETURN count(n) AS c").single()["c"]
+              actual_edges = session.run("MATCH ()-[r]->() RETURN count(r) AS c").single()["c"]
+
+          print(f"Nodes: expected={EXPECTED_NODES}, actual={actual_nodes}")
+          print(f"Edges: expected={EXPECTED_EDGES}, actual={actual_edges}")
+
+          fail = False
+          if actual_nodes != EXPECTED_NODES:
+              print(f"MISMATCH: expected {EXPECTED_NODES} nodes, got {actual_nodes}")
+              fail = True
+          if actual_edges != EXPECTED_EDGES:
+              print(f"MISMATCH: expected {EXPECTED_EDGES} edges, got {actual_edges}")
+              fail = True
+
+          if fail:
+              print("\nDetailed breakdown:")
+              with driver.session() as session:
+                  for record in session.run("MATCH (n) RETURN labels(n)[0] AS label, count(n) AS count ORDER BY label"):
+                      print(f"  {record['label']}: {record['count']}")
+                  for record in session.run("MATCH ()-[r]->() RETURN type(r) AS type, count(r) AS count ORDER BY type"):
+                      print(f"  {record['type']}: {record['count']}")
+              driver.close()
+              sys.exit(1)
+
+          driver.close()
+          print(f"\nGraph smoke test passed: {EXPECTED_NODES} nodes, {EXPECTED_EDGES} edges")
+          PYEOF

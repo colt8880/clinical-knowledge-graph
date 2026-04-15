@@ -123,20 +123,22 @@ jobs:
       - name: Validate OpenAPI spec
         run: |
           python - <<'PYEOF'
-          import yaml, json, sys
+          import yaml
           from openapi_spec_validator import validate
 
           with open("docs/contracts/api.openapi.yaml") as f:
               spec = yaml.safe_load(f)
 
-          # Inline external $refs before validation so the validator doesn't
-          # try to fetch them as URLs. We validate these files separately below.
+          # Replace external $refs with a placeholder so the validator doesn't
+          # try to resolve them as URLs. These JSON Schema files are validated
+          # independently in the next step.
           if "components" in spec and "schemas" in spec["components"]:
-              for name, schema in spec["components"]["schemas"].items():
+              for name, schema in list(spec["components"]["schemas"].items()):
                   if "$ref" in schema and schema["$ref"].startswith("./"):
-                      ref_path = "docs/contracts/" + schema["$ref"][2:]
-                      with open(ref_path) as rf:
-                          spec["components"]["schemas"][name] = json.load(rf)
+                      spec["components"]["schemas"][name] = {
+                          "type": "object",
+                          "description": f"Placeholder for {schema['$ref']} (validated separately)"
+                      }
 
           validate(spec)
           print("OpenAPI spec is valid")

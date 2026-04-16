@@ -44,9 +44,7 @@ export default function RootLayout({
             </Link>
             <Link
               href="/eval"
-              className="px-3 py-1.5 rounded text-slate-400 cursor-not-allowed"
-              aria-disabled
-              tabIndex={-1}
+              className="px-3 py-1.5 rounded hover:bg-slate-700 transition-colors"
             >
               Eval
             </Link>

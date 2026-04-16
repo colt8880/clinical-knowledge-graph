@@ -43,8 +43,27 @@ The Explore tab encodes the selection path in the URL for shareable deep links:
 - `r` — selected recommendation (shows Strategies column when set)
 - `s` — selected strategy (shows Actions column when set)
 
+## Running in Docker
+
+Build the image (from the repo root — the Eval tab bundles fixture JSON at build time):
+
+```sh
+docker build -t ckg-ui -f ui/Dockerfile .
+```
+
+Run the container (assuming the API is running on the host):
+
+```sh
+docker run --rm -e API_BASE_URL=http://host.docker.internal:8000 -p 3000:3000 ckg-ui
+```
+
+The `API_BASE_URL` env var is injected at container startup, overriding the default `http://localhost:8000` baked in at build time. If omitted, the app connects to `http://localhost:8000`.
+
+The container runs as a non-root user (`ckg`, UID 1001) and exposes port 3000.
+
 ## Environment variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | API base URL |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | API base URL (build time) |
+| `API_BASE_URL` | — | API base URL (Docker runtime override) |

@@ -6,8 +6,11 @@ set -e
 NEO4J_HOST="${NEO4J_URI#bolt://}"
 NEO4J_HOST="${NEO4J_HOST#neo4j://}"
 NEO4J_HOST_ONLY="${NEO4J_HOST%%:*}"
-NEO4J_PORT="${NEO4J_HOST##*:}"
-NEO4J_PORT="${NEO4J_PORT:-7687}"
+# If the URI has no port suffix, ##*: returns the host unchanged — default to 7687.
+case "$NEO4J_HOST" in
+    *:*) NEO4J_PORT="${NEO4J_HOST##*:}" ;;
+    *)   NEO4J_PORT=7687 ;;
+esac
 
 MAX_WAIT=30
 elapsed=0

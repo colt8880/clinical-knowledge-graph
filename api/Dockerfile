@@ -16,8 +16,6 @@ RUN python -m venv /opt/venv \
     && find /opt/venv -type d -name tests -exec rm -rf {} + 2>/dev/null; true \
     && find /opt/venv -type d -name test -exec rm -rf {} + 2>/dev/null; true
 
-COPY app/ app/
-
 # ---------- runtime ----------
 FROM python:3.12-slim
 
@@ -39,7 +37,7 @@ ENV PATH="/opt/venv/bin:$PATH" \
 EXPOSE 8000
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')" || exit 1
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')"]
 
 USER ckg
 

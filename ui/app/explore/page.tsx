@@ -65,6 +65,7 @@ export default function ExplorePage() {
 function ExploreContent() {
   const { guideline, rec, strategy, setSelection } = useUrlState();
   const [detailNodeId, setDetailNodeId] = useState<string | null>(null);
+  const [detailEdgeId, setDetailEdgeId] = useState<string | null>(null);
 
   // ── Fetch each level ───────────────────────────────────────────
 
@@ -154,15 +155,21 @@ function ExploreContent() {
   }, [guidelineQuery.data, recQuery.data, strategyQuery.data]);
 
   const detailNode = useMemo(
-    () => allNodes.find((n) => n.id === detailNodeId) ?? null,
+    () => (detailNodeId ? allNodes.find((n) => n.id === detailNodeId) ?? null : null),
     [allNodes, detailNodeId],
   );
 
-  // ── Click handler — determine column from node type ────────────
+  const detailEdge = useMemo(
+    () => (detailEdgeId ? allEdges.find((e) => e.id === detailEdgeId) ?? null : null),
+    [allEdges, detailEdgeId],
+  );
+
+  // ── Click handlers ─────────────────────────────────────────────
 
   const handleNodeClick = useCallback(
     (nodeId: string) => {
       setDetailNodeId(nodeId);
+      setDetailEdgeId(null);
 
       // Find the node to determine its hierarchy level.
       const node = allNodes.find((n) => n.id === nodeId);
@@ -185,6 +192,14 @@ function ExploreContent() {
       }
     },
     [allNodes, guideline, rec, setSelection],
+  );
+
+  const handleEdgeClick = useCallback(
+    (edgeId: string) => {
+      setDetailEdgeId(edgeId);
+      setDetailNodeId(null);
+    },
+    [],
   );
 
   // Auto-select detail when URL state changes.
@@ -219,14 +234,16 @@ function ExploreContent() {
             columns={canvasColumns}
             edges={allEdges}
             onNodeClick={handleNodeClick}
+            onEdgeClick={handleEdgeClick}
             selectedNodeId={detailNodeId}
+            selectedEdgeId={detailEdgeId}
           />
         )}
       </div>
 
       {/* Right: detail panel */}
       <aside className="w-[420px] bg-slate-50 border-l border-slate-200 overflow-y-auto shrink-0">
-        <NodeDetail node={detailNode} edge={null} />
+        <NodeDetail node={detailNode} edge={detailEdge} />
       </aside>
     </div>
   );

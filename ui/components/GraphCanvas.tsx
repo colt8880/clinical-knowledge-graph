@@ -24,6 +24,8 @@ interface GraphCanvasProps {
   onEdgeClick?: (edgeId: string) => void;
   /** Which node is selected (for detail panel highlight). */
   selectedNodeId?: string | null;
+  /** Which edge is selected (for detail panel highlight). */
+  selectedEdgeId?: string | null;
 }
 
 /** Color palette keyed by Neo4j label. */
@@ -174,12 +176,26 @@ const CY_STYLE: any[] = [
   {
     selector: "edge",
     style: {
+      label: "data(edgeType)",
+      "font-size": 8,
+      color: "#64748b",
+      "text-background-color": "#ffffff",
+      "text-background-opacity": 0.9,
+      "text-background-padding": "2px",
       width: 1.5,
       "line-color": "data(lineColor)",
       "target-arrow-color": "data(lineColor)",
       "target-arrow-shape": "triangle",
       "curve-style": "bezier",
       "arrow-scale": 0.8,
+    },
+  },
+  {
+    selector: ".selected-edge",
+    style: {
+      "line-color": "#0ea5e9",
+      "target-arrow-color": "#0ea5e9",
+      width: 3,
     },
   },
   {
@@ -200,6 +216,7 @@ export default function GraphCanvas({
   onNodeClick,
   onEdgeClick,
   selectedNodeId,
+  selectedEdgeId,
 }: GraphCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
@@ -259,6 +276,16 @@ export default function GraphCanvas({
       cy.getElementById(selectedNodeId).addClass("detail-node");
     }
   }, [selectedNodeId]);
+
+  // Highlight the edge shown in the detail panel.
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    cy.elements().removeClass("selected-edge");
+    if (selectedEdgeId) {
+      cy.getElementById(selectedEdgeId).addClass("selected-edge");
+    }
+  }, [selectedEdgeId]);
 
   return (
     <div

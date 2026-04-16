@@ -7,6 +7,14 @@ interface NodeDetailProps {
   edge: GraphEdge | null;
 }
 
+const SYSTEM_NAMES: Record<string, string> = {
+  rxnorm: "RxNorm",
+  snomed: "SNOMED CT",
+  loinc: "LOINC",
+  icd10: "ICD-10-CM",
+  cpt: "CPT",
+};
+
 const TYPE_BADGE_COLORS: Record<string, string> = {
   Guideline: "bg-purple-100 text-purple-800 border-purple-300",
   Recommendation: "bg-blue-100 text-blue-800 border-blue-300",
@@ -48,56 +56,75 @@ function formatPredicateArgs(node: PredicateNode): string {
   return args;
 }
 
-function PredicateTree({ node, depth = 0 }: { node: PredicateNode; depth?: number }) {
-  // Leaf predicate
-  if (node.predicate) {
-    const args = formatPredicateArgs(node);
-    return (
-      <div className="flex items-start gap-1.5 py-0.5" style={{ paddingLeft: depth * 16 }}>
-        <span className="text-blue-700 font-mono text-xs font-medium">
-          {node.predicate}
-        </span>
-        {args && (
-          <span className="text-slate-500 font-mono text-xs">({args})</span>
-        )}
-      </div>
-    );
-  }
+const COMPOSITE_OPS = new Set(["all_of", "any_of", "none_of"]);
 
-  // Composite operators
-  const operators: Array<{ key: "all_of" | "any_of" | "none_of"; label: string; color: string }> = [
-    { key: "all_of", label: "ALL OF", color: "text-green-700" },
-    { key: "any_of", label: "ANY OF", color: "text-amber-700" },
-    { key: "none_of", label: "NONE OF", color: "text-red-700" },
-  ];
+const OP_STYLE: Record<string, { label: string; color: string }> = {
+  all_of: { label: "ALL OF", color: "text-green-700" },
+  any_of: { label: "ANY OF", color: "text-amber-700" },
+  none_of: { label: "NONE OF", color: "text-red-700" },
+};
+
+function PredicateTree({ node, depth = 0 }: { node: PredicateNode; depth?: number }) {
+  const entries = Object.entries(node);
 
   return (
     <>
-      {operators.map(({ key, label, color }) => {
-        const children = node[key];
-        if (!children || !Array.isArray(children)) return null;
-        return (
-          <div key={key} className="py-0.5">
-            <div
-              className={`text-[11px] font-semibold uppercase tracking-wide ${color}`}
-              style={{ paddingLeft: depth * 16 }}
-            >
-              {label}
+      {entries.map(([key, value], i) => {
+        // Composite operator — recurse into children.
+        if (COMPOSITE_OPS.has(key) && Array.isArray(value)) {
+          const { label, color } = OP_STYLE[key]!;
+          return (
+            <div key={i} className="py-0.5">
+              <div
+                className={`text-[11px] font-semibold uppercase tracking-wide ${color}`}
+                style={{ paddingLeft: depth * 16 }}
+              >
+                {label}
+              </div>
+              {(value as PredicateNode[]).map((child, j) => (
+                <PredicateTree key={j} node={child} depth={depth + 1} />
+              ))}
             </div>
-            {children.map((child: PredicateNode, i: number) => (
-              <PredicateTree key={i} node={child} depth={depth + 1} />
-            ))}
-          </div>
-        );
+          );
+        }
+
+        // Explicit "predicate" field (spec format).
+        if (key === "predicate") return null; // handled below
+
+        // Leaf predicate — the key is the predicate name, value is its args.
+        // e.g. {"age_between": {"min": 40, "max": 75}}
+        if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+          const args = Object.entries(value as Record<string, unknown>)
+            .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+            .join(", ");
+          return (
+            <div key={i} className="flex items-start gap-1.5 py-0.5" style={{ paddingLeft: depth * 16 }}>
+              <span className="text-blue-700 font-mono text-xs font-medium">{key}</span>
+              {args && <span className="text-slate-500 font-mono text-xs">({args})</span>}
+            </div>
+          );
+        }
+
+        return null;
       })}
+
+      {/* Handle explicit "predicate" field format: {predicate: "name", arg1: val1} */}
+      {node.predicate && (
+        <div className="flex items-start gap-1.5 py-0.5" style={{ paddingLeft: depth * 16 }}>
+          <span className="text-blue-700 font-mono text-xs font-medium">{node.predicate}</span>
+          {formatPredicateArgs(node) && (
+            <span className="text-slate-500 font-mono text-xs">({formatPredicateArgs(node)})</span>
+          )}
+        </div>
+      )}
     </>
   );
 }
 
 function EligibilityBlock({ value }: { value: unknown }) {
-  if (!value || typeof value !== "object") return null;
+  if (!value) return null;
 
-  // Try parsing if it's a string (JSON stored in Neo4j).
+  // Try parsing if it's a string (JSON stored as text in Neo4j).
   let parsed: PredicateNode;
   if (typeof value === "string") {
     try {
@@ -224,7 +251,10 @@ function NodePanel({ node }: { node: GraphNode }) {
               <span
                 key={i}
                 className="inline-block bg-slate-100 px-2 py-0.5 rounded text-xs cursor-default"
-                title={c.display ?? `${c.system.toUpperCase()} code ${c.code}`}
+                title={
+                  c.display ??
+                  `${displayName} — ${SYSTEM_NAMES[c.system] ?? c.system.toUpperCase()} ${c.code}`
+                }
               >
                 {c.system}:{c.code}
               </span>

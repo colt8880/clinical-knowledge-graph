@@ -145,8 +145,8 @@ _EXIT_CHECKERS = {
 # Predicate tree evaluation
 # ---------------------------------------------------------------------------
 
-# Composite operators
-_COMPOSITE_OPS = {"all_of", "any_of", "none_of"}
+# Composite operators — tuple, not set, for deterministic iteration order.
+_COMPOSITE_OPS = ("all_of", "any_of", "none_of")
 
 # Map composite names to evaluator functions
 _COMPOSITE_EVALUATORS = {

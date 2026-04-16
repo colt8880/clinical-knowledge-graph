@@ -8,6 +8,7 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 
 - **`most_recent_observation_value` on missing data.** Three-valued logic returns `unknown`. The predicate then resolves per its `missing_data` policy. Need to pick the default for LDL / TC / HDL — lean `unknown_is_false` so a Rec without a lipid panel is `insufficient_evidence` rather than automatically emitted. Pin before first evaluator implementation.
 - **Most-recent ordering tiebreaker when two observations share `effective_date`.** Proposed: deterministic lexicographic tiebreak by `id`. Pin in `predicate-dsl.md` before evaluator writes the first event.
+- **`policy_overrides` not yet wired in predicate evaluation.** The v0 predicate evaluator reads each predicate's default missing-data policy from the catalog but does not consult `PatientContext.policy_overrides`. No v0 fixture exercises overrides. Wire before un-deferring the missing-lipid-panel fixture (v0.1 candidate).
 - **Unit coercion for value quantities.** `mm[Hg]` vs `mmHg`, `mg/dL` casing. Lean evaluator-side normalization over strict adapter validation.
 - **`risk_score_lookup` when supplied value is stale.** v0 has no freshness check; `risk_scores.ascvd_10yr` is trusted as-of `evaluation_time`. Document the assumption.
 

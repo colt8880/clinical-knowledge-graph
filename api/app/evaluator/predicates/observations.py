@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Any
 
-from app.evaluator.trace import compute_age
+from app.evaluator.predicates.compare import compare_value
 
 
 def _parse_iso_duration_to_days(duration: str) -> int:
@@ -41,23 +41,6 @@ def _normalize_unit(unit: str) -> str:
     """
     normalized = unit.lower().replace("[", "").replace("]", "")
     return normalized
-
-
-def _compare(value: float, comparator: str, threshold: float) -> bool:
-    """Apply a comparator to a value and threshold."""
-    if comparator == "eq":
-        return value == threshold
-    elif comparator == "ne":
-        return value != threshold
-    elif comparator == "gt":
-        return value > threshold
-    elif comparator == "lt":
-        return value < threshold
-    elif comparator == "gte":
-        return value >= threshold
-    elif comparator == "lte":
-        return value <= threshold
-    raise ValueError(f"Unknown comparator: {comparator}")
 
 
 def eval_most_recent_observation_value(
@@ -143,7 +126,7 @@ def eval_most_recent_observation_value(
     matching.sort(key=lambda x: (x[0], x[1]), reverse=True)
     most_recent_value = matching[0][2]
 
-    return "true" if _compare(most_recent_value, comparator, threshold) else "false"
+    return "true" if compare_value(most_recent_value, comparator, threshold) else "false"
 
 
 def _extract_value(obs: dict[str, Any]) -> float | None:

@@ -8,20 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-
-def _compare(value: float, comparator: str, threshold: float) -> bool:
-    """Apply comparator."""
-    if comparator == "eq":
-        return value == threshold
-    elif comparator == "gt":
-        return value > threshold
-    elif comparator == "lt":
-        return value < threshold
-    elif comparator == "gte":
-        return value >= threshold
-    elif comparator == "lte":
-        return value <= threshold
-    raise ValueError(f"Unknown comparator: {comparator}")
+from app.evaluator.predicates.compare import compare_value
 
 
 def eval_risk_score_compares(
@@ -49,4 +36,4 @@ def eval_risk_score_compares(
     if value is None:
         return "unknown"
 
-    return "true" if _compare(value, comparator, threshold) else "false"
+    return "true" if compare_value(value, comparator, threshold) else "false"

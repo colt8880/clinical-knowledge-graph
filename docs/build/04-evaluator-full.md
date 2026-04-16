@@ -6,7 +6,7 @@
 
 ## Context
 
-Feature 03 proved the evaluator pipeline on one fixture with one predicate. This feature fills in every remaining predicate needed by the v0 statin model and asserts all 5 fixtures produce their golden traces. After this ships, the evaluator is feature-complete for v0.
+Feature 03Mer proved the evaluator pipeline on one fixture with one predicate. This feature fills in every remaining predicate needed by the v0 statin model and asserts all 5 fixtures produce their golden traces. After this ships, the evaluator is feature-complete for v0.
 
 ## Required reading
 

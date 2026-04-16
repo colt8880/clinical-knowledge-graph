@@ -18,7 +18,7 @@ Single `docker-compose up` brings up Neo4j + API + UI wired together. This is th
 ## Scope
 
 - `docker-compose.yml` at repo root — three services: `neo4j`, `api`, `ui`.
-- `scripts/seed.sh` — wait for Neo4j, apply `graph/constraints.cypher` + `graph/seed.cypher`, assert node/edge counts, exit 0 on success.
+- `scripts/seed.sh` — wait for Neo4j, apply `graph/constraints.cypher` + `graph/seeds/statins.cypher`, assert node/edge counts, exit 0 on success.
 - Update root `README.md` with "Quickstart: `docker compose up`".
 - Update `docs/workflow.md` if the developer loop changes.
 
@@ -43,7 +43,7 @@ Single `docker-compose up` brings up Neo4j + API + UI wired together. This is th
 
 - All scope files exist and match constraints.
 - All verification targets pass locally.
-- `docs/reference/build-status.md` updated: note full-stack compose readiness.
+- `docs/reference/build-status.md` backlog row updated.
 - Root `README.md` has a working Quickstart.
 - PR opened with Scope / Manual Test Steps / Manual Test Output (include the output of `docker compose ps` showing all healthy).
 - `pr-reviewer` subagent run; blocking feedback addressed.

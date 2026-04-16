@@ -14,7 +14,7 @@ Second tab of the UI: pick a fixture, run it through `/evaluate`, step through t
 - `docs/specs/ui.md` — Eval tab spec.
 - `docs/specs/eval-trace.md` — event shapes; the stepper renders these directly.
 - `docs/contracts/eval-trace.schema.json`
-- `evals/statins/README.md` — fixture list shown in the fixture picker.
+- `evals/fixtures/statins/README.md` — fixture list shown in the fixture picker.
 
 ## Scope
 
@@ -40,13 +40,13 @@ Second tab of the UI: pick a fixture, run it through `/evaluate`, step through t
 - `cd ui && npm run build` — exits 0.
 - `cd ui && npm run test` — all tests pass.
 - Manual: Eval tab, select `01-high-risk-55m`, press `→` repeatedly; each event highlights the relevant node on the graph; terminal event is `recommendation_emitted(rec:statin-initiate-grade-b, due)`; the recommendations strip shows exactly one Grade B rec.
-- Repeat for fixtures 02–05; terminal events match `docs/reference/statin-model.md#patient-path-summary`.
+- Repeat for fixtures 02–05; terminal events match `docs/reference/guidelines/statins.md#patient-path-summary`.
 
 ## Definition of done
 
 - All scope files exist and match constraints.
 - All verification targets pass locally.
-- `docs/reference/build-status.md`: `Eval tab` → `tested`.
+- `docs/reference/build-status.md` backlog row updated.
 - PR opened with Scope / Manual Test Steps / Manual Test Output (screenshots or short GIF).
 - `pr-reviewer` subagent run; blocking feedback addressed.
 

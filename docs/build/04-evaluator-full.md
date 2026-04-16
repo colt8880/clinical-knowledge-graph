@@ -12,8 +12,8 @@ Feature 03 proved the evaluator pipeline on one fixture with one predicate. This
 
 - Everything from 03's required reading.
 - `evals/SPEC.md` — runner contract.
-- `evals/statins/README.md` — fixture inventory.
-- `evals/statins/01-*/`, `02-*/`, `04-*/`, `05-*/` — the remaining fixtures.
+- `evals/fixtures/statins/README.md` — fixture inventory.
+- `evals/fixtures/statins/01-*/`, `02-*/`, `04-*/`, `05-*/` — the remaining fixtures.
 
 ## Scope
 
@@ -43,17 +43,14 @@ Feature 03 proved the evaluator pipeline on one fixture with one predicate. This
 
 - `cd api && pytest` — all tests pass, including all 5 golden-trace fixtures.
 - `python evals/runner.py` (or equivalent) — all 5 fixtures pass.
-- Each fixture's terminal event matches the row in `docs/reference/statin-model.md#patient-path-summary`.
+- Each fixture's terminal event matches the row in `docs/reference/guidelines/statins.md#patient-path-summary`.
 - Re-running produces identical bytes (determinism check).
 
 ## Definition of done
 
 - All scope files exist and match constraints.
 - All verification targets pass locally.
-- `docs/reference/build-status.md`:
-  - `Trace-first evaluator` → `tested`
-  - `Predicate engine (v0 subset)` → `tested`
-  - `Eval runner` → `implemented` or `tested`
+- `docs/reference/build-status.md` backlog row updated.
 - PR opened with Scope / Manual Test Steps / Manual Test Output.
 - `pr-reviewer` subagent run; blocking feedback addressed.
 

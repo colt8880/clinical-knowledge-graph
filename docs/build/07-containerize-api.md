@@ -39,7 +39,7 @@ Package the FastAPI app as a container so it can be run alongside Neo4j via comp
 
 - All scope files exist and match constraints.
 - All verification targets pass locally.
-- `docs/reference/build-status.md`: note container availability in the `FastAPI skeleton` row.
+- `docs/reference/build-status.md` backlog row updated.
 - PR opened with Scope / Manual Test Steps / Manual Test Output.
 - `pr-reviewer` subagent run; blocking feedback addressed.
 

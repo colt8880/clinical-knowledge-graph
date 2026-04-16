@@ -46,11 +46,7 @@ Stand up the Next.js app with the Explore tab: manual graph traversal backed by 
 
 - All scope files exist and match constraints.
 - All verification targets pass locally.
-- `docs/reference/build-status.md`:
-  - `Next.js skeleton` → `scaffolded`
-  - `OpenAPI → TS codegen` → `implemented`
-  - `Shared GraphCanvas` → `implemented`
-  - `Explore tab` → `implemented` or `tested`
+- `docs/reference/build-status.md` backlog row updated.
 - PR opened with Scope / Manual Test Steps / Manual Test Output (include a screenshot).
 - `pr-reviewer` subagent run; blocking feedback addressed.
 

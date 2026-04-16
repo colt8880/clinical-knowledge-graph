@@ -67,36 +67,20 @@ test.describe("Explore tab", () => {
     await expect(detail).toContainText("Strategy", { timeout: 10_000 });
   });
 
-  test("clicking a node in the canvas updates the detail panel", async ({
+  test("navigating between recs updates detail panel content", async ({
     page,
   }) => {
-    await page.goto("/explore");
+    // Start with Grade B rec selected.
+    const g = encodeURIComponent("guideline:uspstf-statin-2022");
+    const rB = encodeURIComponent("rec:statin-initiate-grade-b");
+    await page.goto(`/explore?g=${g}&r=${rB}`);
 
-    await expect(page.getByTestId("graph-canvas")).toBeVisible({
-      timeout: 10_000,
-    });
+    const detail = page.getByTestId("node-detail");
+    await expect(detail).toContainText("Grade B", { timeout: 10_000 });
 
-    // Click somewhere in the canvas area (a Recommendation node).
-    // Cytoscape renders to <canvas>, so we click by coordinates.
-    // The Recommendation column is at roughly x=380 (LEFT_PAD + 1*COL_SPACING).
-    // We click the first rec node which is near the vertical center.
-    const canvas = page.getByTestId("graph-canvas");
-    const box = await canvas.boundingBox();
-    if (box) {
-      // Click toward the right side where Recommendation nodes are.
-      // The layout positions them at COL_SPACING (260px) from the left.
-      await canvas.click({
-        position: { x: box.width * 0.45, y: box.height * 0.35 },
-      });
-
-      // Give a moment for the click to register.
-      await page.waitForTimeout(500);
-
-      // The URL should now have a ?r= param if we hit a rec node,
-      // or the detail panel content should have changed.
-      // We can't guarantee exact pixel hits, so just verify the page
-      // is still functional.
-      await expect(page.getByTestId("node-detail")).toBeVisible();
-    }
+    // Navigate to Grade C rec via URL.
+    const rC = encodeURIComponent("rec:statin-selective-grade-c");
+    await page.goto(`/explore?g=${g}&r=${rC}`);
+    await expect(detail).toContainText("Grade C", { timeout: 10_000 });
   });
 });

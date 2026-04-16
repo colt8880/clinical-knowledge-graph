@@ -6,21 +6,10 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchNeighbors } from "@/lib/api/client";
 import type { GraphNode, GraphEdge } from "@/lib/api/client";
 import GraphCanvas, { type CanvasColumn } from "@/components/GraphCanvas";
-import { filterChildren } from "@/components/ColumnBrowser";
+import { filterChildren, TYPE_RANK } from "@/components/ColumnBrowser";
 import NodeDetail from "@/components/NodeDetail";
 
 const DEFAULT_GUIDELINE = "guideline:uspstf-statin-2022";
-
-/** Hierarchy rank — used to determine which column a clicked node belongs to. */
-const TYPE_RANK: Record<string, number> = {
-  Guideline: 0,
-  Recommendation: 1,
-  Strategy: 2,
-  Condition: 3,
-  Medication: 3,
-  Procedure: 3,
-  Observation: 3,
-};
 
 /**
  * URL state: ?g=<guideline>&r=<rec>&s=<strategy>

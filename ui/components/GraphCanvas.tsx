@@ -106,7 +106,7 @@ function buildElements(
           id: n.id,
           label: display,
           nodeType: type,
-          bgColor: isSelected ? colors.bg : colors.bg,
+          bgColor: colors.bg,
           borderColor: colors.border,
           nodeWidth,
           nodeHeight,

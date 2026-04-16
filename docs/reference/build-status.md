@@ -14,7 +14,7 @@ Status values: `pending` | `in-progress` | `shipped` | `blocked`.
 | 10 | Contract alignment tests | api, docs | shipped | 02 | [10](../../docs/build/10-contract-alignment-tests.md) | [#8](../../pull/8) |
 | 11 | CI skeleton (GitHub Actions) | ci | shipped | 02 | [11](../../docs/build/11-ci-skeleton.md) | [#7](../../pull/7) |
 | 04 | Evaluator full (remaining predicates) | api, evals | shipped | 03 | [04](../../docs/build/04-evaluator-full.md) | [#11](../../pull/11) |
-| 05 | UI Explore tab | ui | pending | 02 | [05](../../docs/build/05-ui-explore.md) | — |
+| 05 | UI Explore tab | ui | shipped | 02 | [05](../../docs/build/05-ui-explore.md) | [#12](../../pull/12) |
 | 06 | UI Eval tab with trace stepper | ui | pending | 04, 05 | [06](../../docs/build/06-ui-eval.md) | — |
 | 07 | Dockerfile for `/api` | api | pending | 04 | [07](../../docs/build/07-containerize-api.md) | — |
 | 08 | Dockerfile for `/ui` | ui | pending | 06 | [08](../../docs/build/08-containerize-ui.md) | — |

@@ -34,15 +34,6 @@ def _parse_iso_duration_to_days(duration: str) -> int:
     return days
 
 
-def _normalize_unit(unit: str) -> str:
-    """Normalize common unit variations for comparison.
-
-    Per docs/ISSUES.md: unit normalization happens in the observation predicate.
-    """
-    normalized = unit.lower().replace("[", "").replace("]", "")
-    return normalized
-
-
 def eval_most_recent_observation_value(
     args: dict[str, Any], patient_context: dict[str, Any], entities: dict[str, Any]
 ) -> str:

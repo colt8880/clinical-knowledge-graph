@@ -10,6 +10,8 @@ import type { components } from "./schema";
 export type GraphNode = components["schemas"]["GraphNode"];
 export type GraphEdge = components["schemas"]["GraphEdge"];
 export type Subgraph = components["schemas"]["Subgraph"];
+export type EvalTrace = components["schemas"]["eval-trace.schema"];
+export type PatientContext = components["schemas"]["patient-context.schema"];
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -39,6 +41,16 @@ export async function fetchNeighbors(
   return apiFetch<Subgraph>(
     `/nodes/${encodeURIComponent(id)}/neighbors${qs ? `?${qs}` : ""}`,
   );
+}
+
+export async function evaluate(
+  patientContext: PatientContext,
+): Promise<EvalTrace> {
+  return apiFetch<EvalTrace>("/evaluate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ patient_context: patientContext }),
+  });
 }
 
 export async function searchNodes(

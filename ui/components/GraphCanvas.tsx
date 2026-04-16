@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import type { GraphNode, GraphEdge } from "@/lib/api/client";
 
@@ -26,6 +26,8 @@ interface GraphCanvasProps {
   selectedNodeId?: string | null;
   /** Which edge is selected (for detail panel highlight). */
   selectedEdgeId?: string | null;
+  /** Node ID(s) highlighted by the Eval tab stepper. */
+  highlightedNodeIds?: string[];
 }
 
 /** Color palette keyed by Neo4j label. */
@@ -208,6 +210,16 @@ const CY_STYLE: any[] = [
       "overlay-padding": 5,
     },
   },
+  {
+    selector: ".eval-highlight",
+    style: {
+      "border-width": 3,
+      "border-color": "#f59e0b",
+      "overlay-color": "#f59e0b",
+      "overlay-opacity": 0.15,
+      "overlay-padding": 6,
+    },
+  },
 ];
 
 export default function GraphCanvas({
@@ -217,9 +229,12 @@ export default function GraphCanvas({
   onEdgeClick,
   selectedNodeId,
   selectedEdgeId,
+  highlightedNodeIds: highlightedIds,
 }: GraphCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
+  // Incremented each time cy is recreated so highlight effects re-fire.
+  const [cyVersion, setCyVersion] = useState(0);
 
   const onNodeClickRef = useRef(onNodeClick);
   onNodeClickRef.current = onNodeClick;
@@ -257,6 +272,7 @@ export default function GraphCanvas({
     });
 
     cyRef.current = cy;
+    setCyVersion((v) => v + 1);
   }, [columns, edges]);
 
   useEffect(() => {
@@ -286,6 +302,19 @@ export default function GraphCanvas({
       cy.getElementById(selectedEdgeId).addClass("selected-edge");
     }
   }, [selectedEdgeId]);
+
+  // Eval tab: highlight node(s) for the current trace step.
+  // Depends on cyVersion so it re-fires after cy is recreated (column expansion).
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    cy.elements().removeClass("eval-highlight");
+    if (highlightedIds && highlightedIds.length > 0) {
+      for (const id of highlightedIds) {
+        cy.getElementById(id).addClass("eval-highlight");
+      }
+    }
+  }, [highlightedIds, cyVersion]);
 
   return (
     <div

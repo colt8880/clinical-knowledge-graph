@@ -32,9 +32,10 @@ RUN addgroup --system --gid 1001 ckg \
 
 WORKDIR /app
 
-# Copy standalone server and static assets
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Copy standalone server and static assets (owned by ckg so the
+# entrypoint can sed-replace API_BASE_URL at runtime)
+COPY --from=builder --chown=ckg:ckg /app/.next/standalone ./
+COPY --from=builder --chown=ckg:ckg /app/.next/static ./.next/static
 
 # Copy entrypoint for runtime API_BASE_URL injection
 COPY ui/docker-entrypoint.sh /docker-entrypoint.sh

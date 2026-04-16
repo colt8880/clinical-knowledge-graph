@@ -1,93 +1,119 @@
 /**
- * Explore tab e2e tests.
+ * Explore tab e2e tests — column browser navigation.
  *
  * Requires: API running at localhost:8000 with a seeded Neo4j graph.
  * Run: cd ui && npm run test
  *
- * The test verifies the core Explore flow:
- *  1. Page loads with the guideline node auto-pinned, showing its children.
- *  2. Clicking a Recommendation navigates down to show that rec's children.
- *  3. Deep link via ?pinned= restores the correct view.
+ * Tests verify the Miller-column hierarchy:
+ *   Guideline → Recommendations → Strategies → Actions
  */
 import { test, expect } from "@playwright/test";
 
-const GUIDELINE_ID = "guideline:uspstf-statin-2022";
-
 test.describe("Explore tab", () => {
-  test("loads the guideline node and renders Recommendation children", async ({
+  test("loads with Guidelines and Recommendations columns", async ({
     page,
   }) => {
     await page.goto("/explore");
 
     await expect(page.getByTestId("explore-page")).toBeVisible();
-    await expect(page.getByTestId("graph-canvas")).toBeVisible();
+    await expect(page.getByTestId("column-browser")).toBeVisible();
 
-    // Wait for the 3 Recommendation children to appear in the sidebar.
-    await expect(async () => {
-      const count = await page.locator("aside ul li").count();
-      expect(count).toBe(3);
-    }).toPass({ timeout: 10_000 });
+    // Should have 2 columns initially: Guidelines and Recommendations.
+    const columns = page.locator("[data-testid='column-browser'] > div");
+    await expect(columns).toHaveCount(2, { timeout: 10_000 });
+
+    // The Recommendations column should have 3 items (the 3 statin recs).
+    const recItems = columns.nth(1).locator("ul li button");
+    await expect(recItems).toHaveCount(3, { timeout: 10_000 });
   });
 
-  test("clicking a recommendation navigates down the hierarchy", async ({
+  test("clicking a recommendation adds a Strategies column", async ({
     page,
   }) => {
     await page.goto("/explore");
 
-    // Wait for children to load.
-    await expect(async () => {
-      const count = await page.locator("aside ul li").count();
-      expect(count).toBe(3);
-    }).toPass({ timeout: 10_000 });
+    // Wait for Recommendations to load.
+    const columns = page.locator("[data-testid='column-browser'] > div");
+    await expect(columns).toHaveCount(2, { timeout: 10_000 });
 
-    // Click a recommendation to navigate down.
-    const recButton = page.locator("aside ul li button").first();
-    await recButton.click();
+    // Click the first recommendation.
+    const recButtons = columns.nth(1).locator("ul li button");
+    await recButtons.first().click();
 
-    // Should navigate — URL should change to have the rec as pinned.
-    await expect(page).toHaveURL(/pinned=rec%3A/, { timeout: 5_000 });
+    // A third column (Strategies) should appear.
+    await expect(columns).toHaveCount(3, { timeout: 10_000 });
 
-    // The "Back to parent" button should now be visible.
-    await expect(
-      page.locator("button", { hasText: "Back to parent" }),
-    ).toBeVisible({ timeout: 5_000 });
+    // URL should have ?g= and ?r= params.
+    await expect(page).toHaveURL(/[?&]r=/, { timeout: 5_000 });
   });
 
-  test("deep link with ?pinned= restores state", async ({ page }) => {
-    await page.goto(
-      `/explore?pinned=${encodeURIComponent(GUIDELINE_ID)}`,
-    );
+  test("clicking a strategy adds an Actions column", async ({ page }) => {
+    await page.goto("/explore");
 
-    await expect(page.getByTestId("explore-page")).toBeVisible();
-    await expect(page.getByTestId("graph-canvas")).toBeVisible();
+    const columns = page.locator("[data-testid='column-browser'] > div");
+    await expect(columns).toHaveCount(2, { timeout: 10_000 });
 
-    // Should load the guideline's children (3 recs).
-    await expect(async () => {
-      const count = await page.locator("aside ul li").count();
-      expect(count).toBe(3);
-    }).toPass({ timeout: 10_000 });
+    // Click first rec.
+    await columns.nth(1).locator("ul li button").first().click();
+    await expect(columns).toHaveCount(3, { timeout: 10_000 });
+
+    // Click the strategy.
+    await columns.nth(2).locator("ul li button").first().click();
+
+    // A fourth column (Actions) should appear with medications.
+    await expect(columns).toHaveCount(4, { timeout: 10_000 });
+
+    // URL should have ?g=, ?r=, and ?s= params.
+    await expect(page).toHaveURL(/[?&]s=/, { timeout: 5_000 });
   });
 
-  test("deep link to a recommendation shows its children only", async ({
-    page,
-  }) => {
-    const recId = "rec:statin-initiate-grade-b";
-    await page.goto(
-      `/explore?pinned=${encodeURIComponent(recId)}`,
-    );
+  test("clicking a different rec resets deeper columns", async ({ page }) => {
+    await page.goto("/explore");
+
+    const columns = page.locator("[data-testid='column-browser'] > div");
+    await expect(columns).toHaveCount(2, { timeout: 10_000 });
+
+    // Select first rec → strategies column appears.
+    const recButtons = columns.nth(1).locator("ul li button");
+    await recButtons.first().click();
+    await expect(columns).toHaveCount(3, { timeout: 10_000 });
+
+    // Select strategy → actions column appears.
+    await columns.nth(2).locator("ul li button").first().click();
+    await expect(columns).toHaveCount(4, { timeout: 10_000 });
+
+    // Now click a different rec — should reset to 3 columns.
+    await recButtons.nth(1).click();
+    await expect(columns).toHaveCount(3, { timeout: 10_000 });
+  });
+
+  test("deep link restores column state", async ({ page }) => {
+    const g = encodeURIComponent("guideline:uspstf-statin-2022");
+    const r = encodeURIComponent("rec:statin-initiate-grade-b");
+    await page.goto(`/explore?g=${g}&r=${r}`);
 
     await expect(page.getByTestId("explore-page")).toBeVisible();
 
-    // Should show the rec's children (strategy node), not sibling recs.
-    await expect(async () => {
-      const count = await page.locator("aside ul li").count();
-      // Grade B rec has 1 strategy child.
-      expect(count).toBeGreaterThanOrEqual(1);
-    }).toPass({ timeout: 10_000 });
+    // Should show 3 columns (Guideline, Recommendations, Strategies).
+    const columns = page.locator("[data-testid='column-browser'] > div");
+    await expect(columns).toHaveCount(3, { timeout: 10_000 });
 
-    // Back to parent button should be available.
-    await expect(
-      page.locator("button", { hasText: "Back to parent" }),
-    ).toBeVisible();
+    // The detail panel should be visible.
+    await expect(page.getByTestId("node-detail")).toBeVisible();
+  });
+
+  test("clicking a node shows its details in the panel", async ({ page }) => {
+    await page.goto("/explore");
+
+    const columns = page.locator("[data-testid='column-browser'] > div");
+    await expect(columns).toHaveCount(2, { timeout: 10_000 });
+
+    // Click a recommendation.
+    await columns.nth(1).locator("ul li button").first().click();
+
+    // Detail panel should show node info.
+    const detail = page.getByTestId("node-detail");
+    await expect(detail).toBeVisible({ timeout: 5_000 });
+    await expect(detail).toContainText("Recommendation", { timeout: 5_000 });
   });
 });

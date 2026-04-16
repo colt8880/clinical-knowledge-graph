@@ -1,83 +1,51 @@
 "use client";
 
-import { Suspense, useCallback, useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNeighbors } from "@/lib/api/client";
-import type { GraphNode, Subgraph } from "@/lib/api/client";
-import GraphCanvas from "@/components/GraphCanvas";
+import type { GraphNode } from "@/lib/api/client";
+import ColumnBrowser, {
+  type Column,
+  getColumnLabel,
+  filterChildren,
+} from "@/components/ColumnBrowser";
 import NodeDetail from "@/components/NodeDetail";
 
-/**
- * Default entry point: the statin guideline node.
- * Users land here and expand outward.
- */
-const DEFAULT_PINNED = "guideline:uspstf-statin-2022";
+const DEFAULT_GUIDELINE = "guideline:uspstf-statin-2022";
 
 /**
- * URL state is now just `?pinned=<id>`.
- * The graph shows the pinned node + its direct children only.
- * Clicking a child navigates down (makes it the new pinned node).
- * Clicking the parent navigates back up.
+ * The hierarchy has up to 4 levels:
+ *   0: Guidelines
+ *   1: Recommendations  (children of a Guideline)
+ *   2: Strategies        (children of a Recommendation)
+ *   3: Actions           (children of a Strategy — Medications/Procedures/Observations)
+ *
+ * URL state: ?g=<guideline>&r=<rec>&s=<strategy>
+ * Each param records which node is selected at that level.
+ * Columns to the right of the deepest selection are not shown.
  */
+
 function useUrlState() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const pinned = searchParams.get("pinned") ?? DEFAULT_PINNED;
+  const guideline = searchParams.get("g") ?? DEFAULT_GUIDELINE;
+  const rec = searchParams.get("r") ?? null;
+  const strategy = searchParams.get("s") ?? null;
 
-  const navigate = useCallback(
-    (nextPinned: string) => {
+  const setSelection = useCallback(
+    (g: string, r: string | null, s: string | null) => {
       const params = new URLSearchParams();
-      params.set("pinned", nextPinned);
+      params.set("g", g);
+      if (r) params.set("r", r);
+      if (s) params.set("s", s);
       router.push(`/explore?${params.toString()}`);
     },
     [router],
   );
 
-  return { pinned, navigate };
-}
-
-/**
- * Given a Subgraph response, identify the parent node of the center.
- * The parent is a node connected by an edge where the center is the
- * edge's start (outgoing from center, e.g. FROM_GUIDELINE points
- * Rec -> Guideline, OFFERS_STRATEGY points Rec -> Strategy is actually
- * wrong direction). We use the graph structure: a parent is a neighbor
- * that, if you navigated to it, the current center would appear as its child.
- *
- * Heuristic: the parent is the node with the "higher" type in the hierarchy:
- * Guideline > Recommendation > Strategy > (Medication/Procedure/Observation)
- */
-const TYPE_RANK: Record<string, number> = {
-  Guideline: 0,
-  Recommendation: 1,
-  Strategy: 2,
-  Condition: 3,
-  Medication: 4,
-  Procedure: 4,
-  Observation: 4,
-};
-
-function findParentId(
-  subgraph: Subgraph,
-): string | null {
-  const centerNode = subgraph.nodes.find((n) => n.id === subgraph.center);
-  if (!centerNode) return null;
-  const centerRank = TYPE_RANK[centerNode.labels[0]] ?? 99;
-
-  // Find neighbors with a lower (higher in hierarchy) rank.
-  let bestParent: GraphNode | null = null;
-  let bestRank = centerRank;
-  for (const node of subgraph.nodes) {
-    if (node.id === subgraph.center) continue;
-    const rank = TYPE_RANK[node.labels[0]] ?? 99;
-    if (rank < bestRank) {
-      bestRank = rank;
-      bestParent = node;
-    }
-  }
-  return bestParent?.id ?? null;
+  return { guideline, rec, strategy, setSelection };
 }
 
 export default function ExplorePage() {
@@ -95,195 +63,193 @@ export default function ExplorePage() {
 }
 
 function ExploreContent() {
-  const { pinned, navigate } = useUrlState();
+  const { guideline, rec, strategy, setSelection } = useUrlState();
 
-  // Fetch only the pinned node's direct neighbors.
-  const { data: subgraph, isLoading, error } = useQuery({
-    queryKey: ["neighbors", pinned],
-    queryFn: () => fetchNeighbors(pinned),
+  // Detail panel: which node is inspected (click selects in column, double-click or single-click shows detail).
+  const [detailNodeId, setDetailNodeId] = useState<string | null>(null);
+
+  // ── Fetch each level ───────────────────────────────────────────
+
+  // Level 0: Guideline's neighbors → get Recommendations.
+  const guidelineQuery = useQuery({
+    queryKey: ["neighbors", guideline],
+    queryFn: () => fetchNeighbors(guideline),
   });
 
-  // Detail panel state.
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+  // Level 1: Selected Recommendation's neighbors → get Strategies.
+  const recQuery = useQuery({
+    queryKey: ["neighbors", rec],
+    queryFn: () => fetchNeighbors(rec!),
+    enabled: !!rec,
+  });
 
-  // Filter: only show the center node + its children (nodes at the same
-  // or lower level in the hierarchy). Siblings at the same level as center
-  // that come from the parent are excluded — only children are shown.
-  const { visibleNodes, visibleEdges, parentId } = useMemo(() => {
-    if (!subgraph) return { visibleNodes: [], visibleEdges: [], parentId: null };
+  // Level 2: Selected Strategy's neighbors → get Actions.
+  const strategyQuery = useQuery({
+    queryKey: ["neighbors", strategy],
+    queryFn: () => fetchNeighbors(strategy!),
+    enabled: !!strategy,
+  });
 
-    const parentId = findParentId(subgraph);
-    const centerNode = subgraph.nodes.find((n) => n.id === subgraph.center);
-    if (!centerNode) return { visibleNodes: [], visibleEdges: [], parentId: null };
+  // ── Build columns ─────────────────────────────────────────────
 
-    const centerRank = TYPE_RANK[centerNode.labels[0]] ?? 99;
-
-    // Keep: the center node, plus neighbors that are children (higher rank number)
-    // or the parent (for back-navigation). Exclude siblings at the same rank.
-    const visibleNodes = subgraph.nodes.filter((n) => {
-      if (n.id === subgraph.center) return true;
-      if (n.id === parentId) return true;
-      const rank = TYPE_RANK[n.labels[0]] ?? 99;
-      return rank > centerRank;
-    });
-
-    const visibleNodeIds = new Set(visibleNodes.map((n) => n.id));
-
-    // Only keep edges between visible nodes.
-    const visibleEdges = subgraph.edges.filter(
-      (e) => visibleNodeIds.has(e.start) && visibleNodeIds.has(e.end),
+  // Column 0: Guidelines (just the one for v0).
+  const guidelineNodes: GraphNode[] = useMemo(() => {
+    if (!guidelineQuery.data) return [];
+    const center = guidelineQuery.data.nodes.find(
+      (n) => n.id === guidelineQuery.data!.center,
     );
+    return center ? [center] : [];
+  }, [guidelineQuery.data]);
 
-    return { visibleNodes, visibleEdges, parentId };
-  }, [subgraph]);
+  // Column 1: Recommendations (children of the guideline).
+  const recNodes: GraphNode[] = useMemo(() => {
+    if (!guidelineQuery.data) return [];
+    return filterChildren(guidelineQuery.data.nodes, guideline);
+  }, [guidelineQuery.data, guideline]);
 
-  const selectedNode = useMemo(
-    () => visibleNodes.find((n) => n.id === selectedNodeId) ?? null,
-    [visibleNodes, selectedNodeId],
+  // Column 2: Strategies (children of the selected rec).
+  const strategyNodes: GraphNode[] = useMemo(() => {
+    if (!rec || !recQuery.data) return [];
+    return filterChildren(recQuery.data.nodes, rec);
+  }, [rec, recQuery.data]);
+
+  // Column 3: Actions (children of the selected strategy).
+  const actionNodes: GraphNode[] = useMemo(() => {
+    if (!strategy || !strategyQuery.data) return [];
+    return filterChildren(strategyQuery.data.nodes, strategy);
+  }, [strategy, strategyQuery.data]);
+
+  // Assemble the visible columns.
+  const columns: Column[] = useMemo(() => {
+    const cols: Column[] = [
+      {
+        label: getColumnLabel(guidelineNodes),
+        nodes: guidelineNodes,
+        selectedId: guideline,
+      },
+      {
+        label: getColumnLabel(recNodes),
+        nodes: recNodes,
+        selectedId: rec,
+      },
+    ];
+
+    // Show strategies column only when a rec is selected.
+    if (rec) {
+      cols.push({
+        label: getColumnLabel(strategyNodes),
+        nodes: strategyNodes,
+        selectedId: strategy,
+      });
+    }
+
+    // Show actions column only when a strategy is selected.
+    if (strategy) {
+      cols.push({
+        label: getColumnLabel(actionNodes),
+        nodes: actionNodes,
+        selectedId: null,
+      });
+    }
+
+    return cols;
+  }, [
+    guidelineNodes,
+    recNodes,
+    strategyNodes,
+    actionNodes,
+    guideline,
+    rec,
+    strategy,
+  ]);
+
+  // ── All fetched nodes (for detail panel lookup) ────────────────
+
+  const allNodes: GraphNode[] = useMemo(() => {
+    const map = new Map<string, GraphNode>();
+    for (const q of [guidelineQuery, recQuery, strategyQuery]) {
+      if (q.data) {
+        for (const n of q.data.nodes) {
+          if (!map.has(n.id)) map.set(n.id, n);
+        }
+      }
+    }
+    return Array.from(map.values());
+  }, [guidelineQuery.data, recQuery.data, strategyQuery.data]);
+
+  const detailNode = useMemo(
+    () => allNodes.find((n) => n.id === detailNodeId) ?? null,
+    [allNodes, detailNodeId],
   );
 
-  const selectedEdge = useMemo(
-    () => visibleEdges.find((e) => e.id === selectedEdgeId) ?? null,
-    [visibleEdges, selectedEdgeId],
-  );
+  // ── Selection handler ──────────────────────────────────────────
 
-  // Clicking a node: navigate to it (hierarchical traversal).
-  const handleNodeClick = useCallback(
-    (nodeId: string) => {
-      setSelectedNodeId(nodeId);
-      setSelectedEdgeId(null);
+  const handleSelect = useCallback(
+    (columnIndex: number, nodeId: string) => {
+      // Always show detail for the clicked node.
+      setDetailNodeId(nodeId);
 
-      // If clicking the center node, just select it (show detail).
-      if (nodeId === pinned) return;
-
-      // Navigate to the clicked node (down to a child, or up to parent).
-      navigate(nodeId);
+      switch (columnIndex) {
+        case 0:
+          // Clicking a guideline — reset everything below.
+          setSelection(nodeId, null, null);
+          break;
+        case 1:
+          // Clicking a rec — keep guideline, set rec, clear strategy.
+          setSelection(guideline, nodeId, null);
+          break;
+        case 2:
+          // Clicking a strategy — keep guideline + rec, set strategy.
+          setSelection(guideline, rec, nodeId);
+          break;
+        case 3:
+          // Clicking an action — just show detail, no deeper level.
+          break;
+      }
     },
-    [pinned, navigate],
+    [guideline, rec, setSelection],
   );
 
-  const handleEdgeClick = useCallback(
-    (edgeId: string) => {
-      setSelectedEdgeId(edgeId);
-      setSelectedNodeId(null);
-    },
-    [],
-  );
+  // Show detail when URL state changes selections.
+  useEffect(() => {
+    if (strategy) setDetailNodeId(strategy);
+    else if (rec) setDetailNodeId(rec);
+    else setDetailNodeId(guideline);
+  }, [guideline, rec, strategy]);
 
-  const centerNode = useMemo(
-    () => visibleNodes.find((n) => n.id === pinned) ?? null,
-    [visibleNodes, pinned],
-  );
+  const isLoading =
+    guidelineQuery.isLoading ||
+    (!!rec && recQuery.isLoading) ||
+    (!!strategy && strategyQuery.isLoading);
 
-  const centerLabel = centerNode
-    ? ((centerNode.properties.title as string) ??
-       (centerNode.properties.name as string) ??
-       (centerNode.properties.display_name as string) ??
-       centerNode.id)
-    : pinned;
+  const error =
+    guidelineQuery.error ?? recQuery.error ?? strategyQuery.error;
 
   return (
     <div className="flex h-full" data-testid="explore-page">
-      {/* Left: node list with hierarchy context */}
-      <aside className="w-60 bg-slate-50 border-r border-slate-200 overflow-y-auto shrink-0">
-        <div className="p-3">
-          {/* Back to parent button */}
-          {parentId && (
-            <button
-              onClick={() => navigate(parentId)}
-              className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 mb-3 px-1 py-1 rounded hover:bg-slate-100 transition-colors w-full"
-            >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to parent
-            </button>
-          )}
-
-          <h2 className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 mb-1">
-            Current
-          </h2>
-          <div className="text-sm font-medium text-slate-900 mb-3 px-1">
-            {centerLabel}
-          </div>
-
-          <h2 className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 mb-2">
-            Children ({visibleNodes.filter((n) => n.id !== pinned && n.id !== parentId).length})
-          </h2>
-          {isLoading && (
-            <p className="text-xs text-slate-400">Loading...</p>
-          )}
-          {error && (
-            <p className="text-xs text-red-500">
-              Error: {(error as Error).message}
-            </p>
-          )}
-          <ul className="space-y-0.5">
-            {visibleNodes
-              .filter((n) => n.id !== pinned && n.id !== parentId)
-              .map((n) => {
-                const label =
-                  (n.properties.title as string) ??
-                  (n.properties.name as string) ??
-                  (n.properties.display_name as string) ??
-                  n.id;
-                const isActive = n.id === selectedNodeId;
-                return (
-                  <li key={n.id}>
-                    <button
-                      onClick={() => handleNodeClick(n.id)}
-                      className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${
-                        isActive
-                          ? "bg-blue-100 text-blue-800 font-medium"
-                          : "text-slate-700 hover:bg-slate-100"
-                      }`}
-                      title={`${n.id} — click to navigate`}
-                    >
-                      <span
-                        className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle"
-                        style={{
-                          backgroundColor:
-                            n.labels[0] === "Guideline" ? "#6b21a8" :
-                            n.labels[0] === "Recommendation" ? "#1e40af" :
-                            n.labels[0] === "Strategy" ? "#92400e" :
-                            n.labels[0] === "Condition" ? "#991b1b" :
-                            n.labels[0] === "Procedure" ? "#166534" :
-                            n.labels[0] === "Observation" ? "#3730a3" :
-                            n.labels[0] === "Medication" ? "#9d174d" :
-                            "#64748b",
-                        }}
-                      />
-                      {label}
-                    </button>
-                  </li>
-                );
-              })}
-          </ul>
-        </div>
-      </aside>
-
-      {/* Center: graph canvas */}
-      <div className="flex-1 min-w-0 relative">
-        {visibleNodes.length > 0 && (
-          <GraphCanvas
-            nodes={visibleNodes}
-            edges={visibleEdges}
-            onNodeClick={handleNodeClick}
-            onEdgeClick={handleEdgeClick}
-            selectedNodeId={selectedNodeId}
-          />
-        )}
-        {isLoading && visibleNodes.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center text-slate-400">
+      {/* Column browser — the primary navigation */}
+      <div className="flex-1 min-w-0 flex">
+        {isLoading && allNodes.length === 0 ? (
+          <div className="flex items-center justify-center w-full text-slate-400">
             Loading graph...
           </div>
+        ) : error ? (
+          <div className="flex items-center justify-center w-full text-red-500 text-sm">
+            Error: {(error as Error).message}
+          </div>
+        ) : (
+          <ColumnBrowser
+            columns={columns}
+            onSelect={handleSelect}
+            onNodeDetail={setDetailNodeId}
+            detailNodeId={detailNodeId}
+          />
         )}
       </div>
 
       {/* Right: detail panel */}
       <aside className="w-[420px] bg-slate-50 border-l border-slate-200 overflow-y-auto shrink-0">
-        <NodeDetail node={selectedNode} edge={selectedEdge} />
+        <NodeDetail node={detailNode} edge={null} />
       </aside>
     </div>
   );

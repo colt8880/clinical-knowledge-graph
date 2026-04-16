@@ -18,10 +18,10 @@
 
 ## Fixture shape
 
-Each case is a directory under `evals/<domain>/<id>/` with two files. v0 uses JSON, not YAML; the evaluator and API speak JSON end to end.
+Each case is a directory under `evals/fixtures/<domain>/<id>/` with two files. v0 uses JSON, not YAML; the evaluator and API speak JSON end to end.
 
 ```
-evals/statins/01-high-risk-55m-smoker/
+evals/fixtures/statins/01-high-risk-55m-smoker/
   patient.json           # PatientContext
   expected-outcome.json  # what the trace must contain
 ```
@@ -83,7 +83,7 @@ Same `PatientContext` (including `evaluation_time`) + same graph version + same 
 
 ## v0 seed set
 
-`evals/statins/`:
+`evals/fixtures/statins/`:
 
 | ID | Scenario | What it exercises |
 |---|---|---|
@@ -93,7 +93,7 @@ Same `PatientContext` (including `evaluation_time`) + same graph version + same 
 | `04-grade-i-78f` | 78F, HTN + T2DM | Grade I band (age >= 76) |
 | `05-prior-mi-62m` | 62M, prior MI on atorvastatin | Secondary-prevention exit |
 
-See `evals/statins/README.md` for coverage notes and deferred cases.
+See `evals/fixtures/statins/README.md` for coverage notes and deferred cases.
 
 ## Related docs
 
@@ -101,4 +101,4 @@ See `evals/statins/README.md` for coverage notes and deferred cases.
 - `docs/specs/eval-trace.md` + `docs/contracts/eval-trace.schema.json` — trace shape.
 - `docs/specs/predicate-dsl.md` + `docs/contracts/predicate-catalog.yaml` — predicates.
 - `docs/specs/schema.md` — graph schema.
-- `docs/reference/statin-model.md` — the concrete model the fixtures are evaluated against.
+- `docs/reference/guidelines/statins.md` — the concrete model the fixtures are evaluated against.

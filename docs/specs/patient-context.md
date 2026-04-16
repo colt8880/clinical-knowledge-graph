@@ -164,4 +164,4 @@ See `predicate-dsl.md` § Three-valued logic for the full treatment. For statins
 - Contract: `docs/contracts/patient-context.schema.json`
 - Predicate DSL: `docs/specs/predicate-dsl.md`
 - Predicate catalog: `docs/contracts/predicate-catalog.yaml`
-- Statin model: `docs/reference/statin-model.md`
+- Statin model: `docs/reference/guidelines/statins.md`

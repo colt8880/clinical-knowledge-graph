@@ -6,7 +6,7 @@ FastAPI service exposing read-only graph query endpoints over the v0 statin know
 
 - Python 3.12+
 - Neo4j 5 Community running locally (the `ckg-neo4j` Docker container)
-- Graph seeded via `graph/seed.cypher`
+- Graph seeded via `graph/seeds/statins.cypher`
 
 ## Setup
 

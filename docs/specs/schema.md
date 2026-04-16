@@ -104,11 +104,11 @@ Time-based recurrence is modeled as state on `INCLUDES_ACTION` edges, evaluated 
 
 The `expects` attribute on `INCLUDES_ACTION` is defined in the schema but not used in v0. Statin actions are presence-based: on-therapy satisfies, off-therapy does not. Result-conditional satisfaction re-activates when a guideline requires it (e.g., a negative FIT satisfying CRC screening).
 
-The vocabulary and registry design was worked out in the CRC archive: see `docs/reference/crc-model.archived.md` § "Result-conditional satisfaction" for prior art when this re-enters scope.
+The vocabulary and registry design was worked out in the CRC archive: see `docs/archive/crc-model.md` § "Result-conditional satisfaction" for prior art when this re-enters scope.
 
 ## Related docs
 
 - Predicate DSL used in `structured_eligibility`, `trigger_criteria`, and `PREEMPTED_BY.condition`: see `predicate-dsl.md`
 - API primitives that traverse this schema: see `api-primitives.md`
 - Eval trace events emitted during traversal: see `eval-trace.md`
-- Concrete v0 instantiation: see `docs/reference/statin-model.md`
+- Concrete v0 instantiation: see `docs/reference/guidelines/statins.md`

@@ -7,7 +7,7 @@ Pins the currently-implemented contract to specific versions.
 | Layer | Version | Source |
 |---|---|---|
 | Spec tag | `spec/v2-2026-04-15` (to be tagged) | git tag |
-| Graph version | `unreleased` | `docs/specs/schema.md` + `docs/reference/statin-model.md` |
+| Graph version | `unreleased` | `docs/specs/schema.md` + `docs/reference/guidelines/statins.md` |
 | Evaluator version | `unreleased` | `docs/contracts/predicate-catalog.yaml` + `docs/contracts/eval-trace.schema.json` |
 
 Versions labeled `unreleased` mean the artifact has not been cut; consumers cite the git commit hash of the tree they built against.

@@ -1,7 +1,7 @@
 // v0 statin knowledge-graph seed.
 //
 // Loads the USPSTF 2022 statin primary prevention model exactly as specified in
-// docs/reference/statin-model.md. Structure:
+// docs/reference/guidelines/statins.md. Structure:
 //
 //   Guideline  ── FROM_GUIDELINE ──  Recommendation{R1,R2,R3}
 //                                    │
@@ -20,7 +20,7 @@
 //   source guideline, version, section, and publication date.
 // - Class-level statin strategy: seven Medication members; any one active
 //   prescription satisfies the strategy (v0 does not model intensity by dose;
-//   see statin-model.md § Strategies).
+//   see guidelines/statins.md § Strategies).
 // - structured_eligibility is stored as a JSON string. The predicate tree is
 //   authoritative; edges (EXCLUDED_BY / TRIGGERED_BY) are materialized views
 //   and deliberately not emitted in v0 (no predicate evaluator yet).
@@ -112,7 +112,7 @@ ON CREATE SET
 MERGE (sMod:Strategy {id: 'strategy:statin-moderate-intensity'})
 ON CREATE SET
   sMod.name = 'Moderate-intensity statin therapy',
-  sMod.evidence_note = 'Any active moderate-intensity statin satisfies. v0 does not model intensity by dose; agent-level substitution is acceptable. See statin-model.md.',
+  sMod.evidence_note = 'Any active moderate-intensity statin satisfies. v0 does not model intensity by dose; agent-level substitution is acceptable. See guidelines/statins.md.',
   sMod.source_section = 'Recommendation Summary, Grade B',
   sMod.provenance_guideline = 'guideline:uspstf-statin-2022',
   sMod.provenance_version = '2022-08-23',
@@ -376,7 +376,7 @@ ON CREATE SET
 
 // ---------------------------------------------------------------------------
 // INCLUDES_ACTION edges — moderate-intensity strategy -> 7 statins.
-// Per statin-model.md: intent=primary_prevention, cadence=null, lookback=null,
+// Per guidelines/statins.md: intent=primary_prevention, cadence=null, lookback=null,
 // priority=routine for every member.
 // ---------------------------------------------------------------------------
 

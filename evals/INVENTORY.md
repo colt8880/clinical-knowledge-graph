@@ -1,6 +1,6 @@
 # Evals — Inventory
 
-Top-level inventory. Fixtures live in `evals/<domain>/<id>/`. See `evals/SPEC.md` for spec.
+Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `evals/SPEC.md` for spec.
 
 ## Statins (v0)
 
@@ -8,11 +8,11 @@ Top-level inventory. Fixtures live in `evals/<domain>/<id>/`. See `evals/SPEC.md
 
 | ID | Directory | Coverage |
 |---|---|---|
-| 01 | `statins/01-high-risk-55m-smoker/` | 55M smoker, HTN, supplied ASCVD 18.2%. Grade B happy path. |
-| 02 | `statins/02-borderline-55f-sdm/` | 55F on lisinopril, supplied ASCVD 8.4%. Grade C band; both SDM and moderate-intensity strategies offered. |
-| 03 | `statins/03-too-young-35m/` | 35M smoker, HTN. Age-below-range exit fires before risk lookup. |
-| 04 | `statins/04-grade-i-78f/` | 78F HTN + T2DM. Age >= 76 Grade I band. |
-| 05 | `statins/05-prior-mi-62m/` | 62M post-MI on atorvastatin. Secondary-prevention exit, no Rec emitted. |
+| 01 | `fixtures/statins/01-high-risk-55m-smoker/` | 55M smoker, HTN, supplied ASCVD 18.2%. Grade B happy path. |
+| 02 | `fixtures/statins/02-borderline-55f-sdm/` | 55F on lisinopril, supplied ASCVD 8.4%. Grade C band; both SDM and moderate-intensity strategies offered. |
+| 03 | `fixtures/statins/03-too-young-35m/` | 35M smoker, HTN. Age-below-range exit fires before risk lookup. |
+| 04 | `fixtures/statins/04-grade-i-78f/` | 78F HTN + T2DM. Age >= 76 Grade I band. |
+| 05 | `fixtures/statins/05-prior-mi-62m/` | 62M post-MI on atorvastatin. Secondary-prevention exit, no Rec emitted. |
 
 ### Deferred (tracked in `docs/ISSUES.md`)
 

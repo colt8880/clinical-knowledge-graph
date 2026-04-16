@@ -57,6 +57,10 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 - Care plans, goals, advance directives, code status.
 - Adherence / refill-gap signals.
 
+## Cleanup
+
+- Delete `/diagrams/crc-graph.html` and the `/diagrams` directory once UI Explore tab ships (backlog #05). Interim artifact superseded by live Explore.
+
 ## Process and tooling
 
 - Tag-cutting workflow for `spec/vN-YYYY-MM-DD`. Document when the first tag is cut.

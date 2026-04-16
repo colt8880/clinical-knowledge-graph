@@ -5,7 +5,7 @@ Neo4j schema + seed for the v0 USPSTF 2022 statin primary-prevention model.
 ## Files
 
 - `constraints.cypher` — uniqueness constraints on `id` per node label. Idempotent (`CREATE CONSTRAINT IF NOT EXISTS`).
-- `seed.cypher` — loads the full statin model per `docs/reference/statin-model.md`. Fully idempotent (`MERGE` with `ON CREATE SET`); re-running against a populated DB is a no-op.
+- `seeds/statins.cypher` — loads the full statin model per `docs/reference/guidelines/statins.md`. Fully idempotent (`MERGE` with `ON CREATE SET`); re-running against a populated DB is a no-op. Per-guideline seed files live under `seeds/` (ADR 0016).
 - `CLAUDE.md` — working notes for Claude inside this directory.
 
 Every node and edge carries `provenance_guideline`, `provenance_version`, `provenance_source_section`, and `provenance_publication_date`.
@@ -16,7 +16,7 @@ Assumes the `ckg-neo4j` container is running and reachable on the default bolt p
 
 ```sh
 docker exec -i ckg-neo4j cypher-shell -u neo4j -p password123 < graph/constraints.cypher
-docker exec -i ckg-neo4j cypher-shell -u neo4j -p password123 < graph/seed.cypher
+docker exec -i ckg-neo4j cypher-shell -u neo4j -p password123 < graph/seeds/statins.cypher
 ```
 
 Run order matters: constraints first, seed second. The uniqueness constraints keep `MERGE` in the seed unambiguous across multiple runs.
@@ -35,7 +35,7 @@ docker exec -i ckg-neo4j cypher-shell -u neo4j -p password123 \
   "MATCH ()-[r]->() RETURN type(r) AS type, count(*) AS count ORDER BY type;"
 ```
 
-Re-running `seed.cypher` must leave both counts unchanged — that's the idempotency check.
+Re-running `seeds/statins.cypher` must leave both counts unchanged — that's the idempotency check.
 
 ## Notes
 

@@ -15,7 +15,7 @@ Four deliverables:
 3. **UI** (`/ui`, Next.js) — one app, two tabs:
    - **Explore**: manual graph traversal, like the existing `diagrams/crc-graph.html` but live against the API.
    - **Eval**: pick a fixture, run it, step through the trace event by event, highlight the current node on the graph.
-4. **Evals** (`/evals/statins/`) — 5 synthetic patient fixtures covering Grade B, Grade C, age-below-range exit, Grade I, and secondary-prevention exit.
+4. **Evals** (`/evals/fixtures/statins/`) — 5 synthetic patient fixtures covering Grade B, Grade C, age-below-range exit, Grade I, and secondary-prevention exit.
 
 See ADR 0013 (guideline selection) and ADR 0014 (v0 scope and structure).
 
@@ -45,6 +45,7 @@ Each decision has a full ADR in `docs/decisions/`. Summary:
 11. Statins as v0 guideline (0013; supersedes 0006).
 12. v0 scope, `/ui` rename, Python for `/api`, trace-first evaluator (0014).
 13. Build workflow and PR review loop (0015).
+14. Guideline content layout (0016).
 
 ## Schema summary
 
@@ -61,21 +62,29 @@ Cross-guideline `PREEMPTED_BY` edges are in the schema but not exercised in v0 (
 ## Repo layout
 
 ```
-/graph             # Neo4j schema, seed.cypher for the statin model (has CLAUDE.md)
+/graph
+  /seeds           # per-guideline Cypher seeds (e.g. statins.cypher)
+  constraints.cypher
 /api               # Python/FastAPI evaluator + REST API (has CLAUDE.md)
 /ui                # Next.js app: Explore tab + Eval tab (has CLAUDE.md)
-/evals             # SPEC + statins/ fixtures
+/evals
+  /fixtures        # per-guideline fixture dirs (e.g. fixtures/statins/)
+  SPEC.md
+  INVENTORY.md
 /diagrams          # visual artifacts (HTML/SVG/Mermaid)
 /scripts           # helper scripts (seed, codegen, etc.)
 /docs
   /specs           # rationale + semantics
   /contracts       # machine-readable shape (JSON Schema, OpenAPI, predicate catalog)
-  /reference       # what's been modeled or built
+  /reference
+    /guidelines    # per-guideline modeling docs (e.g. guidelines/statins.md)
   /decisions       # ADRs, append-only
-  /archive         # retired specs (review-workflow, etc.)
+  /archive         # retired specs (review-workflow, crc-model, etc.)
   VERSIONS.md
   ISSUES.md
 ```
+
+Guideline content layout is a v0 bootstrap; see ADR 0016 for the scaling plan.
 
 Ingestion (`/ingestion`) is archived for v0 — statin model is hand-authored. Will un-archive when LLM-assisted ingestion lands.
 
@@ -103,7 +112,7 @@ Each code directory has its own `CLAUDE.md` with load order, scope, and DoD.
 **Reference:**
 
 - `docs/reference/schema-reference.md`
-- `docs/reference/statin-model.md` — concrete USPSTF 2022 statin model. Replaces CRC.
+- `docs/reference/guidelines/statins.md` — concrete USPSTF 2022 statin model. Replaces CRC.
 - `docs/reference/guideline-sources.md`
 - `docs/reference/build-status.md`
 
@@ -111,14 +120,14 @@ Each code directory has its own `CLAUDE.md` with load order, scope, and DoD.
 
 **Cross-cutting:** `docs/VERSIONS.md`, `docs/ISSUES.md`.
 
-**Evals:** `evals/SPEC.md`, `evals/INVENTORY.md`, `evals/statins/README.md`.
+**Evals:** `evals/SPEC.md`, `evals/INVENTORY.md`, `evals/fixtures/statins/README.md`.
 
 ## Working conventions for Claude
 
 - Load the directory-specific `CLAUDE.md` when working in `/graph`, `/api`, `/ui`, or `/evals`.
 - Check `docs/decisions/` before relitigating a design choice. Reversals ship as new ADRs that supersede old ones, never as edits to the old.
 - Any change to field shape or predicate signature edits both `docs/specs/` and `docs/contracts/` in one commit.
-- Update `docs/reference/build-status.md` in the PR that moves a component forward.
+- Update the backlog row in `docs/reference/build-status.md` when a feature ships or changes status.
 - Log deferred work in `docs/ISSUES.md`.
 - Push back on schema creep. New node types / edge types / predicates / patient-context fields need a concrete guideline requirement.
 - No PHI. Synthetic data only.
@@ -135,7 +144,7 @@ Each code directory has its own `CLAUDE.md` with load order, scope, and DoD.
 - Every feature has tests: unit where it makes sense, at least one fixture- or integration-level test that exercises the user-visible behavior.
 - Run the test suite locally before opening a PR. It must pass — do not open a PR on a red suite. Paste the output into the PR body.
 - Every PR body includes: **Scope** (what this does), **Manual Test Steps** (numbered, reproducible), **Manual Test Output** (the actual output of running those steps).
-- If this PR moves a component's state forward (spec-only → scaffolded, scaffolded → implemented, implemented → tested, etc.), update the relevant row in `docs/reference/build-status.md` in the same PR.
+- Update the backlog row in `docs/reference/build-status.md` when a feature ships or changes status.
 - After opening the PR, invoke the `pr-reviewer` subagent and post its output as a PR comment. If the subagent flags blocking issues or actionable suggestions, address them (push fixes to the same branch, re-run the reviewer) before handing the PR to the human. The human only reviews after the subagent's feedback has been resolved.
 - If the human requests changes, push fixes to the same branch. Do not open a new PR.
 - After merge: `git checkout main && git pull && git branch -d <branch>`.

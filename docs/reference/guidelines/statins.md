@@ -1,6 +1,6 @@
 # Statin model (v0)
 
-Concrete instantiation of the USPSTF 2022 statin primary-prevention recommendation in the v0 knowledge graph. Pairs with the abstract spec in `docs/specs/schema.md` and is the source content for `/graph/seed.cypher`.
+Concrete instantiation of the USPSTF 2022 statin primary-prevention recommendation in the v0 knowledge graph. Pairs with the abstract spec in `docs/specs/schema.md` and is the source content for `/graph/seeds/statins.cypher`.
 
 **Source:** USPSTF. *Statin Use for the Primary Prevention of Cardiovascular Disease in Adults: Preventive Medication.* Final recommendation, 2022-08-23. https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/statin-use-in-adults-preventive-medication
 
@@ -169,7 +169,7 @@ In practice, a patient in the Grade C band who has had the SDM encounter and is 
 | `med:lovastatin` | 6472 | |
 | `med:fluvastatin` | 41127 | |
 | `med:pitavastatin` | 861634 | |
-| `med:antihypertensive-class` | 41127 (placeholder), and class-level RxNorm TTY=IN for ACE-I, ARB, BB, CCB, thiazide, etc. | **Used only for the ASCVD on-treatment BP input, not as a statin strategy action.** See seed.cypher for the full code list. |
+| `med:antihypertensive-class` | 41127 (placeholder), and class-level RxNorm TTY=IN for ACE-I, ARB, BB, CCB, thiazide, etc. | **Used only for the ASCVD on-treatment BP input, not as a statin strategy action.** See seeds/statins.cypher for the full code list. |
 
 ### Procedures
 
@@ -218,4 +218,4 @@ Equations: Goff DC Jr, Lloyd-Jones DM, Bennett G, et al. *2013 ACC/AHA Guideline
 - `docs/specs/predicate-dsl.md`
 - `docs/contracts/predicate-catalog.yaml`
 - `docs/specs/eval-trace.md`
-- `evals/statins/` — 5 patient fixtures and golden traces.
+- `evals/fixtures/statins/` — 5 patient fixtures and golden traces.

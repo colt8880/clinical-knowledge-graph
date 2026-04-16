@@ -18,7 +18,7 @@ Python/FastAPI service that runs the trace-first evaluator and exposes graph rea
 5. `../docs/specs/predicate-dsl.md` + `../docs/contracts/predicate-catalog.yaml`
 6. `../docs/contracts/api.openapi.yaml` — HTTP surface
 7. `../docs/specs/api-primitives.md`
-8. `../docs/reference/statin-model.md` — the graph the evaluator runs against
+8. `../docs/reference/guidelines/statins.md` — the graph the evaluator runs against
 9. `../docs/decisions/0005-internal-rest-api.md`, `0007-homegrown-predicate-dsl.md`, `0014-v0-scope-and-structure.md`
 
 ## Scope
@@ -52,7 +52,7 @@ Evaluator:
 1. Every predicate in `predicate-catalog.yaml` implemented and unit-tested.
 2. Three-valued logic matches `predicate-dsl.md`.
 3. Missing-data defaults match the catalog; `policy_overrides` honored.
-4. All fixtures in `evals/statins/` pass (structural + determinism byte-compare).
+4. All fixtures in `evals/fixtures/statins/` pass (structural + determinism byte-compare).
 5. Every emitted event validates against `eval-trace.schema.json`.
 
 API:

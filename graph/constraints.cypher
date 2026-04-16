@@ -5,7 +5,7 @@
 // applied against a fresh or a populated database safely.
 //
 // Schema source of truth: docs/specs/schema.md and docs/reference/schema-reference.md.
-// Apply before seed.cypher — MERGE in the seed relies on these uniqueness
+// Apply before seeds/statins.cypher — MERGE in the seed relies on these uniqueness
 // guarantees to be truly idempotent.
 
 CREATE CONSTRAINT guideline_id_unique IF NOT EXISTS

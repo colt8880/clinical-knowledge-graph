@@ -1,60 +1,41 @@
-# Build status
+# Backlog
 
-What exists vs. what's spec-only. Update in any PR that moves a component forward.
+Feature backlog for the Clinical Knowledge Graph. Source of truth for what's shipped, what's next, and what's blocked.
 
-States: `spec-only` → `scaffolded` → `implemented` → `tested` → `live`.
+Status values: `pending` | `in-progress` | `shipped` | `blocked`.
 
-## Graph (`/graph`)
+## v0 — USPSTF 2022 statin primary prevention
 
-| Component | State | Notes |
-|---|---|---|
-| Neo4j schema (constraints, indexes) | implemented | Uniqueness constraints on `id` per label in `graph/constraints.cypher`. Indexes deferred — add when `/api` traversal needs them. |
-| Statin seed (`seed.cypher`) | implemented | Model: `reference/statin-model.md`. 23 nodes / 14 edges, fully idempotent. Fixture-level test runs against this when evaluator lands. |
-| Value-set registry | spec-only | External, keyed by (clinical_entity_id, label). Storage medium TBD. |
+| # | Feature | Components | Status | Depends on | Spec | PR |
+|---|---------|------------|--------|------------|------|----|
+| 01 | Graph seed (statin model into Neo4j) | graph | shipped | — | — | [#4](../../pull/4) |
+| 02 | API skeleton (FastAPI, endpoints) | api | shipped | 01 | [02](../../docs/build/02-api-skeleton.md) | [#6](../../pull/6) |
+| 03 | Evaluator vertical slice (fixture 03) | api, evals | shipped | 02 | [03](../../docs/build/03-evaluator-case-03.md) | [#9](../../pull/9) |
+| 10 | Contract alignment tests | api, docs | shipped | 02 | [10](../../docs/build/10-contract-alignment-tests.md) | [#8](../../pull/8) |
+| 11 | CI skeleton (GitHub Actions) | ci | shipped | 02 | [11](../../docs/build/11-ci-skeleton.md) | [#7](../../pull/7) |
+| 04 | Evaluator full (remaining predicates) | api, evals | pending | 03 | [04](../../docs/build/04-evaluator-full.md) | — |
+| 05 | UI Explore tab | ui | pending | 02 | [05](../../docs/build/05-ui-explore.md) | — |
+| 06 | UI Eval tab with trace stepper | ui | pending | 04, 05 | [06](../../docs/build/06-ui-eval.md) | — |
+| 07 | Dockerfile for `/api` | api | pending | 04 | [07](../../docs/build/07-containerize-api.md) | — |
+| 08 | Dockerfile for `/ui` | ui | pending | 06 | [08](../../docs/build/08-containerize-ui.md) | — |
+| 09 | `docker-compose.yml` | ci | pending | 07, 08 | [09](../../docs/build/09-compose.md) | — |
 
-## API (`/api`)
+## v0.1 — stretch goals
 
-| Component | State | Notes |
-|---|---|---|
-| FastAPI skeleton | tested | Python 3.12, FastAPI, Pydantic v2. `/healthz`, `/version`, `/nodes/{id}`, `/nodes/{id}/neighbors` wired to Neo4j. 10 tests (unit + integration). Shipped in PR #6. |
-| Trace-first evaluator | scaffolded | Spec: `specs/eval-trace.md`. Contract: `contracts/eval-trace.schema.json`. Exit-condition path working (fixture 03). Full rec evaluation in feature 04. |
-| Predicate engine (v0 subset) | scaffolded | Contract: `contracts/predicate-catalog.yaml`. Fixture 03 only: age predicates implemented; all others stub to NotImplementedError. |
-| Patient-context validator | spec-only | Contract: `contracts/patient-context.schema.json`. |
-| REST endpoints | scaffolded | Contract: `contracts/api.openapi.yaml`. `POST /evaluate` implemented in feature 03. `/search` still spec-only. |
-| Contract alignment tests | tested | 10 tests: OpenAPI path/method/response alignment, predicate catalog coverage, build-status consistency. PR #8. |
+No features assigned yet. Candidates: live ASCVD/PCE calculation, boundary-age fixtures, missing-lipid-panel semantics.
 
-## UI (`/ui`)
+## post-v0
 
-| Component | State | Notes |
-|---|---|---|
-| Next.js skeleton | spec-only | Next.js 14 App Router, TypeScript. |
-| OpenAPI → TS codegen | spec-only | Against `contracts/api.openapi.yaml`. |
-| Shared GraphCanvas (Cytoscape.js) | spec-only | |
-| Explore tab | spec-only | Spec: `specs/ui.md`. |
-| Eval tab | spec-only | Spec: `specs/ui.md`. |
-
-## Evals (`/evals`)
-
-| Component | State | Notes |
-|---|---|---|
-| Eval spec | implemented | `evals/SPEC.md`. |
-| Statin fixtures (5) | implemented | `evals/statins/01..05`. Awaiting evaluator to run against. |
-| Eval runner | spec-only | Runs each fixture, asserts trace + recommendation expectations. |
-
-## CI
-
-| Component | State | Notes |
-|---|---|---|
-| GitHub Actions workflow (`ci.yml`) | implemented | Three jobs: `api-tests`, `contract-lint`, `graph-smoke`. Branch protection pending human enablement. |
+No features assigned yet. Candidates: second guideline, cross-guideline preemption, LLM-assisted ingestion, historical replay.
 
 ## Archived
 
-| Component | State | Notes |
-|---|---|---|
-| Ingestion pipeline | archived | Deferred until LLM-assisted drafting returns. |
-| CRC seed + fixtures | archived | Superseded by statins (ADR 0013). |
-| Review-and-flag workflow | archived | Deferred until post-v0. |
+| Feature | Reason |
+|---------|--------|
+| Ingestion pipeline | Deferred until LLM-assisted drafting returns. |
+| CRC seed + fixtures | Superseded by statins (ADR 0013). |
+| Review-and-flag workflow | Deferred until post-v0. |
 
 ## Update protocol
 
-Update this file in the same PR that moves a component's state. If a PR doesn't advance a component, it doesn't touch this file. Partial progress = a note in the Notes column, not an inflated state.
+Update this file in the same PR that ships or changes the status of a feature. If a PR doesn't advance a feature, it doesn't touch this file.

@@ -568,4 +568,4 @@ Absence of a recorded preference produces `unknown` rather than `false`; the API
 - `patient-context.md` — input shape the DSL evaluates against.
 - `schema.md` — graph schema; `structured_eligibility`, `trigger_criteria`, and `PREEMPTED_BY.condition` carry these expressions.
 - `api-primitives.md` — evaluator lives here; surfaces evaluation errors, cannot-evaluate responses, and data-gap details.
-- `crc-model.md` — worked guideline using this DSL.
+- `docs/archive/crc-model.md` — worked guideline using this DSL (archived).

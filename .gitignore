@@ -32,6 +32,7 @@ out/
 # IDE
 .vscode/
 .idea/
+.obsidian/
 *.swp
 *.swo
 

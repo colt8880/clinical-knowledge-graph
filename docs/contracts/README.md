@@ -1,5 +1,7 @@
 # Contracts
 
+Machine-readable shapes (JSON Schema, OpenAPI, YAML catalogs). Source of truth for shape.
+
 Machine-readable artifacts that pair with the prose specs in `docs/specs/`. When prose and a contract diverge, **the prose spec is the source of truth for rationale and semantics; the contract is the source of truth for shape**. If they disagree, file an ADR and update both.
 
 | Contract | Paired spec | Purpose |
@@ -16,7 +18,7 @@ Contracts do not carry inline version strings. Their version is the git tag of t
 
 - Editing the shape of a field or a predicate signature: edit both. Prose first (so the rationale is clear), then the contract to match. One commit.
 - Editing rationale, open questions, or examples that don't change shape: edit the prose spec only. No contract change.
-- Adding a new predicate or field: edit both. Update `docs/reference/build-status.md` if this opens new implementation work.
+- Adding a new predicate or field: edit both. Update the backlog in `docs/reference/build-status.md` if this opens new implementation work.
 
 ## Validation
 

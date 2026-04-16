@@ -1,0 +1,58 @@
+/**
+ * Typed API client for the Clinical Knowledge Graph API.
+ *
+ * All calls go through this module — no direct fetch() in components.
+ * Types come from the generated schema.d.ts (openapi-typescript).
+ */
+
+import type { components } from "./schema";
+
+export type GraphNode = components["schemas"]["GraphNode"];
+export type GraphEdge = components["schemas"]["GraphEdge"];
+export type Subgraph = components["schemas"]["Subgraph"];
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, init);
+  if (!res.ok) {
+    throw new Error(`API ${res.status}: ${res.statusText}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+export async function fetchNode(id: string): Promise<GraphNode> {
+  return apiFetch<GraphNode>(`/nodes/${encodeURIComponent(id)}`);
+}
+
+export async function fetchNeighbors(
+  id: string,
+  edgeTypes?: string[],
+): Promise<Subgraph> {
+  const params = new URLSearchParams();
+  if (edgeTypes) {
+    for (const t of edgeTypes) {
+      params.append("edge_types", t);
+    }
+  }
+  const qs = params.toString();
+  return apiFetch<Subgraph>(
+    `/nodes/${encodeURIComponent(id)}/neighbors${qs ? `?${qs}` : ""}`,
+  );
+}
+
+export async function searchNodes(
+  q: string,
+  nodeTypes?: string[],
+  limit?: number,
+): Promise<{ results: GraphNode[] }> {
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (nodeTypes) {
+    for (const t of nodeTypes) {
+      params.append("node_types", t);
+    }
+  }
+  if (limit) params.set("limit", String(limit));
+  return apiFetch<{ results: GraphNode[] }>(`/search?${params.toString()}`);
+}

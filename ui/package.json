@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "npx playwright test",
-    "test:unit": "vitest run",
+    "test:unit": "vitest run --exclude 'tests/**'",
     "generate-api": "npx tsx scripts/generate-api.ts"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import type { GraphNode, GraphEdge } from "@/lib/api/client";
 
@@ -233,6 +233,8 @@ export default function GraphCanvas({
 }: GraphCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
+  // Incremented each time cy is recreated so highlight effects re-fire.
+  const [cyVersion, setCyVersion] = useState(0);
 
   const onNodeClickRef = useRef(onNodeClick);
   onNodeClickRef.current = onNodeClick;
@@ -270,6 +272,7 @@ export default function GraphCanvas({
     });
 
     cyRef.current = cy;
+    setCyVersion((v) => v + 1);
   }, [columns, edges]);
 
   useEffect(() => {
@@ -301,6 +304,7 @@ export default function GraphCanvas({
   }, [selectedEdgeId]);
 
   // Eval tab: highlight node(s) for the current trace step.
+  // Depends on cyVersion so it re-fires after cy is recreated (column expansion).
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
@@ -310,7 +314,7 @@ export default function GraphCanvas({
         cy.getElementById(id).addClass("eval-highlight");
       }
     }
-  }, [highlightedIds]);
+  }, [highlightedIds, cyVersion]);
 
   return (
     <div

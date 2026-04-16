@@ -52,6 +52,25 @@ function primaryLabel(node: GraphNode): string {
   return node.labels[0] ?? "Unknown";
 }
 
+/** Compute a font size that fits the label inside the node width. */
+function computeFontSize(label: string, nodeWidth: number): number {
+  // Rough heuristic: ~6px per character at font-size 10.
+  // Allow text wrapping at ~nodeWidth, so measure the longest word.
+  const words = label.split(/\s+/);
+  const longestWord = words.reduce((a, b) => (a.length > b.length ? a : b), "");
+  const charWidthAtSize10 = 6;
+  const maxFontForLongestWord = Math.floor(
+    (nodeWidth - 16) / (longestWord.length * (charWidthAtSize10 / 10)),
+  );
+  // Also consider total lines: if many words, shrink a bit.
+  const totalChars = label.length;
+  const charsPerLine = Math.floor((nodeWidth - 16) / charWidthAtSize10);
+  const estimatedLines = Math.ceil(totalChars / charsPerLine);
+  const maxFontForHeight = estimatedLines > 4 ? 8 : estimatedLines > 3 ? 9 : 10;
+
+  return Math.max(7, Math.min(maxFontForLongestWord, maxFontForHeight, 11));
+}
+
 function toElements(
   nodes: GraphNode[],
   edges: GraphEdge[],
@@ -60,13 +79,22 @@ function toElements(
   for (const n of nodes) {
     const label = primaryLabel(n);
     const colors = TYPE_COLORS[label] ?? { bg: "#e2e8f0", border: "#64748b" };
+    const displayLabel = nodeLabel(n);
+    const nodeWidth =
+      label === "Guideline" ? 180 :
+      label === "Recommendation" ? 150 :
+      110;
+    const fontSize = computeFontSize(displayLabel, nodeWidth);
     els.push({
       data: {
         id: n.id,
-        label: nodeLabel(n),
+        label: displayLabel,
         nodeType: label,
         bgColor: colors.bg,
         borderColor: colors.border,
+        nodeWidth,
+        nodeHeight: label === "Guideline" ? 65 : label === "Recommendation" ? 70 : 55,
+        fontSize,
       },
     });
   }
@@ -91,13 +119,15 @@ const CY_STYLE: any[] = [
     style: {
       label: "data(label)",
       "text-wrap": "wrap",
-      "text-max-width": "100px",
+      "text-max-width": (ele: { data: (k: string) => number }) =>
+        `${ele.data("nodeWidth") - 16}px`,
       "text-valign": "center",
       "text-halign": "center",
-      "font-size": 10,
+      "font-size": (ele: { data: (k: string) => number }) =>
+        ele.data("fontSize"),
       "font-weight": 500,
-      width: 100,
-      height: 55,
+      width: (ele: { data: (k: string) => number }) => ele.data("nodeWidth"),
+      height: (ele: { data: (k: string) => number }) => ele.data("nodeHeight"),
       shape: "round-rectangle",
       "border-width": 2,
       color: "#0f172a",
@@ -107,11 +137,7 @@ const CY_STYLE: any[] = [
   },
   {
     selector: "node[nodeType = 'Guideline']",
-    style: { width: 140, height: 60, "font-weight": 600, "font-size": 11 },
-  },
-  {
-    selector: "node[nodeType = 'Recommendation']",
-    style: { width: 120, height: 65 },
+    style: { "font-weight": 600 },
   },
   {
     selector: "edge",

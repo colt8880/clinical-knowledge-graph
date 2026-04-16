@@ -29,10 +29,109 @@ function Badge({ label }: { label: string }) {
   );
 }
 
-function PropertyValue({ value }: { value: unknown }) {
+// ── Structured eligibility renderer ────────────────────────────────
+
+interface PredicateNode {
+  predicate?: string;
+  all_of?: PredicateNode[];
+  any_of?: PredicateNode[];
+  none_of?: PredicateNode[];
+  [key: string]: unknown;
+}
+
+function formatPredicateArgs(node: PredicateNode): string {
+  const skip = new Set(["predicate", "all_of", "any_of", "none_of"]);
+  const args = Object.entries(node)
+    .filter(([k]) => !skip.has(k))
+    .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+    .join(", ");
+  return args;
+}
+
+function PredicateTree({ node, depth = 0 }: { node: PredicateNode; depth?: number }) {
+  // Leaf predicate
+  if (node.predicate) {
+    const args = formatPredicateArgs(node);
+    return (
+      <div className="flex items-start gap-1.5 py-0.5" style={{ paddingLeft: depth * 16 }}>
+        <span className="text-blue-700 font-mono text-xs font-medium">
+          {node.predicate}
+        </span>
+        {args && (
+          <span className="text-slate-500 font-mono text-xs">({args})</span>
+        )}
+      </div>
+    );
+  }
+
+  // Composite operators
+  const operators: Array<{ key: "all_of" | "any_of" | "none_of"; label: string; color: string }> = [
+    { key: "all_of", label: "ALL OF", color: "text-green-700" },
+    { key: "any_of", label: "ANY OF", color: "text-amber-700" },
+    { key: "none_of", label: "NONE OF", color: "text-red-700" },
+  ];
+
+  return (
+    <>
+      {operators.map(({ key, label, color }) => {
+        const children = node[key];
+        if (!children || !Array.isArray(children)) return null;
+        return (
+          <div key={key} className="py-0.5">
+            <div
+              className={`text-[11px] font-semibold uppercase tracking-wide ${color}`}
+              style={{ paddingLeft: depth * 16 }}
+            >
+              {label}
+            </div>
+            {children.map((child: PredicateNode, i: number) => (
+              <PredicateTree key={i} node={child} depth={depth + 1} />
+            ))}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function EligibilityBlock({ value }: { value: unknown }) {
+  if (!value || typeof value !== "object") return null;
+
+  // Try parsing if it's a string (JSON stored in Neo4j).
+  let parsed: PredicateNode;
+  if (typeof value === "string") {
+    try {
+      parsed = JSON.parse(value) as PredicateNode;
+    } catch {
+      return (
+        <pre className="bg-white border border-slate-200 rounded p-2 text-xs font-mono overflow-x-auto">
+          {value}
+        </pre>
+      );
+    }
+  } else {
+    parsed = value as PredicateNode;
+  }
+
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded p-3 space-y-0.5">
+      <PredicateTree node={parsed} />
+    </div>
+  );
+}
+
+// ── Generic property renderer ──────────────────────────────────────
+
+function PropertyValue({ value, propKey }: { value: unknown; propKey?: string }) {
   if (value === null || value === undefined) {
     return <span className="text-slate-400 italic">null</span>;
   }
+
+  // Special rendering for structured_eligibility.
+  if (propKey === "structured_eligibility") {
+    return <EligibilityBlock value={value} />;
+  }
+
   if (typeof value === "object") {
     return (
       <pre className="bg-white border border-slate-200 rounded p-2 text-xs leading-relaxed overflow-x-auto max-h-80 overflow-y-auto font-mono">
@@ -56,6 +155,9 @@ const PROVENANCE_KEYS = [
   "source_section",
   "effective_date",
 ];
+
+/** Properties that are already displayed in the header — exclude from the properties list. */
+const HEADER_KEYS = ["title", "name", "display_name"];
 
 function ProvenanceBlock({ properties }: { properties: Record<string, unknown> }) {
   const entries = PROVENANCE_KEYS.filter((k) => k in properties).map((k) => ({
@@ -92,9 +194,9 @@ function NodePanel({ node }: { node: GraphNode }) {
     (node.properties.display_name as string) ??
     node.id;
 
-  // Separate provenance from other properties.
+  // Separate provenance and header-duplicate keys from other properties.
   const otherProps = Object.entries(node.properties).filter(
-    ([k]) => !PROVENANCE_KEYS.includes(k),
+    ([k]) => !PROVENANCE_KEYS.includes(k) && !HEADER_KEYS.includes(k),
   );
 
   return (
@@ -121,7 +223,8 @@ function NodePanel({ node }: { node: GraphNode }) {
             {node.codes.map((c, i) => (
               <span
                 key={i}
-                className="inline-block bg-slate-100 px-2 py-0.5 rounded text-xs"
+                className="inline-block bg-slate-100 px-2 py-0.5 rounded text-xs cursor-default"
+                title={c.display ?? `${c.system.toUpperCase()} code ${c.code}`}
               >
                 {c.system}:{c.code}
               </span>
@@ -142,7 +245,7 @@ function NodePanel({ node }: { node: GraphNode }) {
                   {key}
                 </div>
                 <div className="text-slate-900">
-                  <PropertyValue value={value} />
+                  <PropertyValue value={value} propKey={key} />
                 </div>
               </div>
             ))}
@@ -189,7 +292,7 @@ function EdgePanel({ edge }: { edge: GraphEdge }) {
                   {key}
                 </div>
                 <div className="text-slate-900">
-                  <PropertyValue value={value} />
+                  <PropertyValue value={value} propKey={key} />
                 </div>
               </div>
             ))}

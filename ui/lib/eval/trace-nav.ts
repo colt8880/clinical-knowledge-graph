@@ -57,7 +57,7 @@ export function highlightedNodeIds(event: TraceEvent): string[] {
   }
 }
 
-/** Derive the recommendation list from trace events (filter for recommendation_emitted). */
+/** Return the convenience recommendations array from the trace envelope. */
 export function deriveRecommendations(trace: EvalTrace): Recommendation[] {
   return trace.recommendations;
 }

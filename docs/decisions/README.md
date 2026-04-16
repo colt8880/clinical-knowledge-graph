@@ -11,7 +11,7 @@ Each ADR captures a single decision: what was decided, why, what was considered,
 
 ## Filename convention
 
-`NNNN-short-kebab-title.md`, four-digit zero-padded sequence. Sequence never reuses numbers.
+`NNNN-short-kebab-title.md`, four-digit zero-padded sequence. Sequence never reuses numbers. Numbers are assigned monotonically; gaps mean reserved or abandoned drafts and are preserved as stub files (`NNNN-reserved.md`), never renumbered.
 
 ## Template
 
@@ -63,6 +63,9 @@ Do **not** write an ADR for:
 | 0008 | Pregnancy as a top-level structured record | Deferred in v0 (see 0014) |
 | 0009 | Spec versioning via git tags, not inline versions | Accepted |
 | 0010 | Machine contracts paired with prose specs | Accepted |
+| 0011 | *(reserved)* | — |
+| 0012 | *(reserved)* | — |
 | 0013 | Statins (USPSTF 2022) replaces CRC as v0 guideline | Accepted |
 | 0014 | v0 scope reduction, repo restructure, Python for /api | Accepted |
 | 0015 | Build workflow and PR review loop | Accepted |
+| 0016 | Guideline content layout | Accepted |

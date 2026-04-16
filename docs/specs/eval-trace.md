@@ -8,7 +8,7 @@ The knowledge graph exists because LLMs are nondeterministic. The evaluator is d
 
 Concretely:
 - The Eval UI is a stepper over the trace. There is no separate "debug" mode.
-- Golden eval fixtures (`evals/statins/<case>/expected-trace.json`) are full traces, not just final rec lists. Regression tests diff traces, not outputs.
+- Golden eval fixtures (`evals/fixtures/statins/<case>/expected-trace.json`) are full traces, not just final rec lists. Regression tests diff traces, not outputs.
 - The "final recommendation set" is a derived view over `recommendation_emitted` events in the trace, not a separate API field.
 
 If a design choice would trade trace fidelity for brevity, default to fidelity. A verbose trace is a feature.

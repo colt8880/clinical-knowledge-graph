@@ -38,7 +38,7 @@ Implementation changes must ship with their contract updates in the same diff. C
 - **Evaluator events ↔ trace schema:** If the diff touches evaluator event emission (new event types, changed event fields, trace construction), then `docs/contracts/eval-trace.schema.json` must also appear in the diff. Block if missing.
 - **Patient context handling ↔ context schema:** If the diff touches patient context parsing, validation, or field access, then `docs/contracts/patient-context.schema.json` must also appear in the diff. Block if missing.
 - **Predicate implementations ↔ predicate catalog:** If the diff adds, removes, or changes predicate evaluators, then `docs/contracts/predicate-catalog.yaml` must also appear in the diff. Block if missing.
-- **Feature ship ↔ status tracking:** If the PR body or commits claim to ship a feature from `docs/build/NN-*.md`, then the matching row in `docs/build/README.md` must be moved to `shipped` and the corresponding row in `docs/reference/build-status.md` must reflect the shipped state — both in the same diff. Block if either is missing.
+- **Feature ship ↔ status tracking:** If the PR body or commits claim to ship a feature from `docs/build/NN-*.md`, then the matching row in `docs/reference/build-status.md` must be moved to `shipped` in the same diff. Block if missing.
 - **No deferred contract fixes:** If the PR body contains deferral language ("align later", "in a later commit", "will fix in follow-up", "can update after", or similar) referencing any file under `docs/contracts/`, `docs/specs/`, or `docs/reference/`, block. The fix must land in this PR, or a concrete entry must be added to `docs/ISSUES.md` in the same diff explaining what is deferred and why.
 
 ### 4. Test coverage at the right layers
@@ -72,7 +72,7 @@ Any of these in evaluator code paths is blocking unless the PR explicitly justif
 - No PHI — any patient-like data must be in `evals/` as a synthetic fixture.
 - Guideline citations present in commits or code comments when modeling clinical content.
 - Cypher over app-layer joins for graph reads.
-- `docs/reference/build-status.md` updated if the PR moves a component forward.
+- `docs/reference/build-status.md` backlog row updated if the PR ships or changes the status of a feature.
 
 ## Output format
 

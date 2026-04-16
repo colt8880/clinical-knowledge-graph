@@ -6,7 +6,7 @@ All CI lives in `.github/workflows/ci.yml`. Three jobs run on every push to `mai
 
 ### `api-tests`
 
-Runs the `/api` pytest suite against a real Neo4j 5 Community service container. Loads `graph/constraints.cypher` and `graph/seed.cypher` before running tests.
+Runs the `/api` pytest suite against a real Neo4j 5 Community service container. Loads `graph/constraints.cypher` and `graph/seeds/statins.cypher` before running tests.
 
 **Reproduce locally:**
 
@@ -29,7 +29,7 @@ d.verify_connectivity(); d.close(); print('Ready')
 python -c "
 from neo4j import GraphDatabase
 driver = GraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', 'password123'))
-for f in ['graph/constraints.cypher', 'graph/seed.cypher']:
+for f in ['graph/constraints.cypher', 'graph/seeds/statins.cypher']:
     stmts = [s.strip() for s in open(f).read().split(';') if s.strip() and not all(
         l.strip().startswith('//') or l.strip() == '' for l in s.strip().splitlines())]
     with driver.session() as session:
@@ -87,7 +87,7 @@ print('OK')
 
 ### `graph-smoke`
 
-Loads `graph/constraints.cypher` and `graph/seed.cypher` into a fresh Neo4j 5 Community container using the Python `neo4j` driver, then asserts the expected node and edge counts (currently 23 nodes, 14 edges from the statin model) via exact integer comparison. Prints a detailed per-label breakdown on failure.
+Loads `graph/constraints.cypher` and `graph/seeds/statins.cypher` into a fresh Neo4j 5 Community container using the Python `neo4j` driver, then asserts the expected node and edge counts (currently 23 nodes, 14 edges from the statin model) via exact integer comparison. Prints a detailed per-label breakdown on failure.
 
 **Reproduce locally:**
 

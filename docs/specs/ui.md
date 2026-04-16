@@ -73,7 +73,7 @@ Given a `PatientContext`, produce a recommendation set by running the evaluator,
 
 ### Surfaces
 
-- **Case picker** (top). Dropdown of the 5 v0 patient fixtures (sourced from `evals/statins/<case>/patient.json` — shipped into the UI as static JSON for v0). Optional file-upload of a custom `PatientContext` JSON.
+- **Case picker** (top). Dropdown of the 5 v0 patient fixtures (sourced from `evals/fixtures/statins/<case>/patient.json` — shipped into the UI as static JSON for v0). Optional file-upload of a custom `PatientContext` JSON.
 - **Run button**. Calls `POST /evaluate` with the selected patient context. Response is the full `EvalTrace`.
 - **Event stepper** (left panel). Ordered list of events with `seq` and `type`. Current step is highlighted. Controls:
   - Prev / Next buttons.

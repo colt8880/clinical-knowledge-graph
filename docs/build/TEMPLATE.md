@@ -2,11 +2,12 @@
 
 **Status**: pending | in-progress | shipped
 **Depends on**: NN, NN (or —)
+**Components touched**: graph / api / ui / evals / ci / docs
 **Branch**: `feat/<slug>` | `chore/<slug>` | `fix/<slug>`
 
 ## Context
 
-Why this feature exists. What it unblocks. Link out to the specs and ADRs that ground it. Keep to 3–5 sentences; the reader already has `CLAUDE.md` loaded.
+Why this feature exists. What it unblocks. Link out to the specs and ADRs that ground it. Keep to 3-5 sentences; the reader already has `CLAUDE.md` loaded.
 
 ## Required reading
 
@@ -37,7 +38,7 @@ What the implementer must prove works before opening the PR. Each target should 
 - All scope files exist and match constraints.
 - All verification targets pass locally.
 - Tests written (unit where sensible, at least one integration-level test exercising user-visible behavior).
-- `docs/reference/build-status.md` updated in the same PR.
+- `docs/reference/build-status.md` backlog row updated.
 - PR opened with Scope / Manual Test Steps / Manual Test Output in the body.
 - `pr-reviewer` subagent run; blocking feedback addressed; output posted as PR comment.
 

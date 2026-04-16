@@ -16,7 +16,7 @@ Each feature has a self-contained spec in `docs/build/`. In a fresh Claude Code 
    git checkout -b feat/<slug>
    ```
 3. Do the work in logical chunks. Commit as you go — do not save one giant commit for the end.
-   - **Contract alignment rule:** if your changes touch API routes, evaluator events, patient context handling, or predicates, the corresponding contract file (`api.openapi.yaml`, `eval-trace.schema.json`, `patient-context.schema.json`, `predicate-catalog.yaml`) must be updated in the same diff. If you're shipping a feature from `docs/build/`, the matching rows in `docs/build/README.md` and `docs/reference/build-status.md` must also move to `shipped` in the same diff. The `pr-reviewer` subagent will block if these are missing. See `.claude/agents/pr-reviewer.md` § Contract alignment for the full list.
+   - **Contract alignment rule:** if your changes touch API routes, evaluator events, patient context handling, or predicates, the corresponding contract file (`api.openapi.yaml`, `eval-trace.schema.json`, `patient-context.schema.json`, `predicate-catalog.yaml`) must be updated in the same diff. If you're shipping a feature from `docs/build/`, the matching row in `docs/reference/build-status.md` must also move to `shipped` in the same diff. The `pr-reviewer` subagent will block if these are missing. See `.claude/agents/pr-reviewer.md` § Contract alignment for the full list.
 4. Before opening a PR:
    - Run the test suite locally. It **must pass**. Do not open a PR on a red suite.
    - Run the manual test steps you plan to put in the PR body. Capture the real output.
@@ -63,7 +63,7 @@ Per ADR 0007 (predicate DSL). Contract updated in the same commit.
 Four layers. Pick the lowest layer that exercises the behavior you added, and add higher-layer coverage when the behavior is user-visible.
 
 - **Unit** — a single function, pure logic. Fast, no I/O. Use for: predicate evaluators, trace event construction, JSON Schema validation helpers, any utility. Required for new primitives.
-- **Fixture** — the evaluator run against a synthetic `PatientContext` from `evals/statins/`. Asserts the trace event stream and the derived recommendation list. Use for: new eligibility rules, new trace event types, changes to how strategies resolve. Required for any evaluator change.
+- **Fixture** — the evaluator run against a synthetic `PatientContext` from `evals/fixtures/statins/`. Asserts the trace event stream and the derived recommendation list. Use for: new eligibility rules, new trace event types, changes to how strategies resolve. Required for any evaluator change.
 - **Integration** — wire through the REST API, often with a live Neo4j instance. Asserts a full `/evaluate` call end-to-end. Use for: API shape changes, new endpoints, schema changes that affect traversal.
 - **e2e** — the `/ui` talking to the `/api` talking to the graph. Reserved for UI flows — Explore traversal, Eval step-through. Keep these few and focused; they are slow and brittle.
 
@@ -187,7 +187,7 @@ Conflicts in ADRs or contracts are almost always semantic. Escalate by default.
 
 Concrete run-through. Task: add `predicate_age_range` to the v0 predicate catalog, because the statin model needs `age in [40, 75]` as one event instead of a `gte`+`lte` pair.
 
-The commands below assume the Stage 1+ harness is in place (`api/`, `evals/statins/tests/`, seed loaded into Neo4j). Until then, substitute whatever test runner exists at the time — and if nothing exists yet, the PR needs manual-test evidence only, per the carve-out in `.claude/agents/pr-reviewer.md`.
+The commands below assume the Stage 1+ harness is in place (`api/`, `evals/fixtures/statins/tests/`, seed loaded into Neo4j). Until then, substitute whatever test runner exists at the time — and if nothing exists yet, the PR needs manual-test evidence only, per the carve-out in `.claude/agents/pr-reviewer.md`.
 
 1. **Branch from main:**
    ```sh
@@ -229,13 +229,13 @@ The commands below assume the Stage 1+ harness is in place (`api/`, `evals/stati
    ```
 6. **Update the statin seed to use the new predicate and refresh the fixture-level test:**
    ```sh
-   git add graph/seed.cypher evals/statins/tests/test_grade_b.py
+   git add graph/seeds/statins.cypher evals/fixtures/statins/tests/test_grade_b.py
    git commit -m "Migrate statin Grade B eligibility to predicate_age_range
 
    Replaces the gte+lte pair in the Grade B Rec's structured_eligibility.
    Updates the Grade B fixture test to expect one age event instead of two.
 
-   Per docs/reference/statin-model.md."
+   Per docs/reference/guidelines/statins.md."
    ```
 7. **Run the suite locally:**
    ```sh

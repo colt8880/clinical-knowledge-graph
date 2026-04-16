@@ -19,9 +19,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CONTRACTS = REPO_ROOT / "docs" / "contracts"
 OPENAPI_PATH = CONTRACTS / "api.openapi.yaml"
 PREDICATE_CATALOG_PATH = CONTRACTS / "predicate-catalog.yaml"
-SEED_PATH = REPO_ROOT / "graph" / "seed.cypher"
-BUILD_README_PATH = REPO_ROOT / "docs" / "build" / "README.md"
-BUILD_STATUS_PATH = REPO_ROOT / "docs" / "reference" / "build-status.md"
+SEED_PATH = REPO_ROOT / "graph" / "seeds" / "statins.cypher"
+BACKLOG_PATH = REPO_ROOT / "docs" / "reference" / "build-status.md"
 
 
 # ── Helpers ────────────────────────────────────────────────────────────
@@ -94,47 +93,38 @@ def _load_catalog_predicate_names() -> set[str]:
     return names
 
 
-def _parse_build_readme_table() -> dict[str, str]:
-    """Parse the backlog table in docs/build/README.md.
+def _parse_backlog_rows() -> list[dict]:
+    """Parse the backlog table in docs/reference/build-status.md.
 
-    Returns {feature_number: status} e.g. {"01": "shipped", "10": "pending"}.
+    Returns list of dicts with keys: num, feature, components, status,
+    depends_on, spec, pr.
     """
-    text = BUILD_README_PATH.read_text()
-    rows: dict[str, str] = {}
+    text = BACKLOG_PATH.read_text()
+    rows: list[dict] = []
 
-    # Table rows: | 01 | Graph seed ... | shipped | — |
+    # Table rows: | 01 | Feature name | components | status | depends | spec | pr |
     pattern = re.compile(
-        r"^\|\s*(\d+)\s*\|[^|]+\|\s*(\w[\w-]*)\s*\|",
+        r"^\|\s*(\d+)\s*\|"       # #
+        r"\s*([^|]+?)\s*\|"       # Feature
+        r"\s*([^|]*?)\s*\|"       # Components
+        r"\s*(\w[\w-]*)\s*\|"     # Status
+        r"\s*([^|]*?)\s*\|"       # Depends on
+        r"\s*([^|]*?)\s*\|"       # Spec
+        r"\s*([^|]*?)\s*\|",      # PR
         re.MULTILINE,
     )
     for match in pattern.finditer(text):
-        num = match.group(1).zfill(2)
-        status = match.group(2).strip()
-        rows[num] = status
+        rows.append({
+            "num": match.group(1).zfill(2),
+            "feature": match.group(2).strip(),
+            "components": match.group(3).strip(),
+            "status": match.group(4).strip(),
+            "depends_on": match.group(5).strip(),
+            "spec": match.group(6).strip(),
+            "pr": match.group(7).strip(),
+        })
 
     return rows
-
-
-def _parse_build_status_shipped_components() -> set[str]:
-    """Extract component names that are in 'tested' or 'implemented' or later
-    states from docs/reference/build-status.md.
-
-    Returns set of component description strings (first column values)
-    with states beyond spec-only.
-    """
-    text = BUILD_STATUS_PATH.read_text()
-    active: set[str] = set()
-
-    # Table rows: | Component name | state | Notes |
-    pattern = re.compile(
-        r"^\|\s*([^|]+?)\s*\|\s*(implemented|tested|scaffolded|live)\s*\|",
-        re.MULTILINE,
-    )
-    for match in pattern.finditer(text):
-        component = match.group(1).strip()
-        active.add(component)
-
-    return active
 
 
 # ── Test 1: OpenAPI contract alignment ─────────────────────────────────
@@ -271,61 +261,91 @@ class TestPredicateCatalogAlignment:
         assert len(catalog_names) > 0, "Predicate catalog is empty"
 
 
-# ── Test 3: Build tracking consistency ─────────────────────────────────
+# ── Test 3: Backlog consistency ───────────────────────────────────────
 
 
-class TestBuildStatusConsistency:
-    """Validate that docs/build/README.md and docs/reference/build-status.md
-    are consistent — no feature marked shipped in one but not reflected
-    in the other."""
+class TestBacklogConsistency:
+    """Validate the backlog in docs/reference/build-status.md:
+    valid status values, no dependency cycles, referenced spec files
+    exist, and every shipped row has a PR link."""
 
-    def test_shipped_features_have_build_status_updates(self):
-        """Every feature marked 'shipped' in docs/build/README.md should
-        have corresponding state beyond 'spec-only' in build-status.md
-        for its component."""
-        readme_statuses = _parse_build_readme_table()
-        build_status_components = _parse_build_status_shipped_components()
+    VALID_STATUSES = {"pending", "in-progress", "shipped", "blocked"}
 
-        # Map feature numbers to their expected build-status component
-        # keywords. A shipped feature should have moved its component
-        # beyond spec-only. When adding a new feature, add its mapping here.
-        feature_component_keywords: dict[str, list[str]] = {
-            "01": ["seed", "statin seed"],
-            "02": ["fastapi", "skeleton"],
-            "10": ["contract alignment"],
-            "11": ["github actions", "ci"],
-        }
+    def test_backlog_has_rows(self):
+        """Sanity check: the backlog has parseable feature rows."""
+        rows = _parse_backlog_rows()
+        assert len(rows) > 0, "No feature rows found in docs/reference/build-status.md"
 
-        shipped = {num for num, status in readme_statuses.items() if status == "shipped"}
-
-        for num in shipped:
-            keywords = feature_component_keywords.get(num)
-            assert keywords is not None, (
-                f"Feature {num} is 'shipped' in docs/build/README.md but has "
-                f"no keyword mapping in test_contract_alignment.py. Add an "
-                f"entry to feature_component_keywords."
+    def test_valid_status_values(self):
+        """Every row must use one of the allowed status values."""
+        rows = _parse_backlog_rows()
+        for row in rows:
+            assert row["status"] in self.VALID_STATUSES, (
+                f"Feature {row['num']} ({row['feature']}) has invalid status "
+                f"'{row['status']}'. Allowed: {self.VALID_STATUSES}"
             )
 
-            # Check that at least one active component matches a keyword
-            found = False
-            for component in build_status_components:
-                component_lower = component.lower()
-                if any(kw in component_lower for kw in keywords):
-                    found = True
-                    break
+    def test_no_dependency_cycles(self):
+        """The dependency graph must be a DAG — no cycles."""
+        rows = _parse_backlog_rows()
+        deps: dict[str, set[str]] = {}
+        for row in rows:
+            dep_str = row["depends_on"]
+            if dep_str in ("—", "-", ""):
+                deps[row["num"]] = set()
+            else:
+                # Parse "03" or "04, 05"
+                dep_nums = {d.strip().zfill(2) for d in dep_str.split(",")}
+                deps[row["num"]] = dep_nums
 
-            assert found, (
-                f"Feature {num} is 'shipped' in docs/build/README.md but no "
-                f"matching component (keywords: {keywords}) is beyond "
-                f"'spec-only' in docs/reference/build-status.md."
+        # Detect cycles via DFS
+        visited: set[str] = set()
+        in_stack: set[str] = set()
+
+        def _has_cycle(node: str) -> bool:
+            if node in in_stack:
+                return True
+            if node in visited:
+                return False
+            visited.add(node)
+            in_stack.add(node)
+            for dep in deps.get(node, set()):
+                if _has_cycle(dep):
+                    return True
+            in_stack.discard(node)
+            return False
+
+        for num in deps:
+            assert not _has_cycle(num), (
+                f"Dependency cycle detected involving feature {num}"
             )
 
-    def test_build_readme_has_features(self):
-        """Sanity check: the build README has parseable feature rows."""
-        rows = _parse_build_readme_table()
-        assert len(rows) > 0, "No feature rows found in docs/build/README.md"
+    def test_referenced_spec_files_exist(self):
+        """Every spec link in the backlog must point to an existing file."""
+        rows = _parse_backlog_rows()
+        for row in rows:
+            spec = row["spec"]
+            if spec in ("—", "-", ""):
+                continue
+            # Extract path from markdown link [NN](path)
+            link_match = re.search(r"\[.*?\]\((.*?)\)", spec)
+            if link_match:
+                rel_path = link_match.group(1)
+                # Resolve relative to backlog file location
+                abs_path = (BACKLOG_PATH.parent / rel_path).resolve()
+                assert abs_path.exists(), (
+                    f"Feature {row['num']}: spec link '{rel_path}' "
+                    f"resolves to {abs_path} which does not exist."
+                )
 
-    def test_build_status_has_components(self):
-        """Sanity check: build-status.md has parseable component rows."""
-        components = _parse_build_status_shipped_components()
-        assert len(components) > 0, "No active components in docs/reference/build-status.md"
+    def test_shipped_rows_have_pr_link(self):
+        """Every feature marked 'shipped' must have a PR link."""
+        rows = _parse_backlog_rows()
+        for row in rows:
+            if row["status"] != "shipped":
+                continue
+            pr = row["pr"]
+            assert pr not in ("—", "-", ""), (
+                f"Feature {row['num']} ({row['feature']}) is shipped "
+                f"but has no PR link in the backlog."
+            )

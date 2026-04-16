@@ -1,6 +1,6 @@
-# Feature build backlog
+# Feature specs
 
-Ordered list of features that make up v0. Each entry has its own spec file in this directory. Each spec is the entire input needed to build the feature: context, scope, constraints, verification targets, DoD.
+Each v0 feature has a self-contained spec in this directory. The spec is the entire input needed to build the feature: context, scope, constraints, verification targets, definition of done.
 
 ## How to build one
 
@@ -8,31 +8,21 @@ Ordered list of features that make up v0. Each entry has its own spec file in th
 /build NN
 ```
 
-(or, equivalently, start a fresh Claude Code session and prompt: *"Build the feature in `docs/build/NN-<slug>.md`. Follow the build workflow end to end."*)
+Or start a fresh Claude Code session and prompt: *"Build the feature in `docs/build/NN-<slug>.md`. Follow the build workflow end to end."*
 
-Every feature runs the workflow in `docs/workflow.md`: branch → implement → test → commit → push → PR → subagent review → human merge. One feature per session. Don't batch features — small, verifiable slices.
+Every feature runs the workflow in `docs/workflow.md`: branch, implement, test, commit, push, PR, subagent review, human merge. One feature per session. Don't batch features.
 
 ## Backlog
 
-| # | Feature | Status | Depends on |
-|---|---|---|---|
-| 01 | Graph seed (statin model loaded into Neo4j) | shipped | — |
-| 02 | API skeleton (FastAPI, `/healthz`, `/version`, `/nodes/{id}`) | shipped | 01 |
-| 03 | Evaluator vertical slice (fixture 03: age-below-range exit) | shipped | 02 |
-| 04 | Evaluator full (remaining predicates, fixtures 01/02/04/05) | pending | 03 |
-| 05 | UI Explore tab | pending | 02 |
-| 06 | UI Eval tab with trace stepper | pending | 04, 05 |
-| 07 | Dockerfile for `/api` | pending | 04 |
-| 08 | Dockerfile for `/ui` | pending | 06 |
-| 09 | `docker-compose.yml` for full stack | pending | 07, 08 |
-| 10 | Contract alignment tests | shipped | 02 |
-| 11 | CI skeleton (GitHub Actions) | shipped | 02 |
-
-Status values: `pending` → `in-progress` → `shipped`.
+See [`docs/reference/build-status.md`](../reference/build-status.md) for the full backlog with status, dependencies, and PR links.
 
 ## Adding a feature
 
-Copy `TEMPLATE.md`, assign the next number, fill in every section, add a row to the table above. If a feature needs more than one PR, split it into numbered sub-specs rather than letting one spec sprawl.
+1. Copy `TEMPLATE.md` and assign the next number.
+2. Fill in every section.
+3. Add a row to `docs/reference/build-status.md`.
+
+If a feature needs more than one PR, split it into numbered sub-specs rather than letting one spec sprawl.
 
 ## Rules
 

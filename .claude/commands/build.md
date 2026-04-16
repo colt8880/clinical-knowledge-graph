@@ -26,7 +26,7 @@ The feature number is: $ARGUMENTS
 
 9. **Test.** Hit every verification target. Tests must pass locally before opening the PR. Paste the output into the PR body.
 
-10. **Update `docs/reference/build-status.md`.** As specified in the spec's DoD.
+10. **Update `docs/reference/build-status.md`.** Mark the backlog row as `shipped` (or `in-progress`) per the spec's DoD.
 
 11. **Commit in logical chunks.** Each commit message explains the *why*.
 

@@ -4,7 +4,7 @@ evaluate() is pure — no wall-clock reads, no RNG, no external I/O.
 All inputs are PatientContext + a loaded GraphSnapshot.
 
 For v0, the statin model has three out-of-scope exits that are checked
-before iterating recommendations. See docs/reference/statin-model.md §
+before iterating recommendations. See docs/reference/guidelines/statins.md §
 Out-of-scope exits.
 """
 
@@ -20,7 +20,7 @@ from app.evaluator.trace import TraceBuilder, compute_age, patient_fingerprint
 # ---------------------------------------------------------------------------
 # Exit-condition definitions (statin guideline)
 #
-# Per statin-model.md, these are not Recommendation nodes — they are
+# Per guidelines/statins.md, these are not Recommendation nodes — they are
 # evaluator-level pre-flight checks. Ordering matters: secondary
 # prevention > familial hypercholesterolemia > age below range.
 # ---------------------------------------------------------------------------
@@ -163,7 +163,7 @@ def evaluate(patient_context: dict[str, Any], graph: GraphSnapshot) -> dict[str,
     # 2. guideline_entered
     trace.guideline_entered(graph.guideline_id, graph.guideline_title)
 
-    # 3. Exit-condition scan (statin-specific, per statin-model.md)
+    # 3. Exit-condition scan (statin-specific, per guidelines/statins.md)
     #    The first recommendation is used as the recommendation_id for exit
     #    events, since exits short-circuit eligibility evaluation at R1.
     exit_rec_id = graph.recommendations[0].id if graph.recommendations else graph.guideline_id

@@ -33,7 +33,7 @@ Running log of guidelines modeled into the graph. Append-only; supersession is t
   - ASCVD 10-year risk is computed via the Pooled Cohort Equations (Goff et al. 2013). v0 evaluator reads `risk_scores.ascvd_10yr` from the supplied patient context; live PCE calculation is deferred.
   - Strategy: any moderate-intensity statin (modeled at the RxNorm class level: atorvastatin, rosuvastatin, simvastatin, pravastatin, lovastatin, fluvastatin, pitavastatin). Intensity dose ranges captured in clinical nuance; not enforced as a predicate in v0 (no dose predicates yet).
   - Grade C also offers an explicit shared-decision-making Procedure-backed strategy.
-  - See `docs/reference/statin-model.md` for the concrete nodes, edges, and code mappings.
+  - See `docs/reference/guidelines/statins.md` for the concrete nodes, edges, and code mappings.
 
 ### Archived
 

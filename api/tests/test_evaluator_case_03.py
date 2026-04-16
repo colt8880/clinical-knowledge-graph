@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-FIXTURE_DIR = Path(__file__).resolve().parent.parent.parent / "evals" / "statins" / "03-too-young-35m"
+FIXTURE_DIR = Path(__file__).resolve().parent.parent.parent / "evals" / "fixtures" / "statins" / "03-too-young-35m"
 
 
 def _load_fixture() -> tuple[dict, dict]:

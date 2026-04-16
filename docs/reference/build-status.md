@@ -18,7 +18,7 @@ Status values: `pending` | `in-progress` | `shipped` | `blocked`.
 | 06 | UI Eval tab with trace stepper | ui | shipped | 04, 05 | [06](../../docs/build/06-ui-eval.md) | [#13](../../pull/13) |
 | 07 | Dockerfile for `/api` | api | shipped | 04 | [07](../../docs/build/07-containerize-api.md) | [#14](../../pull/14) |
 | 08 | Dockerfile for `/ui` | ui | shipped | 06 | [08](../../docs/build/08-containerize-ui.md) | [#15](../../pull/15) |
-| 09 | `docker-compose.yml` | ci | pending | 07, 08 | [09](../../docs/build/09-compose.md) | — |
+| 09 | `docker-compose.yml` | ci | shipped | 07, 08 | [09](../../docs/build/09-compose.md) | — |
 
 ## v0.1 — stretch goals
 

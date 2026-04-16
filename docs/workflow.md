@@ -4,6 +4,22 @@ The per-feature runbook. Read once; follow every time. The short version lives i
 
 Each feature has a self-contained spec in `docs/build/`. In a fresh Claude Code session, prompt `/build NN` to run that feature through this workflow end to end. One feature per session. **One Claude Code session per repo at a time** — two sessions racing the same `.git` directory causes lock contention and lost work.
 
+## Running the full stack
+
+The simplest way to run everything:
+
+```sh
+docker compose up --build
+```
+
+This starts Neo4j, seeds the graph, starts the API, and starts the UI. All services are wired together and start in dependency order via healthchecks.
+
+- UI: http://localhost:3000
+- API: http://localhost:8000
+- Neo4j Browser: http://localhost:7474 (neo4j / password123)
+
+For component-level development (hot reload, faster iteration), run individual services locally per their READMEs (`api/README.md`, `ui/README.md`, `graph/README.md`).
+
 ## Per-feature loop
 
 1. Start from a clean `main`:

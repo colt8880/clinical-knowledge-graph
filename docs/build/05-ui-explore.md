@@ -1,6 +1,6 @@
 # 05: UI Explore tab
 
-**Status**: pending
+**Status**: shipped
 **Depends on**: 02
 **Branch**: `feat/ui-explore`
 

@@ -4,28 +4,28 @@ import { Suspense, useCallback, useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNeighbors } from "@/lib/api/client";
-import type { GraphNode } from "@/lib/api/client";
-import ColumnBrowser, {
-  type Column,
-  getColumnLabel,
-  filterChildren,
-} from "@/components/ColumnBrowser";
+import type { GraphNode, GraphEdge } from "@/lib/api/client";
+import GraphCanvas, { type CanvasColumn } from "@/components/GraphCanvas";
+import { filterChildren } from "@/components/ColumnBrowser";
 import NodeDetail from "@/components/NodeDetail";
 
 const DEFAULT_GUIDELINE = "guideline:uspstf-statin-2022";
 
+/** Hierarchy rank — used to determine which column a clicked node belongs to. */
+const TYPE_RANK: Record<string, number> = {
+  Guideline: 0,
+  Recommendation: 1,
+  Strategy: 2,
+  Condition: 3,
+  Medication: 3,
+  Procedure: 3,
+  Observation: 3,
+};
+
 /**
- * The hierarchy has up to 4 levels:
- *   0: Guidelines
- *   1: Recommendations  (children of a Guideline)
- *   2: Strategies        (children of a Recommendation)
- *   3: Actions           (children of a Strategy — Medications/Procedures/Observations)
- *
  * URL state: ?g=<guideline>&r=<rec>&s=<strategy>
  * Each param records which node is selected at that level.
- * Columns to the right of the deepest selection are not shown.
  */
-
 function useUrlState() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -64,26 +64,21 @@ export default function ExplorePage() {
 
 function ExploreContent() {
   const { guideline, rec, strategy, setSelection } = useUrlState();
-
-  // Detail panel: which node is inspected (click selects in column, double-click or single-click shows detail).
   const [detailNodeId, setDetailNodeId] = useState<string | null>(null);
 
   // ── Fetch each level ───────────────────────────────────────────
 
-  // Level 0: Guideline's neighbors → get Recommendations.
   const guidelineQuery = useQuery({
     queryKey: ["neighbors", guideline],
     queryFn: () => fetchNeighbors(guideline),
   });
 
-  // Level 1: Selected Recommendation's neighbors → get Strategies.
   const recQuery = useQuery({
     queryKey: ["neighbors", rec],
     queryFn: () => fetchNeighbors(rec!),
     enabled: !!rec,
   });
 
-  // Level 2: Selected Strategy's neighbors → get Actions.
   const strategyQuery = useQuery({
     queryKey: ["neighbors", strategy],
     queryFn: () => fetchNeighbors(strategy!),
@@ -92,7 +87,6 @@ function ExploreContent() {
 
   // ── Build columns ─────────────────────────────────────────────
 
-  // Column 0: Guidelines (just the one for v0).
   const guidelineNodes: GraphNode[] = useMemo(() => {
     if (!guidelineQuery.data) return [];
     const center = guidelineQuery.data.nodes.find(
@@ -101,69 +95,51 @@ function ExploreContent() {
     return center ? [center] : [];
   }, [guidelineQuery.data]);
 
-  // Column 1: Recommendations (children of the guideline).
   const recNodes: GraphNode[] = useMemo(() => {
     if (!guidelineQuery.data) return [];
     return filterChildren(guidelineQuery.data.nodes, guideline);
   }, [guidelineQuery.data, guideline]);
 
-  // Column 2: Strategies (children of the selected rec).
   const strategyNodes: GraphNode[] = useMemo(() => {
     if (!rec || !recQuery.data) return [];
     return filterChildren(recQuery.data.nodes, rec);
   }, [rec, recQuery.data]);
 
-  // Column 3: Actions (children of the selected strategy).
   const actionNodes: GraphNode[] = useMemo(() => {
     if (!strategy || !strategyQuery.data) return [];
     return filterChildren(strategyQuery.data.nodes, strategy);
   }, [strategy, strategyQuery.data]);
 
-  // Assemble the visible columns.
-  const columns: Column[] = useMemo(() => {
-    const cols: Column[] = [
-      {
-        label: getColumnLabel(guidelineNodes),
-        nodes: guidelineNodes,
-        selectedId: guideline,
-      },
-      {
-        label: getColumnLabel(recNodes),
-        nodes: recNodes,
-        selectedId: rec,
-      },
+  // Columns for the graph canvas.
+  const canvasColumns: CanvasColumn[] = useMemo(() => {
+    const cols: CanvasColumn[] = [
+      { nodes: guidelineNodes, selectedId: guideline },
+      { nodes: recNodes, selectedId: rec },
     ];
-
-    // Show strategies column only when a rec is selected.
     if (rec) {
-      cols.push({
-        label: getColumnLabel(strategyNodes),
-        nodes: strategyNodes,
-        selectedId: strategy,
-      });
+      cols.push({ nodes: strategyNodes, selectedId: strategy });
     }
-
-    // Show actions column only when a strategy is selected.
     if (strategy) {
-      cols.push({
-        label: getColumnLabel(actionNodes),
-        nodes: actionNodes,
-        selectedId: null,
-      });
+      cols.push({ nodes: actionNodes, selectedId: null });
     }
-
     return cols;
-  }, [
-    guidelineNodes,
-    recNodes,
-    strategyNodes,
-    actionNodes,
-    guideline,
-    rec,
-    strategy,
-  ]);
+  }, [guidelineNodes, recNodes, strategyNodes, actionNodes, guideline, rec, strategy]);
 
-  // ── All fetched nodes (for detail panel lookup) ────────────────
+  // ── Collect all edges across fetched subgraphs ─────────────────
+
+  const allEdges: GraphEdge[] = useMemo(() => {
+    const map = new Map<string, GraphEdge>();
+    for (const q of [guidelineQuery, recQuery, strategyQuery]) {
+      if (q.data) {
+        for (const e of q.data.edges) {
+          if (!map.has(e.id)) map.set(e.id, e);
+        }
+      }
+    }
+    return Array.from(map.values());
+  }, [guidelineQuery.data, recQuery.data, strategyQuery.data]);
+
+  // ── All nodes for detail panel lookup ──────────────────────────
 
   const allNodes: GraphNode[] = useMemo(() => {
     const map = new Map<string, GraphNode>();
@@ -182,35 +158,36 @@ function ExploreContent() {
     [allNodes, detailNodeId],
   );
 
-  // ── Selection handler ──────────────────────────────────────────
+  // ── Click handler — determine column from node type ────────────
 
-  const handleSelect = useCallback(
-    (columnIndex: number, nodeId: string) => {
-      // Always show detail for the clicked node.
+  const handleNodeClick = useCallback(
+    (nodeId: string) => {
       setDetailNodeId(nodeId);
 
-      switch (columnIndex) {
-        case 0:
-          // Clicking a guideline — reset everything below.
+      // Find the node to determine its hierarchy level.
+      const node = allNodes.find((n) => n.id === nodeId);
+      if (!node) return;
+
+      const rank = TYPE_RANK[node.labels[0]] ?? 99;
+
+      switch (rank) {
+        case 0: // Guideline
           setSelection(nodeId, null, null);
           break;
-        case 1:
-          // Clicking a rec — keep guideline, set rec, clear strategy.
+        case 1: // Recommendation
           setSelection(guideline, nodeId, null);
           break;
-        case 2:
-          // Clicking a strategy — keep guideline + rec, set strategy.
+        case 2: // Strategy
           setSelection(guideline, rec, nodeId);
           break;
-        case 3:
-          // Clicking an action — just show detail, no deeper level.
+        default: // Action (Medication/Procedure/Observation) — detail only
           break;
       }
     },
-    [guideline, rec, setSelection],
+    [allNodes, guideline, rec, setSelection],
   );
 
-  // Show detail when URL state changes selections.
+  // Auto-select detail when URL state changes.
   useEffect(() => {
     if (strategy) setDetailNodeId(strategy);
     else if (rec) setDetailNodeId(rec);
@@ -227,22 +204,22 @@ function ExploreContent() {
 
   return (
     <div className="flex h-full" data-testid="explore-page">
-      {/* Column browser — the primary navigation */}
-      <div className="flex-1 min-w-0 flex">
+      {/* Center: graph canvas with column layout */}
+      <div className="flex-1 min-w-0">
         {isLoading && allNodes.length === 0 ? (
-          <div className="flex items-center justify-center w-full text-slate-400">
+          <div className="flex items-center justify-center h-full text-slate-400">
             Loading graph...
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center w-full text-red-500 text-sm">
+          <div className="flex items-center justify-center h-full text-red-500 text-sm">
             Error: {(error as Error).message}
           </div>
         ) : (
-          <ColumnBrowser
-            columns={columns}
-            onSelect={handleSelect}
-            onNodeDetail={setDetailNodeId}
-            detailNodeId={detailNodeId}
+          <GraphCanvas
+            columns={canvasColumns}
+            edges={allEdges}
+            onNodeClick={handleNodeClick}
+            selectedNodeId={detailNodeId}
           />
         )}
       </div>

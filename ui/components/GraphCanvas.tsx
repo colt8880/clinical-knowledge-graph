@@ -4,19 +4,29 @@ import { useEffect, useRef, useCallback } from "react";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import type { GraphNode, GraphEdge } from "@/lib/api/client";
 
-// cose-bilkent is a UMD module; register it once on first import.
-let coseBilkentRegistered = false;
+/**
+ * A column of nodes to render in the graph canvas.
+ * Nodes within a column are laid out vertically; columns progress left to right.
+ */
+export interface CanvasColumn {
+  nodes: GraphNode[];
+  selectedId: string | null;
+}
 
 interface GraphCanvasProps {
-  nodes: GraphNode[];
+  /** Columns of nodes to lay out left-to-right. */
+  columns: CanvasColumn[];
+  /** Edges to draw between nodes across columns. */
   edges: GraphEdge[];
-  highlight?: { nodeIds?: string[]; edgeIds?: string[] };
+  /** Callback when a node is clicked. */
   onNodeClick?: (nodeId: string) => void;
+  /** Callback when an edge is clicked. */
   onEdgeClick?: (edgeId: string) => void;
+  /** Which node is selected (for detail panel highlight). */
   selectedNodeId?: string | null;
 }
 
-/** Color palette matching the crc-graph.html reference, keyed by Neo4j label. */
+/** Color palette keyed by Neo4j label. */
 const TYPE_COLORS: Record<string, { bg: string; border: string }> = {
   Guideline: { bg: "#f3e8ff", border: "#6b21a8" },
   Recommendation: { bg: "#dbeafe", border: "#1e40af" },
@@ -29,21 +39,15 @@ const TYPE_COLORS: Record<string, { bg: string; border: string }> = {
 
 const EDGE_COLORS: Record<string, string> = {
   FROM_GUIDELINE: "#6b21a8",
-  FOR_CONDITION: "#64748b",
   OFFERS_STRATEGY: "#92400e",
   INCLUDES_ACTION: "#166534",
-  EXCLUDED_BY: "#991b1b",
-  TRIGGERED_BY: "#3730a3",
-  TRIGGERS_FOLLOWUP: "#1e40af",
-  PREEMPTED_BY: "#b91c1c",
 };
 
 function nodeLabel(node: GraphNode): string {
-  const props = node.properties;
   return (
-    (props.title as string) ??
-    (props.name as string) ??
-    (props.display_name as string) ??
+    (node.properties.title as string) ??
+    (node.properties.name as string) ??
+    (node.properties.display_name as string) ??
     node.id
   );
 }
@@ -52,63 +56,81 @@ function primaryLabel(node: GraphNode): string {
   return node.labels[0] ?? "Unknown";
 }
 
-/** Compute a font size that fits the label inside the node width. */
 function computeFontSize(label: string, nodeWidth: number): number {
-  // Rough heuristic: ~6px per character at font-size 10.
-  // Allow text wrapping at ~nodeWidth, so measure the longest word.
   const words = label.split(/\s+/);
   const longestWord = words.reduce((a, b) => (a.length > b.length ? a : b), "");
-  const charWidthAtSize10 = 6;
-  const maxFontForLongestWord = Math.floor(
-    (nodeWidth - 16) / (longestWord.length * (charWidthAtSize10 / 10)),
+  const charWidth = 6;
+  const maxForWord = Math.floor(
+    (nodeWidth - 20) / (longestWord.length * (charWidth / 10)),
   );
-  // Also consider total lines: if many words, shrink a bit.
-  const totalChars = label.length;
-  const charsPerLine = Math.floor((nodeWidth - 16) / charWidthAtSize10);
-  const estimatedLines = Math.ceil(totalChars / charsPerLine);
-  const maxFontForHeight = estimatedLines > 4 ? 8 : estimatedLines > 3 ? 9 : 10;
-
-  return Math.max(7, Math.min(maxFontForLongestWord, maxFontForHeight, 11));
+  const charsPerLine = Math.floor((nodeWidth - 20) / charWidth);
+  const lines = Math.ceil(label.length / charsPerLine);
+  const maxForHeight = lines > 4 ? 8 : lines > 3 ? 9 : 10;
+  return Math.max(7, Math.min(maxForWord, maxForHeight, 11));
 }
 
-function toElements(
-  nodes: GraphNode[],
+/** Layout constants. */
+const COL_SPACING = 260;
+const ROW_SPACING = 90;
+const LEFT_PAD = 120;
+const TOP_PAD = 80;
+
+function buildElements(
+  columns: CanvasColumn[],
   edges: GraphEdge[],
 ): ElementDefinition[] {
   const els: ElementDefinition[] = [];
-  for (const n of nodes) {
-    const label = primaryLabel(n);
-    const colors = TYPE_COLORS[label] ?? { bg: "#e2e8f0", border: "#64748b" };
-    const displayLabel = nodeLabel(n);
-    const nodeWidth =
-      label === "Guideline" ? 180 :
-      label === "Recommendation" ? 150 :
-      110;
-    const fontSize = computeFontSize(displayLabel, nodeWidth);
-    els.push({
-      data: {
-        id: n.id,
-        label: displayLabel,
-        nodeType: label,
-        bgColor: colors.bg,
-        borderColor: colors.border,
-        nodeWidth,
-        nodeHeight: label === "Guideline" ? 65 : label === "Recommendation" ? 70 : 55,
-        fontSize,
-      },
-    });
+  const nodeIds = new Set<string>();
+
+  for (let col = 0; col < columns.length; col++) {
+    const { nodes, selectedId } = columns[col];
+    const colX = LEFT_PAD + col * COL_SPACING;
+    // Center the column vertically.
+    const totalHeight = (nodes.length - 1) * ROW_SPACING;
+    const startY = TOP_PAD + Math.max(0, (300 - totalHeight) / 2);
+
+    for (let row = 0; row < nodes.length; row++) {
+      const n = nodes[row];
+      nodeIds.add(n.id);
+      const type = primaryLabel(n);
+      const colors = TYPE_COLORS[type] ?? { bg: "#e2e8f0", border: "#64748b" };
+      const display = nodeLabel(n);
+      const nodeWidth = type === "Guideline" ? 180 : type === "Recommendation" ? 160 : 130;
+      const nodeHeight = type === "Guideline" ? 60 : 55;
+      const isSelected = n.id === selectedId;
+
+      els.push({
+        data: {
+          id: n.id,
+          label: display,
+          nodeType: type,
+          bgColor: isSelected ? colors.bg : colors.bg,
+          borderColor: colors.border,
+          nodeWidth,
+          nodeHeight,
+          fontSize: computeFontSize(display, nodeWidth),
+          isSelected: isSelected ? "true" : "false",
+        },
+        position: { x: colX, y: startY + row * ROW_SPACING },
+      });
+    }
   }
+
+  // Only include edges between nodes that are visible.
   for (const e of edges) {
-    els.push({
-      data: {
-        id: e.id,
-        source: e.start,
-        target: e.end,
-        edgeType: e.type,
-        lineColor: EDGE_COLORS[e.type] ?? "#94a3b8",
-      },
-    });
+    if (nodeIds.has(e.start) && nodeIds.has(e.end)) {
+      els.push({
+        data: {
+          id: e.id,
+          source: e.start,
+          target: e.end,
+          edgeType: e.type,
+          lineColor: EDGE_COLORS[e.type] ?? "#94a3b8",
+        },
+      });
+    }
   }
+
   return els;
 }
 
@@ -120,7 +142,7 @@ const CY_STYLE: any[] = [
       label: "data(label)",
       "text-wrap": "wrap",
       "text-max-width": (ele: { data: (k: string) => number }) =>
-        `${ele.data("nodeWidth") - 16}px`,
+        `${ele.data("nodeWidth") - 20}px`,
       "text-valign": "center",
       "text-halign": "center",
       "font-size": (ele: { data: (k: string) => number }) =>
@@ -140,14 +162,18 @@ const CY_STYLE: any[] = [
     style: { "font-weight": 600 },
   },
   {
+    selector: "node[isSelected = 'true']",
+    style: {
+      "border-width": 3,
+      "border-color": "#0ea5e9",
+      "overlay-color": "#0ea5e9",
+      "overlay-opacity": 0.1,
+      "overlay-padding": 4,
+    },
+  },
+  {
     selector: "edge",
     style: {
-      label: "data(edgeType)",
-      "font-size": 8,
-      color: "#64748b",
-      "text-background-color": "#ffffff",
-      "text-background-opacity": 0.9,
-      "text-background-padding": "2px",
       width: 1.5,
       "line-color": "data(lineColor)",
       "target-arrow-color": "data(lineColor)",
@@ -157,33 +183,20 @@ const CY_STYLE: any[] = [
     },
   },
   {
-    selector: "edge[edgeType = 'EXCLUDED_BY']",
-    style: { "line-style": "dashed" },
-  },
-  {
-    selector: ".highlighted",
-    style: {
-      "overlay-color": "#0ea5e9",
-      "overlay-opacity": 0.22,
-      "overlay-padding": 8,
-    },
-  },
-  {
-    selector: ".selected-node",
+    selector: ".detail-node",
     style: {
       "border-width": 3,
-      "border-color": "#0ea5e9",
-      "overlay-color": "#0ea5e9",
+      "border-color": "#6366f1",
+      "overlay-color": "#6366f1",
       "overlay-opacity": 0.12,
-      "overlay-padding": 6,
+      "overlay-padding": 5,
     },
   },
 ];
 
 export default function GraphCanvas({
-  nodes,
+  columns,
   edges,
-  highlight,
   onNodeClick,
   onEdgeClick,
   selectedNodeId,
@@ -191,57 +204,44 @@ export default function GraphCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
 
-  // Stable callback refs to avoid re-binding events.
   const onNodeClickRef = useRef(onNodeClick);
   onNodeClickRef.current = onNodeClick;
   const onEdgeClickRef = useRef(onEdgeClick);
   onEdgeClickRef.current = onEdgeClick;
 
-  const initCy = useCallback(async () => {
+  const initCy = useCallback(() => {
     if (!containerRef.current) return;
 
-    // Dynamically import and register cose-bilkent layout.
-    if (!coseBilkentRegistered) {
-      const coseBilkent = await import("cytoscape-cose-bilkent");
-      cytoscape.use(coseBilkent.default ?? coseBilkent);
-      coseBilkentRegistered = true;
-    }
-
-    const elements = toElements(nodes, edges);
+    const elements = buildElements(columns, edges);
 
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       style: CY_STYLE,
-      layout: {
-        name: "cose-bilkent",
-        // Fixed seed for deterministic layout (per ISSUES.md).
-        // @ts-expect-error — cose-bilkent options not in base types
-        randomize: true,
-        seed: 42,
-        idealEdgeLength: 120,
-        nodeRepulsion: 6000,
-        animate: false,
-      },
+      // Use preset layout — positions are set explicitly per node.
+      layout: { name: "preset" },
       wheelSensitivity: 0.2,
-      minZoom: 0.15,
-      maxZoom: 3,
+      minZoom: 0.3,
+      maxZoom: 2.5,
+      userPanningEnabled: true,
+      userZoomingEnabled: true,
+      boxSelectionEnabled: false,
     });
 
+    // Fit with padding after render.
+    cy.fit(undefined, 40);
+
     cy.on("tap", "node", (evt) => {
-      const id = evt.target.id();
-      onNodeClickRef.current?.(id);
+      onNodeClickRef.current?.(evt.target.id());
     });
 
     cy.on("tap", "edge", (evt) => {
-      const id = evt.target.id();
-      onEdgeClickRef.current?.(id);
+      onEdgeClickRef.current?.(evt.target.id());
     });
 
     cyRef.current = cy;
-  }, [nodes, edges]);
+  }, [columns, edges]);
 
-  // Initialize / re-initialize when nodes or edges change.
   useEffect(() => {
     initCy();
     return () => {
@@ -250,30 +250,13 @@ export default function GraphCanvas({
     };
   }, [initCy]);
 
-  // Apply highlight classes.
+  // Highlight the node shown in the detail panel.
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
-    cy.elements().removeClass("highlighted");
-    if (highlight?.nodeIds) {
-      for (const id of highlight.nodeIds) {
-        cy.getElementById(id).addClass("highlighted");
-      }
-    }
-    if (highlight?.edgeIds) {
-      for (const id of highlight.edgeIds) {
-        cy.getElementById(id).addClass("highlighted");
-      }
-    }
-  }, [highlight]);
-
-  // Apply selected-node class.
-  useEffect(() => {
-    const cy = cyRef.current;
-    if (!cy) return;
-    cy.elements().removeClass("selected-node");
+    cy.elements().removeClass("detail-node");
     if (selectedNodeId) {
-      cy.getElementById(selectedNodeId).addClass("selected-node");
+      cy.getElementById(selectedNodeId).addClass("detail-node");
     }
   }, [selectedNodeId]);
 

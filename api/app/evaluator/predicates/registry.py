@@ -8,7 +8,19 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from app.evaluator.predicates.age import eval_age_between, eval_age_less_than, eval_age_greater_than_or_equal
+from app.evaluator.predicates.age import (
+    eval_age_between,
+    eval_age_less_than,
+    eval_age_greater_than_or_equal,
+)
+from app.evaluator.predicates.conditions import (
+    eval_has_condition_history,
+    eval_has_active_condition,
+)
+from app.evaluator.predicates.observations import eval_most_recent_observation_value
+from app.evaluator.predicates.medications import eval_has_medication_active
+from app.evaluator.predicates.smoking import eval_smoking_status_is
+from app.evaluator.predicates.risk_score import eval_risk_score_compares
 
 # Type: (args, patient_context, entities) -> "true" | "false" | "unknown"
 PredicateFn = Callable[[dict[str, Any], dict[str, Any], dict[str, Any]], str]
@@ -21,25 +33,24 @@ def _not_implemented(name: str) -> PredicateFn:
 
 
 # Dispatch table keyed by predicate name from predicate-catalog.yaml.
-# Implemented predicates point to real functions; everything else stubs.
 REGISTRY: dict[str, PredicateFn] = {
-    # Demographics — implemented
+    # Demographics
     "age_between": eval_age_between,
     "age_less_than": eval_age_less_than,
     "age_greater_than_or_equal": eval_age_greater_than_or_equal,
     "administrative_sex_is": _not_implemented("administrative_sex_is"),
     "has_ancestry_matching": _not_implemented("has_ancestry_matching"),
-    # Conditions — stub
-    "has_condition_history": _not_implemented("has_condition_history"),
-    "has_active_condition": _not_implemented("has_active_condition"),
-    # Tobacco — stub
-    "smoking_status_is": _not_implemented("smoking_status_is"),
-    # Observations — stub
-    "most_recent_observation_value": _not_implemented("most_recent_observation_value"),
-    # Medications — stub
-    "has_medication_active": _not_implemented("has_medication_active"),
-    # Risk scores — stub
-    "risk_score_compares": _not_implemented("risk_score_compares"),
+    # Conditions
+    "has_condition_history": eval_has_condition_history,
+    "has_active_condition": eval_has_active_condition,
+    # Tobacco
+    "smoking_status_is": eval_smoking_status_is,
+    # Observations
+    "most_recent_observation_value": eval_most_recent_observation_value,
+    # Medications
+    "has_medication_active": eval_has_medication_active,
+    # Risk scores
+    "risk_score_compares": eval_risk_score_compares,
 }
 
 

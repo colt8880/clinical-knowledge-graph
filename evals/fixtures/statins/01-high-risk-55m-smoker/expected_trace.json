@@ -1,0 +1,878 @@
+{
+  "envelope": {
+    "spec_tag": "v0.1.0",
+    "graph_version": "2022-08-23",
+    "evaluator_version": "0.1.0",
+    "evaluation_time": "2026-04-15T10:00:00Z",
+    "patient_fingerprint": "a72696b08f11a6c612deb21f24968a99f83f0d3e5633a0f1d31fa0debb0204c8"
+  },
+  "events": [
+    {
+      "seq": 1,
+      "type": "evaluation_started",
+      "patient_age_years": 55,
+      "patient_sex": "male",
+      "guidelines_in_scope": [
+        "guideline:uspstf-statin-2022"
+      ]
+    },
+    {
+      "seq": 2,
+      "type": "guideline_entered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "guideline_title": "Statin Use for the Primary Prevention of Cardiovascular Disease in Adults: Preventive Medication"
+    },
+    {
+      "seq": 3,
+      "type": "recommendation_considered",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "recommendation_title": "Initiate statin for primary prevention of CVD (Grade B)",
+      "evidence_grade": "B",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 4,
+      "type": "eligibility_evaluation_started",
+      "recommendation_id": "rec:statin-initiate-grade-b"
+    },
+    {
+      "seq": 5,
+      "type": "risk_score_lookup",
+      "score_name": "ascvd_10yr",
+      "resolution": "supplied",
+      "supplied_value": 18.2,
+      "supplied_computed_date": "2026-03-02",
+      "inputs_read": [],
+      "computed_value": null,
+      "method": "pooled_cohort_equations_2013_goff",
+      "note": null
+    },
+    {
+      "seq": 6,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 40,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 7,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        0
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:ascvd-established"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 8,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:ldl-cholesterol",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 190,
+        "unit": "mg/dL"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:ldl-cholesterol]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 9,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        2
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:familial-hypercholesterolemia"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 10,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        1,
+        "none_of"
+      ],
+      "operator": "none_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 11,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        0
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:dyslipidemia"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 12,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        1
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:diabetes"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 13,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        2
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:hypertension"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 14,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        2,
+        "any_of"
+      ],
+      "operator": "any_of",
+      "result": "true",
+      "short_circuited": true
+    },
+    {
+      "seq": 15,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        3
+      ],
+      "predicate": "risk_score_compares",
+      "args": {
+        "name": "ascvd_10yr",
+        "comparator": "gte",
+        "threshold": 10
+      },
+      "inputs_read": [
+        {
+          "source": "patient.risk_scores",
+          "locator": "risk_scores.ascvd_10yr",
+          "value": 18.2,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 16,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 17,
+      "type": "eligibility_evaluation_completed",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "result": "eligible",
+      "final_value": "true"
+    },
+    {
+      "seq": 18,
+      "type": "strategy_considered",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "strategy_name": "Moderate-intensity statin therapy"
+    },
+    {
+      "seq": 19,
+      "type": "action_checked",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:atorvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:atorvastatin"
+    },
+    {
+      "seq": 20,
+      "type": "action_checked",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:fluvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:fluvastatin"
+    },
+    {
+      "seq": 21,
+      "type": "action_checked",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:lovastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:lovastatin"
+    },
+    {
+      "seq": 22,
+      "type": "action_checked",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:pitavastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:pitavastatin"
+    },
+    {
+      "seq": 23,
+      "type": "action_checked",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:pravastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:pravastatin"
+    },
+    {
+      "seq": 24,
+      "type": "action_checked",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:rosuvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:rosuvastatin"
+    },
+    {
+      "seq": 25,
+      "type": "action_checked",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:simvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:simvastatin"
+    },
+    {
+      "seq": 26,
+      "type": "strategy_resolved",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "satisfied": false
+    },
+    {
+      "seq": 27,
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "status": "due",
+      "evidence_grade": "B",
+      "reason": "Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.",
+      "offered_strategies": [
+        "strategy:statin-moderate-intensity"
+      ]
+    },
+    {
+      "seq": 28,
+      "type": "recommendation_considered",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "recommendation_title": "Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)",
+      "evidence_grade": "I",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 29,
+      "type": "eligibility_evaluation_started",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i"
+    },
+    {
+      "seq": 30,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_greater_than_or_equal",
+      "args": {
+        "value": 76
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 31,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 32,
+      "type": "eligibility_evaluation_completed",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 33,
+      "type": "recommendation_considered",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "recommendation_title": "Selectively offer statin based on shared decision-making (Grade C)",
+      "evidence_grade": "C",
+      "intent": "shared_decision",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 34,
+      "type": "eligibility_evaluation_started",
+      "recommendation_id": "rec:statin-selective-grade-c"
+    },
+    {
+      "seq": 35,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 40,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 36,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        0
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:ascvd-established"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 37,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:ldl-cholesterol",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 190,
+        "unit": "mg/dL"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:ldl-cholesterol]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 38,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        2
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:familial-hypercholesterolemia"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 39,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        1,
+        "none_of"
+      ],
+      "operator": "none_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 40,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        0
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:dyslipidemia"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 41,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        1
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:diabetes"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 42,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        2
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:hypertension"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 43,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        2,
+        "any_of"
+      ],
+      "operator": "any_of",
+      "result": "true",
+      "short_circuited": true
+    },
+    {
+      "seq": 44,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        3
+      ],
+      "predicate": "risk_score_compares",
+      "args": {
+        "name": "ascvd_10yr",
+        "comparator": "gte",
+        "threshold": 7.5
+      },
+      "inputs_read": [
+        {
+          "source": "patient.risk_scores",
+          "locator": "risk_scores.ascvd_10yr",
+          "value": 18.2,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 45,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        4
+      ],
+      "predicate": "risk_score_compares",
+      "args": {
+        "name": "ascvd_10yr",
+        "comparator": "lt",
+        "threshold": 10
+      },
+      "inputs_read": [
+        {
+          "source": "patient.risk_scores",
+          "locator": "risk_scores.ascvd_10yr",
+          "value": 18.2,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 46,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": false
+    },
+    {
+      "seq": 47,
+      "type": "eligibility_evaluation_completed",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 48,
+      "type": "evaluation_completed",
+      "recommendations_emitted": 1,
+      "duration_ms": 0
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "status": "due",
+      "evidence_grade": "B",
+      "reason": "Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.",
+      "offered_strategies": [
+        "strategy:statin-moderate-intensity"
+      ]
+    }
+  ]
+}

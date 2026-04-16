@@ -5,7 +5,7 @@
       "recommendation_id": "rec:statin-selective-grade-c",
       "status": "due",
       "evidence_grade": "C",
-      "offered_strategies": ["strategy:statin-shared-decision-discussion", "strategy:statin-moderate-intensity"]
+      "offered_strategies": ["strategy:statin-moderate-intensity", "strategy:statin-shared-decision-discussion"]
     }
   ],
   "expected_trace_contains": [

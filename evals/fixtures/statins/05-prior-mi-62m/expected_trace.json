@@ -4,13 +4,13 @@
     "graph_version": "2022-08-23",
     "evaluator_version": "0.1.0",
     "evaluation_time": "2026-04-15T10:00:00Z",
-    "patient_fingerprint": "2a95262269d11772673559bb46fe4dfd6aeb6c5fdc30348c420686c29a3b4f9b"
+    "patient_fingerprint": "5a2bfd52493e27349539c6ca13e8a5c2e323a4b10128d375fecc6e6707f63821"
   },
   "events": [
     {
       "seq": 1,
       "type": "evaluation_started",
-      "patient_age_years": 35,
+      "patient_age_years": 62,
       "patient_sex": "male",
       "guidelines_in_scope": [
         "guideline:uspstf-statin-2022"
@@ -26,8 +26,8 @@
       "seq": 3,
       "type": "exit_condition_triggered",
       "recommendation_id": "rec:statin-initiate-grade-b",
-      "exit": "out_of_scope_age_below_range",
-      "rationale": "USPSTF statin primary prevention does not address adults under 40."
+      "exit": "out_of_scope_secondary_prevention",
+      "rationale": "Established ASCVD is secondary prevention \u2014 addressed by ACC/AHA cholesterol guideline, not this USPSTF statement."
     },
     {
       "seq": 4,

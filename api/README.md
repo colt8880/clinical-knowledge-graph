@@ -44,6 +44,33 @@ The API starts on `http://localhost:8000`. Interactive docs at `/docs`.
 | GET | `/nodes/{id}` | Fetch a single node by stable id |
 | GET | `/nodes/{id}/neighbors` | Fetch a node with one-hop inbound/outbound neighbors |
 
+## Running in Docker
+
+Build the image:
+
+```sh
+docker build -t ckg-api api/
+```
+
+Run (assumes Neo4j is reachable from the container):
+
+```sh
+docker run --rm \
+  -e NEO4J_URI=bolt://host.docker.internal:7687 \
+  -e NEO4J_USER=neo4j \
+  -e NEO4J_PASSWORD=password123 \
+  -p 8000:8000 \
+  ckg-api
+```
+
+The entrypoint waits up to 30 seconds for Neo4j to become reachable before starting the app. All configuration is via environment variables — no secrets are baked into the image.
+
+Verify:
+
+```sh
+curl http://localhost:8000/healthz
+```
+
 ## Tests
 
 ```sh

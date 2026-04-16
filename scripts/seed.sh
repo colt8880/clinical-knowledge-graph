@@ -11,9 +11,6 @@
 
 set -euo pipefail
 
-HOST="${NEO4J_URI#bolt://}"
-HOST_ONLY="${HOST%%:*}"
-
 echo "==> Applying constraints..."
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/constraints.cypher
 

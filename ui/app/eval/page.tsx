@@ -2,13 +2,15 @@
 
 import { Suspense, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { evaluate, fetchNeighbors } from "@/lib/api/client";
-import type { PatientContext } from "@/lib/api/client";
+import type { PatientContext, GraphNode, GraphEdge } from "@/lib/api/client";
 import {
   highlightedNodeIds as getHighlightedNodeIds,
   deriveRecommendations,
   clampIndex,
+  subgraphFetchIds,
+  visibleNodeIds,
 } from "@/lib/eval/trace-nav";
 import type { EvalTrace, TraceEvent } from "@/lib/eval/trace-nav";
 import GraphCanvas, { type CanvasColumn } from "@/components/GraphCanvas";
@@ -74,13 +76,39 @@ function EvalContent() {
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch the guideline subgraph to build graph columns.
+  // ── Data fetching ──────────────────────────────────────────────
+
+  // Always fetch the guideline subgraph (guideline + recs).
   const guidelineQuery = useQuery({
     queryKey: ["neighbors", GUIDELINE_ID],
     queryFn: () => fetchNeighbors(GUIDELINE_ID),
   });
 
-  // Update URL state without triggering a Next.js navigation (avoids Suspense re-mount).
+  // From the full trace, determine which recs and strategies we need
+  // neighbor data for. Fetches happen once when the trace loads.
+  const events = useMemo(() => trace?.events ?? [], [trace]);
+  const fetchIds = useMemo(() => subgraphFetchIds(events), [events]);
+
+  // Fetch neighbors for each recommendation (gives us Strategy nodes).
+  const recQueries = useQueries({
+    queries: fetchIds.recIds.map((id) => ({
+      queryKey: ["neighbors", id],
+      queryFn: () => fetchNeighbors(id),
+      staleTime: Infinity,
+    })),
+  });
+
+  // Fetch neighbors for each strategy (gives us Action/Medication nodes).
+  const strategyQueries = useQueries({
+    queries: fetchIds.strategyIds.map((id) => ({
+      queryKey: ["neighbors", id],
+      queryFn: () => fetchNeighbors(id),
+      staleTime: Infinity,
+    })),
+  });
+
+  // ── URL state ─────────────────────────────────────────────────
+
   const updateUrl = useCallback(
     (fixtureId: string | null, seq: number | null) => {
       const params = new URLSearchParams();
@@ -122,8 +150,6 @@ function EvalContent() {
     }
   }, [selectedFixture, updateUrl]);
 
-  const events = trace?.events ?? [];
-
   const handleSetIndex = useCallback(
     (index: number) => {
       const clamped = clampIndex(index, events.length);
@@ -142,6 +168,8 @@ function EvalContent() {
     [currentIndex, handleSetIndex],
   );
 
+  // ── Current event + highlighting ──────────────────────────────
+
   const currentEvent: TraceEvent | null =
     events.length > 0 ? events[currentIndex] ?? null : null;
 
@@ -155,28 +183,88 @@ function EvalContent() {
     [trace],
   );
 
-  // Build graph canvas columns from the guideline subgraph.
+  // ── Build a complete node/edge pool from all fetched subgraphs ─
+
+  const { nodePool, edgePool } = useMemo(() => {
+    const nodeMap = new Map<string, GraphNode>();
+    const edgeMap = new Map<string, GraphEdge>();
+
+    const addSubgraph = (data: { nodes: GraphNode[]; edges: GraphEdge[] } | undefined) => {
+      if (!data) return;
+      for (const n of data.nodes) {
+        if (!nodeMap.has(n.id)) nodeMap.set(n.id, n);
+      }
+      for (const e of data.edges) {
+        if (!edgeMap.has(e.id)) edgeMap.set(e.id, e);
+      }
+    };
+
+    addSubgraph(guidelineQuery.data);
+    for (const q of recQueries) addSubgraph(q.data);
+    for (const q of strategyQueries) addSubgraph(q.data);
+
+    return {
+      nodePool: nodeMap,
+      edgePool: Array.from(edgeMap.values()),
+    };
+  }, [guidelineQuery.data, recQueries, strategyQueries]);
+
+  // ── Build canvas columns based on which nodes the trace has visited ─
+
+  const visible = useMemo(
+    () => visibleNodeIds(events, currentIndex),
+    [events, currentIndex],
+  );
+
   const canvasColumns: CanvasColumn[] = useMemo(() => {
     if (!guidelineQuery.data) return [];
-    const allNodes = guidelineQuery.data.nodes;
-    const center = allNodes.find((n) => n.id === GUIDELINE_ID);
-    if (!center) return [];
 
-    const guidelineCol = [center];
-    const recNodes = allNodes.filter(
-      (n) => n.labels[0] === "Recommendation" && n.id !== GUIDELINE_ID,
-    );
+    const guidelineNode = nodePool.get(GUIDELINE_ID);
+    if (!guidelineNode) return [];
 
-    return [
-      { nodes: guidelineCol, selectedId: null },
-      { nodes: recNodes, selectedId: null },
+    const cols: CanvasColumn[] = [
+      { nodes: [guidelineNode], selectedId: null },
     ];
-  }, [guidelineQuery.data]);
 
-  const allEdges = useMemo(
-    () => guidelineQuery.data?.edges ?? [],
-    [guidelineQuery.data],
-  );
+    // Col 1: Recommendations that have been considered up to currentIndex.
+    const recNodes = Array.from(visible.recIds)
+      .map((id) => nodePool.get(id))
+      .filter((n): n is GraphNode => n != null);
+    if (recNodes.length > 0) {
+      cols.push({ nodes: recNodes, selectedId: null });
+    }
+
+    // Col 2: Strategies that have been considered.
+    const strategyNodes = Array.from(visible.strategyIds)
+      .map((id) => nodePool.get(id))
+      .filter((n): n is GraphNode => n != null);
+    if (strategyNodes.length > 0) {
+      cols.push({ nodes: strategyNodes, selectedId: null });
+    }
+
+    // Col 3: Actions that have been checked.
+    const actionNodes = Array.from(visible.actionIds)
+      .map((id) => nodePool.get(id))
+      .filter((n): n is GraphNode => n != null);
+    if (actionNodes.length > 0) {
+      cols.push({ nodes: actionNodes, selectedId: null });
+    }
+
+    return cols;
+  }, [guidelineQuery.data, nodePool, visible]);
+
+  // Only include edges between currently visible nodes.
+  const visibleEdges = useMemo(() => {
+    const visibleIds = new Set<string>();
+    for (const col of canvasColumns) {
+      for (const n of col.nodes) visibleIds.add(n.id);
+    }
+    return edgePool.filter(
+      (e) => visibleIds.has(e.start) && visibleIds.has(e.end),
+    );
+  }, [canvasColumns, edgePool]);
+
+  // ── Render ─────────────────────────────────────────────────────
 
   return (
     <div className="flex flex-col h-full" data-testid="eval-page">
@@ -236,7 +324,7 @@ function EvalContent() {
           ) : (
             <GraphCanvas
               columns={canvasColumns}
-              edges={allEdges}
+              edges={visibleEdges}
               highlightedNodeIds={highlighted}
             />
           )}

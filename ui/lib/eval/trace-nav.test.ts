@@ -5,6 +5,8 @@ import {
   eventTypeLabel,
   clampIndex,
   deriveRecommendations,
+  subgraphFetchIds,
+  visibleNodeIds,
 } from "./trace-nav";
 import type { EvalTrace, TraceEvent } from "./trace-nav";
 
@@ -210,5 +212,114 @@ describe("deriveRecommendations", () => {
       recommendations: [],
     } as unknown as EvalTrace;
     expect(deriveRecommendations(trace)).toEqual([]);
+  });
+});
+
+// ── Dynamic subgraph expansion ──────────────────────────────────────
+
+const sampleEvents: TraceEvent[] = [
+  {
+    seq: 1,
+    type: "evaluation_started",
+    patient_age_years: 55,
+    patient_sex: "male",
+    guidelines_in_scope: ["guideline:uspstf-statin-2022"],
+  } as TraceEvent,
+  {
+    seq: 2,
+    type: "guideline_entered",
+    guideline_id: "guideline:uspstf-statin-2022",
+    guideline_title: "USPSTF Statin 2022",
+  } as TraceEvent,
+  {
+    seq: 3,
+    type: "recommendation_considered",
+    recommendation_id: "rec:statin-initiate-grade-b",
+    recommendation_title: "Grade B",
+    evidence_grade: "B",
+    intent: "initiate",
+    trigger: "primary_prevention",
+  } as TraceEvent,
+  {
+    seq: 8,
+    type: "strategy_considered",
+    recommendation_id: "rec:statin-initiate-grade-b",
+    strategy_id: "strategy:statin-moderate-intensity",
+    strategy_name: "Moderate Intensity Statin",
+  } as TraceEvent,
+  {
+    seq: 9,
+    type: "action_checked",
+    recommendation_id: "rec:statin-initiate-grade-b",
+    strategy_id: "strategy:statin-moderate-intensity",
+    action_node_id: "med:atorvastatin",
+    action_entity_type: "Medication" as const,
+    inputs_read: [],
+    satisfied: false,
+  } as TraceEvent,
+  {
+    seq: 10,
+    type: "action_checked",
+    recommendation_id: "rec:statin-initiate-grade-b",
+    strategy_id: "strategy:statin-moderate-intensity",
+    action_node_id: "med:rosuvastatin",
+    action_entity_type: "Medication" as const,
+    inputs_read: [],
+    satisfied: false,
+  } as TraceEvent,
+];
+
+describe("subgraphFetchIds", () => {
+  it("extracts unique rec and strategy IDs from full trace", () => {
+    const { recIds, strategyIds } = subgraphFetchIds(sampleEvents);
+    expect(recIds).toEqual(["rec:statin-initiate-grade-b"]);
+    expect(strategyIds).toEqual(["strategy:statin-moderate-intensity"]);
+  });
+
+  it("returns empty for trace with no recs/strategies", () => {
+    const { recIds, strategyIds } = subgraphFetchIds([sampleEvents[0]]);
+    expect(recIds).toEqual([]);
+    expect(strategyIds).toEqual([]);
+  });
+});
+
+describe("visibleNodeIds", () => {
+  it("shows only guideline at step 0", () => {
+    const visible = visibleNodeIds(sampleEvents, 0);
+    expect(visible.recIds.size).toBe(0);
+    expect(visible.strategyIds.size).toBe(0);
+    expect(visible.actionIds.size).toBe(0);
+  });
+
+  it("shows rec after recommendation_considered", () => {
+    const { recIds, strategyIds, actionIds } = visibleNodeIds(sampleEvents, 2);
+    expect(recIds.has("rec:statin-initiate-grade-b")).toBe(true);
+    expect(strategyIds.size).toBe(0);
+    expect(actionIds.size).toBe(0);
+  });
+
+  it("shows strategy after strategy_considered", () => {
+    const { recIds, strategyIds, actionIds } = visibleNodeIds(sampleEvents, 3);
+    expect(recIds.has("rec:statin-initiate-grade-b")).toBe(true);
+    expect(strategyIds.has("strategy:statin-moderate-intensity")).toBe(true);
+    expect(actionIds.size).toBe(0);
+  });
+
+  it("shows actions after action_checked", () => {
+    const visible = visibleNodeIds(sampleEvents, 4);
+    expect(visible.actionIds.has("med:atorvastatin")).toBe(true);
+    expect(visible.actionIds.has("med:rosuvastatin")).toBe(false);
+  });
+
+  it("accumulates actions as more are checked", () => {
+    const { actionIds } = visibleNodeIds(sampleEvents, 5);
+    expect(actionIds.has("med:atorvastatin")).toBe(true);
+    expect(actionIds.has("med:rosuvastatin")).toBe(true);
+  });
+
+  it("collapses back when stepping backward", () => {
+    // At step 3 (strategy_considered), actions should not be visible.
+    const { actionIds } = visibleNodeIds(sampleEvents, 3);
+    expect(actionIds.size).toBe(0);
   });
 });

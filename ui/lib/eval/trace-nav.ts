@@ -138,3 +138,43 @@ export function clampIndex(index: number, eventCount: number): number {
   if (eventCount === 0) return 0;
   return Math.max(0, Math.min(index, eventCount - 1));
 }
+
+/**
+ * IDs that the Eval page needs to fetch neighbors for,
+ * derived from the full trace (so fetches happen once, not per-step).
+ */
+export function subgraphFetchIds(events: TraceEvent[]): {
+  recIds: string[];
+  strategyIds: string[];
+} {
+  const recs = new Set<string>();
+  const strategies = new Set<string>();
+  for (const e of events) {
+    if (e.type === "recommendation_considered") recs.add(e.recommendation_id);
+    if (e.type === "strategy_considered") strategies.add(e.strategy_id);
+  }
+  return { recIds: Array.from(recs), strategyIds: Array.from(strategies) };
+}
+
+/**
+ * Given events[0..currentIndex], return which rec IDs, strategy IDs,
+ * and action node IDs have been "entered" and should be visible on the canvas.
+ *
+ * This drives dynamic column expansion: the canvas only shows nodes the
+ * evaluator has actually visited up to the current step.
+ */
+export function visibleNodeIds(
+  events: TraceEvent[],
+  currentIndex: number,
+): { recIds: Set<string>; strategyIds: Set<string>; actionIds: Set<string> } {
+  const recIds = new Set<string>();
+  const strategyIds = new Set<string>();
+  const actionIds = new Set<string>();
+  for (let i = 0; i <= currentIndex && i < events.length; i++) {
+    const e = events[i];
+    if (e.type === "recommendation_considered") recIds.add(e.recommendation_id);
+    if (e.type === "strategy_considered") strategyIds.add(e.strategy_id);
+    if (e.type === "action_checked") actionIds.add(e.action_node_id);
+  }
+  return { recIds, strategyIds, actionIds };
+}

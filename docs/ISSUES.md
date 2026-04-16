@@ -25,9 +25,9 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 
 ### UI
 
-- **URL state format for the Explore tab.** Resolved: `?pinned=<id>&expanded=<id1>,<id2>` implemented in feature 05.
-- **Graph layout stability.** Resolved: cose-bilkent with `seed: 42` pinned in feature 05.
-- **Explore tab search.** `GET /search` endpoint is defined in the OpenAPI spec but not yet implemented in the API. The Explore tab uses sidebar navigation and click-to-expand as the primary discovery flow. Search will be wired once the API endpoint ships. The `ui/CLAUDE.md` DoD item "Search finds any node by id or label" is deferred until then.
+- **URL state format for the Explore tab.** Resolved: `?g=<guideline>&r=<rec>&s=<strategy>` implemented in feature 05.
+- **Graph layout stability.** Resolved: column-based preset layout in feature 05 (deterministic by construction — no force-directed jitter).
+- **Explore tab search.** `GET /search` endpoint is defined in the OpenAPI spec but not yet implemented in the API. The generated TS client includes a `searchNodes()` function that will 404 until the backend ships. The Explore tab uses column-based graph traversal via `/nodes/{id}/neighbors` as the primary discovery flow. The `ui/CLAUDE.md` DoD item "Search finds any node by id or label" is deferred until the API endpoint ships.
 
 ## v0 intentional deferrals
 

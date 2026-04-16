@@ -10,7 +10,7 @@ Next.js 14 (App Router) app for browsing and evaluating the clinical knowledge g
 ## Stack
 
 - Next.js 14 (App Router), TypeScript strict
-- Cytoscape.js with cose-bilkent layout (seeded for determinism)
+- Cytoscape.js with column-based preset layout
 - TanStack React Query for data fetching
 - Tailwind CSS
 - OpenAPI-generated types from `docs/contracts/api.openapi.yaml`
@@ -33,14 +33,15 @@ npm run generate-api # regenerate TS types from OpenAPI spec
 
 ## URL state
 
-The Explore tab encodes state in the URL for shareable deep links:
+The Explore tab encodes the selection path in the URL for shareable deep links:
 
 ```
-/explore?pinned=<node-id>&expanded=<id1>,<id2>
+/explore?g=<guideline-id>&r=<recommendation-id>&s=<strategy-id>
 ```
 
-- `pinned` — center node whose neighbors are rendered (default: `guideline:uspstf-statin-2022`)
-- `expanded` — additional nodes whose neighbors are also loaded (comma-separated)
+- `g` — selected guideline (default: `guideline:uspstf-statin-2022`)
+- `r` — selected recommendation (shows Strategies column when set)
+- `s` — selected strategy (shows Actions column when set)
 
 ## Environment variables
 

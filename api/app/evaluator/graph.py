@@ -28,6 +28,24 @@ class ClinicalEntity:
 
 
 @dataclass
+class ActionEdge:
+    """An INCLUDES_ACTION edge from a Strategy to a clinical entity node."""
+    action_node_id: str
+    action_entity_type: str  # Medication, Procedure, Observation
+    cadence: str | None = None
+    lookback: str | None = None
+    priority: str | None = None
+    intent: str | None = None
+
+
+@dataclass
+class StrategyNode:
+    id: str
+    name: str
+    actions: list[ActionEdge] = field(default_factory=list)
+
+
+@dataclass
 class RecommendationNode:
     id: str
     title: str
@@ -44,6 +62,7 @@ class GraphSnapshot:
     guideline_title: str
     recommendations: list[RecommendationNode] = field(default_factory=list)
     entities: dict[str, ClinicalEntity] = field(default_factory=dict)
+    strategies: dict[str, StrategyNode] = field(default_factory=dict)
 
 
 def _extract_codes(props: dict[str, Any]) -> list[CodeRef]:
@@ -139,9 +158,59 @@ async def load_graph(guideline_id: str = "guideline:uspstf-statin-2022") -> Grap
                     codes=_extract_codes(n_props),
                 )
 
+        # Load Strategy nodes with their INCLUDES_ACTION edges.
+        # Strategies are ordered by id for determinism.
+        strategies: dict[str, StrategyNode] = {}
+        strat_result = await session.run(
+            """
+            MATCH (s:Strategy)
+            RETURN s ORDER BY s.id
+            """
+        )
+        strat_records = [record async for record in strat_result]
+        for strat_record in strat_records:
+            s_props = dict(strat_record["s"].items())
+            sid = s_props["id"]
+
+            # Load INCLUDES_ACTION edges for this strategy, ordered by target id
+            action_result = await session.run(
+                """
+                MATCH (s:Strategy {id: $sid})-[e:INCLUDES_ACTION]->(t)
+                RETURN e, t, labels(t) AS target_labels
+                ORDER BY t.id
+                """,
+                sid=sid,
+            )
+            action_records = [a async for a in action_result]
+            actions: list[ActionEdge] = []
+            for a_rec in action_records:
+                e_props = dict(a_rec["e"].items())
+                t_props = dict(a_rec["t"].items())
+                target_labels = a_rec["target_labels"]
+                # Pick the clinical entity label (Medication, Procedure, etc.)
+                entity_type = next(
+                    (l for l in target_labels if l in ("Medication", "Procedure", "Observation")),
+                    "Unknown",
+                )
+                actions.append(ActionEdge(
+                    action_node_id=t_props["id"],
+                    action_entity_type=entity_type,
+                    cadence=e_props.get("cadence"),
+                    lookback=e_props.get("lookback"),
+                    priority=e_props.get("priority"),
+                    intent=e_props.get("intent"),
+                ))
+
+            strategies[sid] = StrategyNode(
+                id=sid,
+                name=s_props.get("name", ""),
+                actions=actions,
+            )
+
         return GraphSnapshot(
             guideline_id=guideline_id,
             guideline_title=guideline_title,
             recommendations=recommendations,
             entities=entities,
+            strategies=strategies,
         )

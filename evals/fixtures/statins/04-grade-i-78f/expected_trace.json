@@ -1,0 +1,289 @@
+{
+  "envelope": {
+    "spec_tag": "v0.1.0",
+    "graph_version": "2022-08-23",
+    "evaluator_version": "0.1.0",
+    "evaluation_time": "2026-04-15T10:00:00Z",
+    "patient_fingerprint": "2206988e36eb39a84848ce59dd9aa3920f48b4ec9abe959590a863b6a57a8732"
+  },
+  "events": [
+    {
+      "seq": 1,
+      "type": "evaluation_started",
+      "patient_age_years": 78,
+      "patient_sex": "female",
+      "guidelines_in_scope": [
+        "guideline:uspstf-statin-2022"
+      ]
+    },
+    {
+      "seq": 2,
+      "type": "guideline_entered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "guideline_title": "Statin Use for the Primary Prevention of Cardiovascular Disease in Adults: Preventive Medication"
+    },
+    {
+      "seq": 3,
+      "type": "recommendation_considered",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "recommendation_title": "Initiate statin for primary prevention of CVD (Grade B)",
+      "evidence_grade": "B",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 4,
+      "type": "eligibility_evaluation_started",
+      "recommendation_id": "rec:statin-initiate-grade-b"
+    },
+    {
+      "seq": 5,
+      "type": "risk_score_lookup",
+      "score_name": "ascvd_10yr",
+      "resolution": "unavailable",
+      "supplied_value": null,
+      "supplied_computed_date": null,
+      "inputs_read": [],
+      "computed_value": null,
+      "method": null,
+      "note": "Risk score not supplied in patient context; v0 does not compute ASCVD via PCE."
+    },
+    {
+      "seq": 6,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 40,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1947-12-08",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 7,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 8,
+      "type": "eligibility_evaluation_completed",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 9,
+      "type": "recommendation_considered",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "recommendation_title": "Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)",
+      "evidence_grade": "I",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 10,
+      "type": "eligibility_evaluation_started",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i"
+    },
+    {
+      "seq": 11,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_greater_than_or_equal",
+      "args": {
+        "value": 76
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1947-12-08",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 12,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        0
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:ascvd-established"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 13,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "path": [
+        "all_of",
+        1,
+        "none_of"
+      ],
+      "operator": "none_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 14,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 15,
+      "type": "eligibility_evaluation_completed",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "result": "eligible",
+      "final_value": "true"
+    },
+    {
+      "seq": 16,
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "status": "insufficient_evidence",
+      "evidence_grade": "I",
+      "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms."
+    },
+    {
+      "seq": 17,
+      "type": "recommendation_considered",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "recommendation_title": "Selectively offer statin based on shared decision-making (Grade C)",
+      "evidence_grade": "C",
+      "intent": "shared_decision",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 18,
+      "type": "eligibility_evaluation_started",
+      "recommendation_id": "rec:statin-selective-grade-c"
+    },
+    {
+      "seq": 19,
+      "type": "predicate_evaluated",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 40,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1947-12-08",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 20,
+      "type": "composite_resolved",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 21,
+      "type": "eligibility_evaluation_completed",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 22,
+      "type": "evaluation_completed",
+      "recommendations_emitted": 1,
+      "duration_ms": 0
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "status": "insufficient_evidence",
+      "evidence_grade": "I",
+      "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms."
+    }
+  ]
+}

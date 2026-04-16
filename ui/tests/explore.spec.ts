@@ -27,21 +27,6 @@ test.describe("Explore tab", () => {
     // Wait for the graph canvas to mount.
     await expect(page.getByTestId("graph-canvas")).toBeVisible();
 
-    // The node list should show the guideline + its 3 recommendation neighbors
-    // + 2 strategy nodes = at least 4 nodes in the sidebar.
-    // Wait for the API response to populate the node list.
-    await expect(
-      page.locator("aside ul li"),
-    ).toHaveCount(
-      // The guideline node + at least 3 recommendation neighbors.
-      // Exact count depends on the graph seed (statins model has guideline + 3 recs + 2 strategies = 6 at depth 1).
-      // We assert >= 4 to be resilient to seed changes.
-      undefined,
-      { timeout: 10_000 },
-    ).catch(() => {
-      // Fallback: just check that more than 1 node loaded.
-    });
-
     // Wait for at least 4 nodes in the sidebar (guideline + 3 recs).
     await expect(async () => {
       const count = await page.locator("aside ul li").count();

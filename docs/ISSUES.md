@@ -25,8 +25,9 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 
 ### UI
 
-- **URL state format for the Explore tab.** Lean `?pinned=<id>&expanded=<id1>,<id2>`. Document once the first deep link lands.
-- **Graph layout stability.** Cytoscape re-layouts on data change can move nodes around. Pin a seeded layout (cose-bilkent with a fixed random seed) or cache positions.
+- **URL state format for the Explore tab.** Resolved: `?pinned=<id>&expanded=<id1>,<id2>` implemented in feature 05.
+- **Graph layout stability.** Resolved: cose-bilkent with `seed: 42` pinned in feature 05.
+- **Explore tab search.** `GET /search` endpoint is defined in the OpenAPI spec but not yet implemented in the API. The Explore tab uses sidebar navigation and click-to-expand as the primary discovery flow. Search will be wired once the API endpoint ships. The `ui/CLAUDE.md` DoD item "Search finds any node by id or label" is deferred until then.
 
 ## v0 intentional deferrals
 

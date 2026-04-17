@@ -1,0 +1,12 @@
+# Runtime outputs — regenerable, not committed
+fixtures/**/arms/
+results/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Environment
+.env

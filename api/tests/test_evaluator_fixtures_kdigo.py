@@ -146,3 +146,69 @@ class TestKdigoFixtureExpectedOutcome:
         assert _canonical_json(trace1) == _canonical_json(trace2), (
             f"Determinism failure for {case_name}"
         )
+
+
+# ---------------------------------------------------------------------------
+# Negative coverage: patient with normal renal function → 0 KDIGO recs
+# ---------------------------------------------------------------------------
+
+class TestKdigoNegativeCoverage:
+    """Patient with normal eGFR and ACR should trigger zero KDIGO recs."""
+
+    NORMAL_PATIENT = {
+        "evaluation_time": "2026-04-15T10:00:00Z",
+        "patient": {
+            "date_of_birth": "1971-05-20",
+            "administrative_sex": "female",
+            "ancestry": ["non_hispanic_white"],
+        },
+        "conditions": [],
+        "observations": [
+            {
+                "id": "obs-egfr-normal",
+                "codes": [{"system": "loinc", "code": "48642-3"}],
+                "status": "final",
+                "effective_date": "2026-03-01T09:00:00Z",
+                "value": {"value_quantity": {"value": 92, "unit": "mL/min/1.73m2"}},
+            },
+            {
+                "id": "obs-acr-normal",
+                "codes": [{"system": "loinc", "code": "9318-7"}],
+                "status": "final",
+                "effective_date": "2026-03-01T09:00:00Z",
+                "value": {"value_quantity": {"value": 12, "unit": "mg/g"}},
+            },
+        ],
+        "medications": [],
+        "social_history": {"tobacco": {"status": "never", "as_of": "2026-03-01"}},
+        "completeness": {"medications": "populated", "social_history": "populated"},
+    }
+
+    @pytest.mark.asyncio
+    async def test_no_kdigo_recs_for_normal_renal_function(self, client):
+        """eGFR 92, ACR 12: no KDIGO Rec should fire."""
+        resp = await client.post("/evaluate", json={"patient_context": self.NORMAL_PATIENT})
+        assert resp.status_code == 200
+
+        recs = resp.json()["recommendations"]
+        kdigo_recs = [r for r in recs if r.get("guideline_id") == "guideline:kdigo-ckd-2024"]
+        assert len(kdigo_recs) == 0, (
+            f"Expected 0 KDIGO recommendations for normal renal function, "
+            f"got {len(kdigo_recs)}: {kdigo_recs}"
+        )
+
+    @pytest.mark.asyncio
+    async def test_no_kdigo_recommendation_emitted_events(self, client):
+        """No recommendation_emitted event with a KDIGO rec id."""
+        resp = await client.post("/evaluate", json={"patient_context": self.NORMAL_PATIENT})
+        assert resp.status_code == 200
+
+        events = resp.json()["events"]
+        kdigo_rec_events = [
+            e for e in events
+            if e.get("type") == "recommendation_emitted"
+            and e.get("guideline_id") == "guideline:kdigo-ckd-2024"
+        ]
+        assert len(kdigo_rec_events) == 0, (
+            f"KDIGO recommendation_emitted events found for normal patient: {kdigo_rec_events}"
+        )

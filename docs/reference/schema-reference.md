@@ -48,47 +48,60 @@ A coherent way to satisfy a Recommendation. All component actions must be comple
 
 ### Clinical entity layer (FHIR-aligned reference nodes)
 
-Shared reference data. One `Procedure: colonoscopy` node is referenced by every Recommendation, Strategy, and trigger that touches it. Every clinical entity node projects to its corresponding FHIR resource shape for external APIs.
+Shared reference data. Canonical nodes live in `graph/seeds/clinical-entities.cypher`, loaded before guideline seeds. One node per concept, referenced by every guideline that needs it. Guideline seeds reference entities via `MERGE` on `id`. Clinical entity nodes carry **no domain labels** — they are global.
 
 **Each node is a semantic concept, not a single code.** Code attributes are **lists** so a single node can match every surface form the concept appears as in an EHR (e.g., `cond:ibd` matches both K50 Crohn's and K51 ulcerative colitis).
 
 #### `Condition` — FHIR Condition
 
+Multi-coding per ADR 0017. Uses `codings` list for cross-system matching.
+
 | Attribute | Type | Description |
 |---|---|---|
 | `id` | string | Stable internal identifier. |
-| `display_name` | string | Human-readable label (e.g., `"Colorectal cancer"`). |
-| `snomed_codes` | list[string] | SNOMED CT codes that map to this concept. |
-| `icd10_codes` | list[string] | ICD-10-CM codes that map to this concept. Full codes or prefix ranges as appropriate. |
+| `display_name` | string | Human-readable label (e.g., `"Established atherosclerotic cardiovascular disease"`). |
+| `codings` | list[string] | Multi-coding list in `SYSTEM:CODE` format (e.g., `['SNOMED:394659003', 'ICD10:I25']`). Both SNOMED and ICD-10-CM populated for US-based conditions. Uniqueness enforced by seed-time check. |
+| `snomed_codes` | list[string] | SNOMED CT codes. Retained for evaluator backward compatibility. |
+| `icd10_codes` | list[string] | ICD-10-CM codes. Retained for evaluator backward compatibility. |
 | `fhir_profile` | string | Optional. Reference to a specific FHIR Condition profile if the project uses one. |
 
 #### `Observation` — FHIR Observation
 
+Single-system primary key: LOINC (ADR 0017).
+
 | Attribute | Type | Description |
 |---|---|---|
 | `id` | string | Stable internal identifier. |
-| `display_name` | string | Human-readable label (e.g., `"Fecal immunochemical test"`). |
-| `loinc_codes` | list[string] | LOINC codes that map to this concept. |
+| `display_name` | string | Human-readable label (e.g., `"LDL cholesterol"`). |
+| `code` | string | **Primary key.** Primary LOINC code for the concept (e.g., `"2089-1"`). Uniqueness constraint with `code_system`. |
+| `code_system` | string | Always `"LOINC"` for Observation nodes. |
+| `loinc_codes` | list[string] | LOINC codes that map to this concept. May include alternates beyond the primary key. |
 | `snomed_codes` | list[string] | Optional SNOMED codes for findings. |
 | `fhir_profile` | string | Optional FHIR Observation profile. |
 
 #### `Medication` — FHIR Medication
 
+Single-system primary key: RxNorm (ADR 0017).
+
 | Attribute | Type | Description |
 |---|---|---|
 | `id` | string | Stable internal identifier. |
 | `display_name` | string | Human-readable label. |
-| `rxnorm_codes` | list[string] | RxNorm codes that map to this medication concept (e.g., a medication class can include multiple specific agents). |
+| `code` | string | **Primary key.** RxCUI at class (ingredient) level (e.g., `"83367"`). Uniqueness constraint with `code_system`. |
+| `code_system` | string | Always `"RxNorm"` for Medication nodes. |
+| `rxnorm_codes` | list[string] | RxNorm codes. May include alternates beyond the primary key. |
 | `fhir_profile` | string | Optional FHIR Medication profile. |
 
 #### `Procedure` — FHIR Procedure
 
-Also used for counseling / shared-decision actions (coded with SNOMED counseling codes).
+Single-system primary key: CPT (ADR 0017). Also used for counseling / shared-decision actions (coded with SNOMED counseling codes).
 
 | Attribute | Type | Description |
 |---|---|---|
 | `id` | string | Stable internal identifier. |
-| `display_name` | string | Human-readable label (e.g., `"Colonoscopy"`, `"CRC screening shared decision discussion"`). |
+| `display_name` | string | Human-readable label (e.g., `"Shared decision-making discussion about statin therapy"`). |
+| `code` | string | **Primary key.** Most representative CPT code (e.g., `"99401"`). Uniqueness constraint with `code_system`. |
+| `code_system` | string | Always `"CPT"` for Procedure nodes. |
 | `cpt_codes` | list[string] | CPT codes that map to this procedure concept. |
 | `snomed_codes` | list[string] | SNOMED codes. Required for counseling/shared-decision procedures where CPT may not apply cleanly. |
 | `fhir_profile` | string | Optional FHIR Procedure profile. |

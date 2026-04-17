@@ -88,7 +88,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/statins.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons
@@ -268,7 +268,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/statins.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons

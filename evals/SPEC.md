@@ -95,6 +95,135 @@ Same `PatientContext` (including `evaluation_time`) + same graph version + same 
 
 See `evals/fixtures/statins/README.md` for coverage notes and deferred cases.
 
+## Three-arm eval harness (v1, F22)
+
+The eval harness extends the v0 fixture system with LLM-based evaluation across three arms. The harness measures whether graph-retrieved context (Arm C) produces better clinical next-best-action recommendations than vanilla LLM knowledge (Arm A) or flat RAG (Arm B).
+
+### Arms
+
+| Arm | ID | Context supplied to LLM |
+|-----|-----|-------------------------|
+| A | `a` | `PatientContext` only. No guideline material. Tests LLM training knowledge. |
+| B | `b` | `PatientContext` + top-k chunks from guideline prose (flat RAG over `docs/reference/guidelines/*.md`). |
+| C | `c` | `PatientContext` + graph-retrieved context: serialized `EvalTrace` summary + relevant subgraph. |
+
+All arms use the same LLM (pinned in `evals/rubric.md`), same system prompt, same temperature (0), same max tokens. Only the context input varies.
+
+### Fixture format extension
+
+v1 fixtures add `expected-actions.json` alongside the v0 files:
+
+```
+evals/fixtures/<guideline>/<fixture_id>/
+  patient.json              # PatientContext (v0)
+  expected-outcome.json     # trace assertions (v0)
+  expected_trace.json       # golden trace (v0)
+  expected-actions.json     # NEW: curated NBA list for harness scoring
+  arms/                     # runtime output (gitignored)
+    a/output.json
+    a/meta.json
+    a/scores.json
+    b/output.json
+    b/meta.json
+    b/scores.json
+    c/output.json
+    c/meta.json
+    c/scores.json
+```
+
+### expected-actions.json schema
+
+```json
+{
+  "description": "plain-English summary",
+  "actions": [
+    {
+      "id": "string",
+      "label": "human-readable action name",
+      "rationale": "clinical justification",
+      "source_rec_id": "optional: graph rec id",
+      "priority": 1
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "string",
+      "label": "action that should NOT appear",
+      "rationale": "why it's contraindicated"
+    }
+  ]
+}
+```
+
+### Scoring
+
+Two scoring mechanisms run per fixture per arm:
+
+1. **Deterministic structural checks** — binary pass/fail:
+   - `expected_actions_present`: all expected action labels/ids found in output
+   - `contraindications_absent`: no contraindicated actions found in output
+   - `output_parseable`: output is valid JSON
+
+2. **LLM judge** (rubric-based, 1-5 per dimension):
+   - `completeness`: are all expected actions present?
+   - `clinical_appropriateness`: are recommendations safe and correct?
+   - `prioritization`: is sequencing reasonable?
+   - `integration`: cross-guideline interactions handled? (scores 5 by default in Phase 1)
+   - `composite`: arithmetic mean
+
+Structural checks are logged alongside rubric scores but not combined into the composite.
+
+### Arm C serialization shape
+
+The graph-context arm receives a frozen context object:
+
+```json
+{
+  "trace_summary": {
+    "matched_recs": [
+      {
+        "recommendation_id": "string",
+        "guideline_id": "string",
+        "status": "string",
+        "evidence_grade": "string",
+        "reason": "string",
+        "offered_strategies": ["string"],
+        "satisfying_strategy": "string | null"
+      }
+    ],
+    "exit_conditions": [...],
+    "preemption_events": [],
+    "modifier_events": []
+  },
+  "subgraph": {
+    "nodes": [{"id": "string", "type": "string", "label": "string"}],
+    "edges": [{"source": "string", "target": "string", "type": "string"}],
+    "rendered_prose": "natural-language rendering of the evaluation"
+  }
+}
+```
+
+The `rendered_prose` field is a natural-language summary so the LLM doesn't have to reason over JSON alone.
+
+### Cache rules
+
+Arm output cache key: `(fixture_path, arm_id, prompt_hash, context_hash, model_version)`. Changing any component invalidates.
+
+Score cache key: `(rubric_version, judge_model)`. Changing either invalidates. Score invalidation is transitive: if an arm output invalidates, its scores also invalidate.
+
+Cache storage: `evals/fixtures/<guideline>/<id>/arms/<arm>/meta.json` holds the hash inputs. `output.json` holds the arm output. `scores.json` holds the judge scores.
+
+### Arm B chunking
+
+- Source: `docs/reference/guidelines/*.md` (prose sections with `{#prose-*}` anchors)
+- Chunk size: ~500 tokens with ~50-token overlap
+- Embedding model: `text-embedding-3-small` (OpenAI)
+- Retrieval: top-k=5 chunks by cosine similarity against a query built from patient demographics and conditions
+
+### Braintrust integration
+
+Optional at runtime. If `BRAINTRUST_API_KEY` is set, results are logged to Braintrust alongside local storage. If unset, harness runs fully locally with results in `evals/results/<timestamp>/`.
+
 ## Related docs
 
 - `docs/specs/patient-context.md` + `docs/contracts/patient-context.schema.json` — input shape.
@@ -102,3 +231,5 @@ See `evals/fixtures/statins/README.md` for coverage notes and deferred cases.
 - `docs/specs/predicate-dsl.md` + `docs/contracts/predicate-catalog.yaml` — predicates.
 - `docs/specs/schema.md` — graph schema.
 - `docs/reference/guidelines/statins.md` — the concrete model the fixtures are evaluated against.
+- `evals/rubric.md` — rubric v1 dimensions, model pinning, scoring criteria.
+- `evals/README.md` — how to run the harness.

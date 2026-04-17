@@ -1,0 +1,32 @@
+{
+  "description": "55F with dyslipidemia, HTN, on lisinopril, ASCVD 8.4%. Grade C shared decision-making about statin initiation.",
+  "actions": [
+    {
+      "id": "shared-decision-making-statin",
+      "label": "Shared decision-making discussion about statin initiation",
+      "rationale": "USPSTF Grade C recommendation: adults 40-75 with >= 1 CVD risk factor and ASCVD 7.5-<10% should selectively receive a statin based on shared decision-making. Patient has dyslipidemia, HTN, and ASCVD 8.4%.",
+      "source_rec_id": "rec:statin-selective-grade-c",
+      "priority": 1
+    },
+    {
+      "id": "consider-moderate-intensity-statin",
+      "label": "Consider moderate-intensity statin if shared decision resolves to initiate",
+      "rationale": "If patient and clinician agree to proceed after shared decision-making, moderate-intensity statin is the recommended therapy.",
+      "source_rec_id": "rec:statin-selective-grade-c",
+      "priority": 2
+    },
+    {
+      "id": "blood-pressure-review",
+      "label": "Review blood pressure control on current antihypertensive",
+      "rationale": "BP 142/86 on lisinopril. May need dose adjustment or additional agent. HTN is a CVD risk factor.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "unconditional-statin-initiation",
+      "label": "Unconditional statin initiation without shared decision-making",
+      "rationale": "ASCVD 8.4% falls in the Grade C (7.5-<10%) band where USPSTF recommends shared decision-making, not automatic initiation."
+    }
+  ]
+}

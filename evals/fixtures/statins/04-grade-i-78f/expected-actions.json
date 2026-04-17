@@ -1,0 +1,31 @@
+{
+  "description": "78F with HTN and T2DM. Age >= 76 triggers Grade I (insufficient evidence) for statin primary prevention.",
+  "actions": [
+    {
+      "id": "acknowledge-insufficient-evidence",
+      "label": "Acknowledge insufficient evidence for statin initiation in adults >= 76",
+      "rationale": "USPSTF Grade I: current evidence is insufficient to assess the balance of benefits and harms of initiating a statin for primary prevention in adults 76 and older.",
+      "source_rec_id": "rec:statin-insufficient-evidence-grade-i",
+      "priority": 1
+    },
+    {
+      "id": "continue-existing-medications",
+      "label": "Continue current medications (losartan, metformin)",
+      "rationale": "Patient is on losartan for HTN and metformin for T2DM. No indication to change; these manage existing conditions.",
+      "priority": 2
+    },
+    {
+      "id": "individualized-discussion",
+      "label": "Individualized discussion about cardiovascular risk management",
+      "rationale": "Given age >= 76 and multiple CVD risk factors (HTN, T2DM, former smoker), clinician should discuss risk/benefit of statin on individual basis, acknowledging the evidence gap.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "routine-statin-initiation",
+      "label": "Routine statin initiation for primary prevention",
+      "rationale": "Grade I means insufficient evidence — should not be interpreted as a positive recommendation to initiate."
+    }
+  ]
+}

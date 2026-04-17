@@ -1,0 +1,30 @@
+{
+  "description": "35M smoker with HTN. Too young for USPSTF statin primary prevention (requires age 40-75). No statin recommendation expected.",
+  "actions": [
+    {
+      "id": "smoking-cessation-counseling",
+      "label": "Smoking cessation counseling and pharmacotherapy",
+      "rationale": "Current daily smoker at age 35. Smoking is the most modifiable CVD risk factor. Early cessation has outsized lifetime benefit.",
+      "priority": 1
+    },
+    {
+      "id": "blood-pressure-management",
+      "label": "Optimize blood pressure management",
+      "rationale": "BP 144/90 mmHg with diagnosed HTN. No antihypertensive on medication list. Young patient benefits from early BP control.",
+      "priority": 2
+    },
+    {
+      "id": "lifestyle-modification",
+      "label": "Lifestyle modification counseling (diet, exercise, weight)",
+      "rationale": "Young patient with multiple CVD risk factors. Lifestyle intervention is first-line before pharmacotherapy for primary prevention at this age.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "statin-initiation",
+      "label": "Statin initiation for primary prevention",
+      "rationale": "USPSTF 2022 statin primary prevention does not address adults under 40. Age-below-range exit should trigger."
+    }
+  ]
+}

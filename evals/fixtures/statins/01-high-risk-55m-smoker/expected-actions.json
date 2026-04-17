@@ -1,0 +1,31 @@
+{
+  "description": "55M current smoker with HTN, ASCVD 18.2%. Grade B statin initiation is the primary action.",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "USPSTF Grade B recommendation: adults 40-75 with >= 1 CVD risk factor and 10-year ASCVD risk >= 10% should be started on a statin for primary prevention. Patient has HTN, current smoking, and ASCVD 18.2%.",
+      "source_rec_id": "rec:statin-initiate-grade-b",
+      "priority": 1
+    },
+    {
+      "id": "smoking-cessation-counseling",
+      "label": "Smoking cessation counseling and pharmacotherapy",
+      "rationale": "Current daily smoker. Smoking is a modifiable CVD risk factor. Cessation reduces ASCVD risk substantially.",
+      "priority": 2
+    },
+    {
+      "id": "blood-pressure-management",
+      "label": "Optimize blood pressure management",
+      "rationale": "BP 148/92 mmHg is above target. HTN is an independent CVD risk factor and ASCVD calculator input. No current antihypertensive on medication list.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "high-intensity-statin",
+      "label": "High-intensity statin therapy",
+      "rationale": "USPSTF 2022 recommends moderate-intensity for primary prevention in this risk band. High-intensity is ACC/AHA secondary prevention territory."
+    }
+  ]
+}

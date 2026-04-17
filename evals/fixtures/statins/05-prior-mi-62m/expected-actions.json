@@ -1,0 +1,30 @@
+{
+  "description": "62M post-MI on atorvastatin. Established ASCVD triggers secondary-prevention exit. USPSTF primary prevention does not apply.",
+  "actions": [
+    {
+      "id": "continue-high-intensity-statin",
+      "label": "Continue statin therapy (secondary prevention)",
+      "rationale": "Patient has established ASCVD (prior MI). Already on atorvastatin. Secondary prevention statin therapy should continue per ACC/AHA cholesterol guidelines.",
+      "priority": 1
+    },
+    {
+      "id": "refer-to-accaha-guidelines",
+      "label": "Manage per ACC/AHA secondary prevention guidelines",
+      "rationale": "USPSTF 2022 statin primary prevention does not cover established ASCVD. ACC/AHA 2018 Cholesterol guideline governs secondary prevention LDL targets and statin intensity.",
+      "priority": 2
+    },
+    {
+      "id": "blood-pressure-monitoring",
+      "label": "Continue blood pressure monitoring",
+      "rationale": "BP 128/78 on metoprolol is well-controlled post-MI. Continue current regimen.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "statin-primary-prevention-recommendation",
+      "label": "Statin initiation for primary prevention",
+      "rationale": "Patient has established ASCVD (prior MI). Primary prevention recommendations do not apply. Should be managed under secondary prevention guidelines."
+    }
+  ]
+}

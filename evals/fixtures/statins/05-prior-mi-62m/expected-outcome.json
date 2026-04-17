@@ -1,11 +1,18 @@
 {
-  "description": "62M with prior MI (2024-11), already on atorvastatin + metoprolol. Established ASCVD means the USPSTF primary prevention guideline does not apply; evaluator must exit before emitting any primary-prevention recommendation. Secondary prevention is out of v0 scope.",
-  "expected_recommendations": [],
+  "description": "62M with prior MI (2024-11), already on atorvastatin + metoprolol. Established ASCVD means USPSTF primary prevention exits. ACC/AHA R1 (secondary prevention) fires: high-intensity statin recommended. Patient already on atorvastatin (high-intensity agent).",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "status": "up_to_date",
+      "evidence_grade": "COR I, LOE A",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    }
+  ],
   "expected_trace_contains": [
-    { "type": "exit_condition_triggered", "exit": "out_of_scope_secondary_prevention" }
+    { "type": "exit_condition_triggered", "exit": "out_of_scope_secondary_prevention", "guideline_id": "guideline:uspstf-statin-2022" },
+    { "type": "recommendation_emitted", "recommendation_id": "rec:accaha-statin-secondary-prevention", "guideline_id": "guideline:acc-aha-cholesterol-2018" }
   ],
   "must_not_contain": [
-    { "type": "recommendation_emitted" },
-    { "type": "risk_score_lookup" }
+    { "type": "recommendation_emitted", "guideline_id": "guideline:uspstf-statin-2022" }
   ]
 }

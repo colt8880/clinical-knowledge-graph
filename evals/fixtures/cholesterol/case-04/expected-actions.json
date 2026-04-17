@@ -1,0 +1,30 @@
+{
+  "description": "48M, LDL 162, no ASCVD, no diabetes, ASCVD risk 6.1%. Below ACC/AHA's 7.5% threshold for COR I statin recommendation. Borderline risk zone (5-7.5%) where statin may be considered (COR IIb) with risk enhancers.",
+  "actions": [
+    {
+      "id": "risk-enhancer-assessment",
+      "label": "Assess for ASCVD risk-enhancing factors",
+      "rationale": "Patient falls in the borderline risk category (5-7.5%). ACC/AHA COR IIb, LOE B-R: statin may be considered if risk enhancers are present (family history of premature ASCVD, LDL ≥160, metabolic syndrome, CKD, chronic inflammatory conditions, high-risk ethnicity, elevated Lp(a), apoB, hsCRP, ABI <0.9, TG ≥175). LDL 162 is itself a risk enhancer (≥160).",
+      "priority": 1
+    },
+    {
+      "id": "consider-cac-score",
+      "label": "Consider coronary artery calcium (CAC) scoring",
+      "rationale": "CAC score can help refine risk in the borderline category. A CAC of 0 supports deferral of statin; CAC >0 (especially ≥100 or ≥75th percentile) supports initiation.",
+      "priority": 2
+    },
+    {
+      "id": "lifestyle-counseling",
+      "label": "Emphasize therapeutic lifestyle changes",
+      "rationale": "Regardless of statin decision, lifestyle modifications (diet, exercise, weight management) are foundational. LDL 162 and TC 224 warrant dietary counseling.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "routine-statin-initiation",
+      "label": "Routine statin initiation without further risk assessment",
+      "rationale": "ASCVD risk 6.1% is below the 7.5% COR I threshold. ACC/AHA does not recommend routine statin at this risk level without risk enhancer assessment."
+    }
+  ]
+}

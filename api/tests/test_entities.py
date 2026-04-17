@@ -221,28 +221,28 @@ class TestConditionCodings:
 # ---------------------------------------------------------------------------
 
 class TestDomainLabels:
-    """Guideline-scoped nodes carry :USPSTF; shared entities do not."""
+    """Guideline-scoped nodes carry a domain label (:USPSTF or :ACC_AHA); shared entities do not."""
 
     @pytest.mark.asyncio
     async def test_all_recommendations_labeled(self, client):
         rows = await read_tx(
-            "MATCH (r:Recommendation) WHERE NOT r:USPSTF RETURN count(r) AS c",
+            "MATCH (r:Recommendation) WHERE NOT r:USPSTF AND NOT r:ACC_AHA RETURN count(r) AS c",
         )
-        assert rows[0]["c"] == 0, "Found Recommendation nodes without :USPSTF"
+        assert rows[0]["c"] == 0, "Found Recommendation nodes without a domain label"
 
     @pytest.mark.asyncio
     async def test_all_strategies_labeled(self, client):
         rows = await read_tx(
-            "MATCH (s:Strategy) WHERE NOT s:USPSTF RETURN count(s) AS c",
+            "MATCH (s:Strategy) WHERE NOT s:USPSTF AND NOT s:ACC_AHA RETURN count(s) AS c",
         )
-        assert rows[0]["c"] == 0, "Found Strategy nodes without :USPSTF"
+        assert rows[0]["c"] == 0, "Found Strategy nodes without a domain label"
 
     @pytest.mark.asyncio
     async def test_guideline_labeled(self, client):
         rows = await read_tx(
-            "MATCH (g:Guideline) WHERE NOT g:USPSTF RETURN count(g) AS c",
+            "MATCH (g:Guideline) WHERE NOT g:USPSTF AND NOT g:ACC_AHA RETURN count(g) AS c",
         )
-        assert rows[0]["c"] == 0, "Found Guideline nodes without :USPSTF"
+        assert rows[0]["c"] == 0, "Found Guideline nodes without a domain label"
 
     @pytest.mark.asyncio
     async def test_entities_not_labeled(self, client):

@@ -35,13 +35,32 @@ Running log of guidelines modeled into the graph. Append-only; supersession is t
   - Grade C also offers an explicit shared-decision-making Procedure-backed strategy.
   - See `docs/reference/guidelines/statins.md` for the concrete nodes, edges, and code mappings.
 
+### v1 corpus (multi-guideline)
+
+#### `acc-aha-cholesterol-2018`
+
+- **Publisher:** American Heart Association / American College of Cardiology
+- **Title:** 2018 AHA/ACC/AACVPR/AAPA/ABC/ACPM/ADA/AGS/APhA/ASPC/NLA/PCNA Guideline on the Management of Blood Cholesterol
+- **Version / effective date:** 2018 / 2018-11-10
+- **URL:** https://doi.org/10.1161/CIR.0000000000000625
+- **Ingestion date:** 2026-04-17 (hand-authored)
+- **Reviewer:** TBD
+- **Notes:**
+  - Scope: four statin benefit groups only. Not the full guideline.
+  - Benefit groups modeled: (1) secondary prevention (clinical ASCVD, ≤75), (2) severe hypercholesterolemia (LDL ≥190), (3) diabetes age 40-75, (4) primary prevention age 40-75 with LDL 70-189 and risk ≥7.5%.
+  - Evidence grades use COR/LOE system (e.g., "COR I, LOE A").
+  - Introduces high-intensity vs. moderate-intensity statin strategies with `intensity` property on `INCLUDES_ACTION` edges.
+  - Reuses shared clinical entities from `clinical-entities.cypher` (same statin medications as USPSTF v0).
+  - No cross-guideline edges to USPSTF in this feature; those land in F25.
+  - Adults >75, ezetimibe, PCSK9 inhibitors, non-statin lipid therapies deferred to v2.
+  - See `docs/reference/guidelines/cholesterol.md` for concrete nodes, edges, and code mappings.
+
 ### Archived
 
 - `uspstf-crc-2021`, `acp-crc-2019` — see `docs/archive/` for notes. Superseded by ADR 0013.
 
-### Planned (post-v0)
+### Planned (post-v1)
 
-- [ ] ACC/AHA 2018/2019 cholesterol guideline — more granular than USPSTF; would test preemption semantics and introduce statin intensity categories.
 - [ ] ADA Standards of Care (diabetes) — next candidate to exercise medication management + risk factor overlap with statins.
 - [ ] USPSTF aspirin primary prevention (2022) — overlaps the same ASCVD risk machinery; good test for predicate reuse.
 

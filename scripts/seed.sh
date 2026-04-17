@@ -25,13 +25,17 @@ cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seed
 echo "==> Applying statin seed..."
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/statins.cypher
 
+echo "==> Applying cholesterol seed..."
+cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/cholesterol.cypher
+
 echo "==> Verifying node count..."
 NODE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH (n) RETURN count(n) AS c" | tail -1 | tr -d '[:space:]')
 
-echo "    Node count: $NODE_COUNT (expected 23)"
-if [ "$NODE_COUNT" -ne 23 ]; then
-  echo "ERROR: Expected 23 nodes, got $NODE_COUNT"
+# 23 (statins) + 7 new ACC/AHA nodes (1 Guideline + 4 Recs + 2 Strategies) = 30
+echo "    Node count: $NODE_COUNT (expected 30)"
+if [ "$NODE_COUNT" -ne 30 ]; then
+  echo "ERROR: Expected 30 nodes, got $NODE_COUNT"
   exit 1
 fi
 
@@ -39,9 +43,11 @@ echo "==> Verifying edge count..."
 EDGE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH ()-[r]->() RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
-echo "    Edge count: $EDGE_COUNT (expected 14)"
-if [ "$EDGE_COUNT" -ne 14 ]; then
-  echo "ERROR: Expected 14 edges, got $EDGE_COUNT"
+# 14 (statins) + 19 new ACC/AHA edges = 33
+# FROM_GUIDELINE: 4, OFFERS_STRATEGY: 6, INCLUDES_ACTION: 9 (2 high + 7 moderate) = 19
+echo "    Edge count: $EDGE_COUNT (expected 33)"
+if [ "$EDGE_COUNT" -ne 33 ]; then
+  echo "ERROR: Expected 33 edges, got $EDGE_COUNT"
   exit 1
 fi
 
@@ -55,13 +61,33 @@ if [ "$DUP_COUNT" -ne 0 ]; then
   exit 1
 fi
 
-echo "==> Verifying USPSTF domain labels..."
+echo "==> Verifying domain labels..."
 UNLABELED_RECS=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
-  --format plain "MATCH (r:Recommendation) WHERE NOT r:USPSTF RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
+  --format plain "MATCH (r:Recommendation) WHERE NOT r:USPSTF AND NOT r:ACC_AHA RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
 echo "    Unlabeled Recommendations: $UNLABELED_RECS (expected 0)"
 if [ "$UNLABELED_RECS" -ne 0 ]; then
-  echo "ERROR: Found $UNLABELED_RECS Recommendation nodes without :USPSTF label"
+  echo "ERROR: Found $UNLABELED_RECS Recommendation nodes without a domain label"
+  exit 1
+fi
+
+echo "==> Verifying ACC/AHA Recommendation count..."
+ACCAHA_RECS=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
+  --format plain "MATCH (r:Recommendation:ACC_AHA) RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
+
+echo "    ACC/AHA Recommendations: $ACCAHA_RECS (expected 4)"
+if [ "$ACCAHA_RECS" -ne 4 ]; then
+  echo "ERROR: Expected 4 ACC/AHA Recommendation nodes, got $ACCAHA_RECS"
+  exit 1
+fi
+
+echo "==> Verifying ACC/AHA Guideline node..."
+ACCAHA_GUIDELINE=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
+  --format plain "MATCH (g:Guideline {id: 'guideline:acc-aha-cholesterol-2018'}) RETURN count(g) AS c" | tail -1 | tr -d '[:space:]')
+
+echo "    ACC/AHA Guideline: $ACCAHA_GUIDELINE (expected 1)"
+if [ "$ACCAHA_GUIDELINE" -ne 1 ]; then
+  echo "ERROR: Expected 1 ACC/AHA Guideline node, got $ACCAHA_GUIDELINE"
   exit 1
 fi
 
@@ -75,4 +101,4 @@ if [ "$ORPHAN_MEDS" -ne 0 ]; then
   exit 1
 fi
 
-echo "==> Seed complete. 23 nodes, 14 edges. All checks passed."
+echo "==> Seed complete. 30 nodes, 33 edges. All checks passed."

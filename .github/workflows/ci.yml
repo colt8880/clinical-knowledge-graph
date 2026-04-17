@@ -88,7 +88,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons
@@ -268,7 +268,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons
@@ -290,11 +290,11 @@ jobs:
 
           driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
 
-          # Expected counts from seed.cypher:
-          # Nodes: 1 Guideline + 3 Recommendation + 2 Strategy + 5 Condition + 4 Observation + 7 Medication + 1 Procedure = 23
-          # Edges: 3 FROM_GUIDELINE + 3 OFFERS_STRATEGY + 8 INCLUDES_ACTION = 14
-          EXPECTED_NODES = 23
-          EXPECTED_EDGES = 14
+          # Expected counts from all seeds (statins + cholesterol):
+          # Nodes: 2 Guideline + 7 Recommendation + 4 Strategy + 5 Condition + 4 Observation + 7 Medication + 1 Procedure = 30
+          # Edges: 7 FROM_GUIDELINE + 9 OFFERS_STRATEGY + 17 INCLUDES_ACTION = 33
+          EXPECTED_NODES = 30
+          EXPECTED_EDGES = 33
 
           with driver.session() as session:
               actual_nodes = session.run("MATCH (n) RETURN count(n) AS c").single()["c"]

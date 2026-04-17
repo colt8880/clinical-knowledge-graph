@@ -38,7 +38,7 @@ Required ADRs (draft alongside Phase 1; merge before the corresponding feature):
 
 | # | Feature | Components | Status | Depends on | Spec | PR |
 |---|---------|------------|--------|------------|------|----|
-| 23 | ACC/AHA 2018 Cholesterol subgraph | graph, docs, evals | pending | 20, 21, 22 | [23](../../docs/build/23-accaha-cholesterol-subgraph.md) | — |
+| 23 | ACC/AHA 2018 Cholesterol subgraph | graph, docs, evals | shipped | 20, 21, 22 | [23](../../docs/build/23-accaha-cholesterol-subgraph.md) | [#21](../../pull/21) |
 | 24 | KDIGO 2024 CKD subgraph | graph, docs, evals | pending | 20, 21, 22 | [24](../../docs/build/24-kdigo-ckd-subgraph.md) | — |
 
 ### Phase 3: cross-guideline connection + thesis test

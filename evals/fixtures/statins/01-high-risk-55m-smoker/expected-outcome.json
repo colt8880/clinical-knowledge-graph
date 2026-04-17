@@ -1,5 +1,5 @@
 {
-  "description": "55M current smoker with HTN and dyslipidemic panel. ASCVD 18.2%. Exercises Grade B initiate path.",
+  "description": "55M current smoker with HTN and dyslipidemic panel. ASCVD 18.2%. Exercises USPSTF Grade B initiate path. Also triggers ACC/AHA R4 (primary prevention, LDL 70-189, risk ≥7.5%).",
   "expected_recommendations": [
     {
       "recommendation_id": "rec:statin-initiate-grade-b",
@@ -9,6 +9,12 @@
         "strategy:statin-moderate-intensity"
       ],
       "guideline_id": "guideline:uspstf-statin-2022"
+    },
+    {
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
     }
   ],
   "expected_trace_contains": [
@@ -22,11 +28,18 @@
       "recommendation_id": "rec:statin-initiate-grade-b",
       "status": "due",
       "evidence_grade": "B"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A"
     }
   ],
   "must_not_contain": [
     {
-      "type": "exit_condition_triggered"
+      "type": "exit_condition_triggered",
+      "guideline_id": "guideline:uspstf-statin-2022"
     }
   ]
 }

@@ -80,12 +80,13 @@ If a future guideline requires distinguishing sub-types, add separate nodes of t
 
 ### From Strategy (outbound)
 
-- `-[:INCLUDES_ACTION {cadence, lookback, priority, intent, expects}]->` `(Procedure | Medication | Observation)` — the component actions of the strategy. Strategy semantics are **conjunction**: *all* included actions must be satisfied within their respective lookback windows for the strategy to count as satisfied. Attrs:
+- `-[:INCLUDES_ACTION {cadence, lookback, priority, intent, expects, intensity}]->` `(Procedure | Medication | Observation)` — the component actions of the strategy. Strategy semantics are **conjunction**: *all* included actions must be satisfied within their respective lookback windows for the strategy to count as satisfied. Attrs:
   - `cadence` — ISO 8601 interval for recurrence, null for one-shot. For medications, null (initiate-and-continue is the default; re-evaluation is event-driven, not time-driven, in v0).
   - `lookback` — ISO 8601 window used to check patient history for a matching prior action. For medication actions, "has an active prescription" is the default check; lookback is used when a dated exposure window matters.
   - `priority` — urgency tier for the agent (routine, urgent, stat).
   - `intent` — screening, diagnostic, treatment, surveillance, counseling, shared_decision, primary_prevention.
   - `expects` — optional result label the matched patient record must carry for this action to count as satisfied. **Not used in v0** (statin actions are presence-based).
+  - `intensity` — optional statin intensity tier: `"high"` or `"moderate"`. Used by ACC/AHA cholesterol strategies to distinguish high-intensity (≥50% LDL-C reduction) from moderate-intensity (30-49% reduction) at the class level. **Not used by USPSTF v0** (all statin actions are moderate-intensity by definition). v1 models at class level; dose verification deferred.
 
 ### Between Guidelines
 

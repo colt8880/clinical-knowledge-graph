@@ -1,0 +1,36 @@
+{
+  "description": "42F with LDL 230 mg/dL. Severe hypercholesterolemia triggers high-intensity statin per ACC/AHA Section 4.2.",
+  "actions": [
+    {
+      "id": "initiate-high-intensity-statin",
+      "label": "Initiate maximally tolerated high-intensity statin therapy",
+      "rationale": "ACC/AHA COR I, LOE B-NR: adults aged 20-75 with LDL-C ≥190 mg/dL should be treated with maximally tolerated high-intensity statin. LDL 230 mg/dL exceeds the ≥190 threshold. No ASCVD risk calculation required at this LDL level. Likely familial hypercholesterolemia given LDL ≥190 in a 42-year-old without secondary causes.",
+      "source_rec_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "priority": 1
+    },
+    {
+      "id": "genetic-evaluation-fh",
+      "label": "Consider evaluation for familial hypercholesterolemia",
+      "rationale": "LDL-C ≥190 mg/dL in a young adult raises suspicion for familial hypercholesterolemia. Genetic testing and cascade screening of first-degree relatives may be warranted.",
+      "priority": 2
+    },
+    {
+      "id": "lifestyle-counseling",
+      "label": "Lifestyle modification counseling (diet, exercise)",
+      "rationale": "Therapeutic lifestyle changes are foundational alongside statin therapy. Heart-healthy diet, regular physical activity, and weight management support LDL reduction.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "moderate-intensity-statin-alone",
+      "label": "Moderate-intensity statin as sole therapy",
+      "rationale": "LDL ≥190 mg/dL requires high-intensity statin per ACC/AHA. Moderate-intensity alone is insufficient for this degree of hypercholesterolemia."
+    },
+    {
+      "id": "defer-treatment-pending-risk-calc",
+      "label": "Defer statin pending ASCVD risk calculation",
+      "rationale": "ACC/AHA explicitly states that LDL ≥190 warrants high-intensity statin without requiring ASCVD risk calculation."
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "description": "55F with dyslipidemia + HTN on lisinopril, never smoker. ASCVD 8.4% (7.5\u2013<10% band). Exercises Grade C shared-decision path.",
+  "description": "55F with dyslipidemia + HTN on lisinopril, never smoker. ASCVD 8.4% (7.5–<10% band). Exercises USPSTF Grade C shared-decision path. Also triggers ACC/AHA R4 (primary prevention, LDL 162 in 70-189, risk 8.4% ≥7.5%).",
   "expected_recommendations": [
     {
       "recommendation_id": "rec:statin-selective-grade-c",
@@ -10,6 +10,12 @@
         "strategy:statin-shared-decision-discussion"
       ],
       "guideline_id": "guideline:uspstf-statin-2022"
+    },
+    {
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
     }
   ],
   "expected_trace_contains": [
@@ -32,11 +38,18 @@
       "recommendation_id": "rec:statin-selective-grade-c",
       "status": "due",
       "evidence_grade": "C"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A"
     }
   ],
   "must_not_contain": [
     {
-      "type": "exit_condition_triggered"
+      "type": "exit_condition_triggered",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "type": "recommendation_emitted",

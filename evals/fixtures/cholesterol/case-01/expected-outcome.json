@@ -1,0 +1,29 @@
+{
+  "description": "42F with LDL 230 mg/dL, no ASCVD, no diabetes. Exercises severe hypercholesterolemia path (R2). LDL ≥190 triggers high-intensity statin without risk calculation.",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "status": "due",
+      "evidence_grade": "COR I, LOE B-NR",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "guideline_entered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "status": "due",
+      "evidence_grade": "COR I, LOE B-NR"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "exit_condition_triggered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    }
+  ]
+}

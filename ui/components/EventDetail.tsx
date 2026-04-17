@@ -259,6 +259,33 @@ export default function EventDetail({ event }: EventDetailProps) {
         </>
       )}
 
+      {event.type === "guideline_exited" && (
+        <>
+          <Field label="Guideline" value={event.guideline_id} mono />
+          <Field label="Recs Emitted" value={String(event.recommendations_emitted)} />
+        </>
+      )}
+
+      {event.type === "preemption_resolved" && (
+        <>
+          <Field label="Preempted Rec" value={event.preempted_recommendation_id} mono />
+          <Field label="Winner Rec" value={event.preempting_recommendation_id} mono />
+          <Field label="Edge Priority" value={String(event.edge_priority)} />
+          <Field label="Reason" value={event.reason} />
+        </>
+      )}
+
+      {event.type === "cross_guideline_match" && (
+        <>
+          <Field label="Source Rec" value={event.source_rec_id} mono />
+          <Field label="Target Rec" value={event.target_rec_id} mono />
+          <Field label="Nature" value={event.nature} badge badgeColor="bg-orange-100 text-orange-700" />
+          <Field label="Note" value={event.note} />
+          <Field label="Source Guideline" value={event.source_guideline_id} mono />
+          <Field label="Target Guideline" value={event.target_guideline_id} mono />
+        </>
+      )}
+
       {/* Full payload for reference */}
       <details className="mt-4">
         <summary className="text-[10px] uppercase tracking-wide font-semibold text-slate-400 cursor-pointer">

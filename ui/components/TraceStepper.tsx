@@ -5,14 +5,44 @@ import { useEffect, useCallback } from "react";
 interface TraceStepperProps {
   currentIndex: number;
   totalEvents: number;
+  currentEventType?: string | null;
   onPrev: () => void;
   onNext: () => void;
   onJump: (index: number) => void;
+  onNavigateToEvent?: (eventType: string) => void;
+}
+
+/** Event type icon for cross-guideline events. */
+function EventTypeIcon({ type }: { type: string | null | undefined }) {
+  if (type === "preemption_resolved") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700"
+        title="Preemption resolved"
+        data-testid="icon-preemption"
+      >
+        <span className="line-through">Rec</span> Preempted
+      </span>
+    );
+  }
+  if (type === "cross_guideline_match") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-orange-100 text-orange-700"
+        title="Cross-guideline modifier"
+        data-testid="icon-modifier"
+      >
+        &#8646; Modifier
+      </span>
+    );
+  }
+  return null;
 }
 
 export default function TraceStepper({
   currentIndex,
   totalEvents,
+  currentEventType,
   onPrev,
   onNext,
   onJump,
@@ -84,6 +114,7 @@ export default function TraceStepper({
         }}
         aria-label="Jump to step"
       />
+      <EventTypeIcon type={currentEventType} />
       <span className="text-[10px] text-slate-400 ml-auto">
         Use arrow keys to step
       </span>

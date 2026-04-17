@@ -19,6 +19,9 @@ const EVENT_TYPE_COLORS: Record<string, string> = {
   exit_condition_triggered: "bg-red-50 text-red-700",
   recommendation_emitted: "bg-green-50 text-green-700",
   evaluation_completed: "bg-slate-100 text-slate-700",
+  guideline_exited: "bg-purple-50 text-purple-600",
+  preemption_resolved: "bg-red-50 text-red-700",
+  cross_guideline_match: "bg-orange-50 text-orange-700",
 };
 
 interface TraceEventListProps {

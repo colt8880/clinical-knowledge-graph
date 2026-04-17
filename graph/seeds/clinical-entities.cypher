@@ -239,6 +239,151 @@ ON CREATE SET
   p.provenance_publication_date = date('2022-08-23');
 
 // ---------------------------------------------------------------------------
+// Conditions — KDIGO CKD 2024
+// ---------------------------------------------------------------------------
+
+MERGE (c:Condition {id: 'cond:chronic-kidney-disease'})
+ON CREATE SET
+  c.display_name = 'Chronic kidney disease',
+  c.codings = ['SNOMED:709044004', 'ICD10:N18', 'ICD10:N18.1', 'ICD10:N18.2', 'ICD10:N18.30', 'ICD10:N18.31', 'ICD10:N18.32', 'ICD10:N18.4', 'ICD10:N18.5', 'ICD10:N18.9'],
+  c.snomed_codes = ['709044004'],
+  c.icd10_codes = ['N18', 'N18.1', 'N18.2', 'N18.30', 'N18.31', 'N18.32', 'N18.4', 'N18.5', 'N18.9'],
+  c.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  c.provenance_version = '2024-03-14',
+  c.provenance_source_section = 'Clinical entity layer',
+  c.provenance_publication_date = date('2024-03-14');
+
+// ---------------------------------------------------------------------------
+// Observations — KDIGO CKD 2024
+// ---------------------------------------------------------------------------
+
+MERGE (o:Observation {id: 'obs:egfr'})
+ON CREATE SET
+  o.display_name = 'Estimated glomerular filtration rate (eGFR)',
+  o.code = '48642-3',
+  o.code_system = 'LOINC',
+  o.loinc_codes = ['48642-3', '62238-1', '88293-6'],
+  o.unit = 'mL/min/1.73m2',
+  o.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  o.provenance_version = '2024-03-14',
+  o.provenance_source_section = 'CKD staging — eGFR categories',
+  o.provenance_publication_date = date('2024-03-14');
+
+MERGE (o:Observation {id: 'obs:urine-acr'})
+ON CREATE SET
+  o.display_name = 'Urine albumin-to-creatinine ratio (ACR)',
+  o.code = '9318-7',
+  o.code_system = 'LOINC',
+  o.loinc_codes = ['9318-7', '14959-1'],
+  o.unit = 'mg/g',
+  o.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  o.provenance_version = '2024-03-14',
+  o.provenance_source_section = 'CKD staging — albuminuria categories',
+  o.provenance_publication_date = date('2024-03-14');
+
+// ---------------------------------------------------------------------------
+// Medications — SGLT2 inhibitors (KDIGO CKD 2024)
+// ---------------------------------------------------------------------------
+
+MERGE (m:Medication {id: 'med:empagliflozin'})
+ON CREATE SET
+  m.display_name = 'Empagliflozin',
+  m.code = '1545653',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['1545653'],
+  m.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  m.provenance_version = '2024-03-14',
+  m.provenance_source_section = 'SGLT2 inhibitor recommendations',
+  m.provenance_publication_date = date('2024-03-14');
+
+MERGE (m:Medication {id: 'med:dapagliflozin'})
+ON CREATE SET
+  m.display_name = 'Dapagliflozin',
+  m.code = '1488564',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['1488564'],
+  m.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  m.provenance_version = '2024-03-14',
+  m.provenance_source_section = 'SGLT2 inhibitor recommendations',
+  m.provenance_publication_date = date('2024-03-14');
+
+// ---------------------------------------------------------------------------
+// Medications — ACE inhibitors (KDIGO CKD 2024)
+// Class-level: three representative agents. KDIGO recommends the class,
+// not specific agents.
+// ---------------------------------------------------------------------------
+
+MERGE (m:Medication {id: 'med:lisinopril'})
+ON CREATE SET
+  m.display_name = 'Lisinopril',
+  m.code = '29046',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['29046'],
+  m.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  m.provenance_version = '2024-03-14',
+  m.provenance_source_section = 'RAS blockade recommendations',
+  m.provenance_publication_date = date('2024-03-14');
+
+MERGE (m:Medication {id: 'med:enalapril'})
+ON CREATE SET
+  m.display_name = 'Enalapril',
+  m.code = '3827',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['3827'],
+  m.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  m.provenance_version = '2024-03-14',
+  m.provenance_source_section = 'RAS blockade recommendations',
+  m.provenance_publication_date = date('2024-03-14');
+
+MERGE (m:Medication {id: 'med:ramipril'})
+ON CREATE SET
+  m.display_name = 'Ramipril',
+  m.code = '35296',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['35296'],
+  m.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  m.provenance_version = '2024-03-14',
+  m.provenance_source_section = 'RAS blockade recommendations',
+  m.provenance_publication_date = date('2024-03-14');
+
+// ---------------------------------------------------------------------------
+// Medications — ARBs (KDIGO CKD 2024)
+// ---------------------------------------------------------------------------
+
+MERGE (m:Medication {id: 'med:losartan'})
+ON CREATE SET
+  m.display_name = 'Losartan',
+  m.code = '52175',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['52175'],
+  m.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  m.provenance_version = '2024-03-14',
+  m.provenance_source_section = 'RAS blockade recommendations',
+  m.provenance_publication_date = date('2024-03-14');
+
+MERGE (m:Medication {id: 'med:valsartan'})
+ON CREATE SET
+  m.display_name = 'Valsartan',
+  m.code = '69749',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['69749'],
+  m.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  m.provenance_version = '2024-03-14',
+  m.provenance_source_section = 'RAS blockade recommendations',
+  m.provenance_publication_date = date('2024-03-14');
+
+MERGE (m:Medication {id: 'med:irbesartan'})
+ON CREATE SET
+  m.display_name = 'Irbesartan',
+  m.code = '83818',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['83818'],
+  m.provenance_guideline = 'guideline:kdigo-ckd-2024',
+  m.provenance_version = '2024-03-14',
+  m.provenance_source_section = 'RAS blockade recommendations',
+  m.provenance_publication_date = date('2024-03-14');
+
+// ---------------------------------------------------------------------------
 // Seed-time uniqueness check: Condition codings
 //
 // Neo4j cannot enforce native uniqueness on list-element contents.

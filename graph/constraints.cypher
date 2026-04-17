@@ -28,3 +28,24 @@ CREATE CONSTRAINT medication_id_unique IF NOT EXISTS
 
 CREATE CONSTRAINT procedure_id_unique IF NOT EXISTS
   FOR (n:Procedure) REQUIRE n.id IS UNIQUE;
+
+// ---------------------------------------------------------------------------
+// Primary-key uniqueness constraints (per ADR 0017).
+//
+// Medication, Observation, and Procedure carry a single-system primary key
+// stored as (code, code_system). These constraints prevent two nodes of the
+// same type from sharing a primary code.
+//
+// Condition uses multi-coding (codings list); uniqueness is enforced by a
+// seed-time check in clinical-entities.cypher, not a native constraint
+// (Neo4j constraints can't enforce list-element uniqueness).
+// ---------------------------------------------------------------------------
+
+CREATE CONSTRAINT medication_code_unique IF NOT EXISTS
+  FOR (n:Medication) REQUIRE (n.code, n.code_system) IS UNIQUE;
+
+CREATE CONSTRAINT observation_code_unique IF NOT EXISTS
+  FOR (n:Observation) REQUIRE (n.code, n.code_system) IS UNIQUE;
+
+CREATE CONSTRAINT procedure_code_unique IF NOT EXISTS
+  FOR (n:Procedure) REQUIRE (n.code, n.code_system) IS UNIQUE;

@@ -5,6 +5,7 @@ import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
 import type { GraphNode, GraphEdge, ForestNode } from "@/lib/api/client";
 import { DOMAIN_PARENTS, FOREST_LAYOUT_OPTIONS } from "@/lib/explore/layout";
+import GraphTooltips from "./GraphTooltips";
 
 // Register cose-bilkent layout once.
 if (typeof window !== "undefined") {
@@ -42,12 +43,22 @@ interface ForestModeProps {
   focusedNodeId?: string | null;
 }
 
+/** Preemption and modifier state derived from the trace's recommendations. */
+export interface RecState {
+  /** Map from rec ID to the winning rec ID, for preempted recs. */
+  preemptedBy: Map<string, string>;
+  /** Map from rec ID to modifier count, for recs with active modifiers. */
+  modifierCounts: Map<string, number>;
+}
+
 type GraphCanvasProps = (ColumnModeProps | ForestModeProps) & {
   onNodeClick?: (nodeId: string) => void;
   onEdgeClick?: (edgeId: string) => void;
   selectedNodeId?: string | null;
   selectedEdgeId?: string | null;
   highlightedNodeIds?: string[];
+  /** Preemption/modifier state from trace recommendations. */
+  recState?: RecState;
 };
 
 /** Color palette keyed by Neo4j label. */
@@ -394,6 +405,55 @@ const CY_STYLE: any[] = [
       "overlay-padding": 6,
     },
   },
+  // Preempted node: dimmed opacity, dashed outline, label suffix handled in data.
+  {
+    selector: ".preempted",
+    style: {
+      opacity: 0.4,
+      "border-style": "dashed",
+      "border-width": 2,
+    },
+  },
+  // PREEMPTED_BY edge: thicker stroke, desaturated red, prominent arrow.
+  {
+    selector: "edge[edgeType = 'PREEMPTED_BY']",
+    style: {
+      width: 3,
+      "line-color": "#991b1b",
+      "target-arrow-color": "#991b1b",
+      "line-style": "solid",
+      "arrow-scale": 1.2,
+      "font-size": 9,
+      "font-weight": 600,
+    },
+  },
+  // MODIFIES edge: dotted line, amber color.
+  {
+    selector: "edge[edgeType = 'MODIFIES']",
+    style: {
+      width: 2,
+      "line-color": "#d97706",
+      "target-arrow-color": "#d97706",
+      "line-style": "dotted",
+      "arrow-scale": 0.9,
+    },
+  },
+  // Modifier badge on target Rec (has modifiers).
+  {
+    selector: ".has-modifiers",
+    style: {
+      "border-width": 3,
+      "border-color": "#d97706",
+    },
+  },
+  // "Hidden by filter" indicator: node whose cross-guideline source is filtered out.
+  {
+    selector: ".cross-edge-filtered",
+    style: {
+      "border-style": "dotted",
+      "border-color": "#94a3b8",
+    },
+  },
 ];
 
 export default function GraphCanvas(props: GraphCanvasProps) {
@@ -403,6 +463,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     selectedNodeId,
     selectedEdgeId,
     highlightedNodeIds: highlightedIds,
+    recState,
   } = props;
 
   const isForestMode = props.nodes !== undefined;
@@ -513,13 +574,22 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       }
     });
 
-    // Edges auto-hide when either endpoint is hidden, but we handle explicitly
-    // for cross-guideline edges.
+    // Edges: hide when either endpoint is hidden; mark target Recs whose
+    // cross-guideline source is filtered out with "cross-edge-filtered".
+    cy.nodes().removeClass("cross-edge-filtered");
     cy.edges().forEach((edge) => {
       const src = cy.getElementById(edge.data("source"));
       const tgt = cy.getElementById(edge.data("target"));
-      if (src.style("display") === "none" || tgt.style("display") === "none") {
+      const srcHidden = src.style("display") === "none";
+      const tgtHidden = tgt.style("display") === "none";
+      if (srcHidden || tgtHidden) {
         edge.style("display", "none");
+        // If this is a cross-guideline edge (PREEMPTED_BY or MODIFIES) and
+        // only the source is hidden, mark the target with a filter indicator.
+        const edgeType = edge.data("edgeType") as string;
+        if (srcHidden && !tgtHidden && (edgeType === "PREEMPTED_BY" || edgeType === "MODIFIES")) {
+          tgt.addClass("cross-edge-filtered");
+        }
       } else {
         edge.style("display", "element");
       }
@@ -567,6 +637,40 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     }
   }, [selectedEdgeId]);
 
+  // Apply preemption/modifier classes from recState.
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    cy.nodes().removeClass("preempted has-modifiers");
+    if (!recState) return;
+
+    recState.preemptedBy.forEach((winnerId, recId) => {
+      const node = cy.getElementById(recId);
+      if (node.length > 0) {
+        node.addClass("preempted");
+        // Append "(preempted)" to the label if not already present.
+        const label = node.data("label") as string;
+        if (label && !label.includes("(preempted)")) {
+          node.data("label", `${label}\n(preempted by ${winnerId.split(":").pop()})`);
+        }
+      }
+    });
+
+    recState.modifierCounts.forEach((count, recId) => {
+      if (count > 0) {
+        const node = cy.getElementById(recId);
+        if (node.length > 0) {
+          node.addClass("has-modifiers");
+          // Append modifier badge to label.
+          const label = node.data("label") as string;
+          if (label && !label.includes("[mod")) {
+            node.data("label", `${label}\n[mod: ${count}]`);
+          }
+        }
+      }
+    });
+  }, [recState, cyVersion]);
+
   // Eval tab: highlight node(s) for the current trace step.
   useEffect(() => {
     const cy = cyRef.current;
@@ -580,10 +684,13 @@ export default function GraphCanvas(props: GraphCanvasProps) {
   }, [highlightedIds, cyVersion]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full bg-white"
-      data-testid="graph-canvas"
-    />
+    <div className="relative w-full h-full">
+      <div
+        ref={containerRef}
+        className="w-full h-full bg-white"
+        data-testid="graph-canvas"
+      />
+      <GraphTooltips cyRef={cyRef} cyVersion={cyVersion} />
+    </div>
   );
 }

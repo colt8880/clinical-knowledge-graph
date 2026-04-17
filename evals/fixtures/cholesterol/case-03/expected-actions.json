@@ -1,0 +1,31 @@
+{
+  "description": "55M with diabetes, HTN, LDL 145, ASCVD risk 9.2%. Diabetes triggers statin per ACC/AHA Section 4.3. Risk ≥7.5% supports high-intensity consideration.",
+  "actions": [
+    {
+      "id": "initiate-statin-therapy",
+      "label": "Initiate statin therapy (moderate- or high-intensity)",
+      "rationale": "ACC/AHA COR I, LOE A: adults aged 40-75 with diabetes should receive at least moderate-intensity statin. With 10-year ASCVD risk of 9.2% (≥7.5%), high-intensity statin to achieve ≥50% LDL-C reduction is reasonable (COR IIa). Patient is statin-naive.",
+      "source_rec_id": "rec:accaha-statin-diabetes",
+      "priority": 1
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure management",
+      "rationale": "BP 142/88 on amlodipine exceeds target <130/80 for patient with diabetes. HTN is an independent ASCVD risk factor. Consider adding or titrating antihypertensive.",
+      "priority": 2
+    },
+    {
+      "id": "diabetes-management",
+      "label": "Continue and optimize diabetes management",
+      "rationale": "Patient is on metformin. Glycemic control status not fully characterized in context, but ongoing diabetes management supports ASCVD risk reduction.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "defer-statin-for-lifestyle-only",
+      "label": "Defer statin in favor of lifestyle modifications alone",
+      "rationale": "ACC/AHA COR I recommends statin therapy for all adults 40-75 with diabetes regardless of risk score. Lifestyle alone is insufficient."
+    }
+  ]
+}

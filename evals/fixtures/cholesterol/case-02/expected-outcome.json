@@ -1,0 +1,29 @@
+{
+  "description": "58M post-MI on simvastatin (moderate-intensity). Clinical ASCVD present. ACC/AHA R1 fires: high-intensity statin recommended. Simvastatin satisfies moderate-intensity strategy but NOT high-intensity strategy, so R1 status is 'due' (upgrade needed).",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "guideline_entered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "exit_condition_triggered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    }
+  ]
+}

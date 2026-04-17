@@ -1,0 +1,36 @@
+{
+  "description": "58M post-MI on simvastatin. Clinical ASCVD triggers secondary prevention. Currently on moderate-intensity statin; should upgrade to high-intensity.",
+  "actions": [
+    {
+      "id": "upgrade-to-high-intensity-statin",
+      "label": "Switch to high-intensity statin therapy (atorvastatin 40-80 mg or rosuvastatin 20-40 mg)",
+      "rationale": "ACC/AHA COR I, LOE A: patients with clinical ASCVD aged ≤75 should receive high-intensity statin with goal of ≥50% LDL-C reduction. Patient is on simvastatin (moderate-intensity) post-MI. LDL 115 mg/dL is above the ≥70 mg/dL threshold where therapy intensification is recommended. Switch to atorvastatin 40-80 mg or rosuvastatin 20-40 mg.",
+      "source_rec_id": "rec:accaha-statin-secondary-prevention",
+      "priority": 1
+    },
+    {
+      "id": "ldl-goal-monitoring",
+      "label": "Recheck LDL-C in 4-12 weeks after statin intensification",
+      "rationale": "After switching to high-intensity statin, monitor LDL-C to assess whether ≥50% reduction achieved and whether LDL-C falls below 70 mg/dL. If not at goal, consider adding ezetimibe.",
+      "priority": 2
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure management",
+      "rationale": "BP 134/82 on lisinopril is borderline elevated post-MI. ACC/AHA BP guideline recommends target <130/80 for patients with ASCVD. May need dose adjustment or additional agent.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "continue-moderate-intensity-only",
+      "label": "Continue moderate-intensity statin without intensification",
+      "rationale": "Patient has clinical ASCVD (post-MI). ACC/AHA COR I recommendation is high-intensity statin, not moderate-intensity. Continuing simvastatin alone is suboptimal."
+    },
+    {
+      "id": "discontinue-statin",
+      "label": "Discontinue statin therapy",
+      "rationale": "Secondary prevention with statin is among the strongest evidence-based recommendations in cardiology. Discontinuation is contraindicated."
+    }
+  ]
+}

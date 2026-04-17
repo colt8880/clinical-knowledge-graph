@@ -1,0 +1,23 @@
+{
+  "description": "48M, LDL 162 (70-189 range), no ASCVD, no diabetes, ASCVD risk 6.1% (<7.5%). R4 requires risk ≥7.5% so this patient is ineligible. No ACC/AHA Rec fires. R1 fails (no ASCVD), R2 fails (LDL <190), R3 fails (no diabetes), R4 fails (risk too low).",
+  "expected_recommendations": [],
+  "expected_trace_contains": [
+    {
+      "type": "guideline_entered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    },
+    {
+      "type": "guideline_exited",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "recommendation_emitted",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    },
+    {
+      "type": "exit_condition_triggered"
+    }
+  ]
+}

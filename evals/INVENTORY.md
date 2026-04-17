@@ -21,6 +21,23 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 - Live ASCVD calculation fixture once the PCE implementation lands. v0 fixtures all supply the score.
 - Statin intolerance / contraindications once the structured signal exists.
 
+## Cholesterol (v1 — ACC/AHA 2018)
+
+### Landed
+
+| ID | Directory | Coverage |
+|---|---|---|
+| 01 | `fixtures/cholesterol/case-01/` | 42F, LDL 230, no ASCVD, no diabetes. Severe hypercholesterolemia (R2): high-intensity statin. |
+| 02 | `fixtures/cholesterol/case-02/` | 58M post-MI, LDL 115, on simvastatin. Secondary prevention (R1): upgrade to high-intensity. |
+| 03 | `fixtures/cholesterol/case-03/` | 55M diabetes, HTN, LDL 145, ASCVD risk 9.2%. Diabetes statin benefit group (R3): moderate-intensity (high-intensity reasonable). |
+| 04 | `fixtures/cholesterol/case-04/` | 48M, LDL 162, no diabetes, ASCVD risk 6.1%. Below R4 threshold (<7.5%): no ACC/AHA rec fires. |
+
+### Deferred
+
+- Cross-domain fixtures (cholesterol + USPSTF overlap) land in F25.
+- Adults >75 with ASCVD (moderate-intensity consideration).
+- Statin-intolerant patient with LDL ≥190.
+
 ## Archived
 
 - `archive/` — CRC-era fixtures and inventory retained for reference. Not loaded by the evaluator.

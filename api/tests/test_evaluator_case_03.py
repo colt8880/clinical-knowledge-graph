@@ -61,18 +61,19 @@ async def test_case_03_exit_age_below_range(client):
 
     trace = resp.json()
 
-    # The trace must contain an exit_condition_triggered event
-    exit_events = [e for e in trace["events"] if e["type"] == "exit_condition_triggered"]
+    # The trace must contain a USPSTF exit_condition_triggered event
+    exit_events = [
+        e for e in trace["events"]
+        if e["type"] == "exit_condition_triggered"
+        and e.get("guideline_id") == "guideline:uspstf-statin-2022"
+    ]
     assert len(exit_events) == 1
     assert exit_events[0]["exit"] == "out_of_scope_age_below_range"
 
-    # No recommendation_emitted events
+    # No recommendation_emitted events from any guideline (age 35 is below
+    # range for both USPSTF and all ACC/AHA benefit groups)
     rec_events = [e for e in trace["events"] if e["type"] == "recommendation_emitted"]
     assert len(rec_events) == 0
-
-    # No risk_score_lookup events
-    risk_events = [e for e in trace["events"] if e["type"] == "risk_score_lookup"]
-    assert len(risk_events) == 0
 
     # recommendations list is empty
     assert trace["recommendations"] == []

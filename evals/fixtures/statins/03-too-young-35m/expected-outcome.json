@@ -1,11 +1,10 @@
 {
-  "description": "35M current smoker, HTN, elevated LDL. Age < 40 exits the guideline regardless of risk factor profile. Demonstrates that age gate is load-bearing: had he been 40, he'd land in Grade B territory.",
+  "description": "35M current smoker, HTN, elevated LDL. Age < 40 exits the USPSTF guideline regardless of risk factor profile. No ACC/AHA recs fire (all require age ≥40 or ≥20 with LDL ≥190, and LDL is 148).",
   "expected_recommendations": [],
   "expected_trace_contains": [
-    { "type": "exit_condition_triggered", "exit": "out_of_scope_age_below_range" }
+    { "type": "exit_condition_triggered", "exit": "out_of_scope_age_below_range", "guideline_id": "guideline:uspstf-statin-2022" }
   ],
   "must_not_contain": [
-    { "type": "recommendation_emitted" },
-    { "type": "risk_score_lookup" }
+    { "type": "recommendation_emitted" }
   ]
 }

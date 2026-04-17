@@ -56,7 +56,7 @@ Parallelizable with Phase 3.
 | # | Feature | Components | Status | Depends on | Spec | PR |
 |---|---------|------------|--------|------------|------|----|
 | 28 | UI domain filter | ui, api | shipped | 20, 23, 24 | [28](../../docs/build/28-ui-domain-filter.md) | [#26](../../pull/26) |
-| 29 | UI preemption/modifier viz | ui, api | pending | 25, 26, 28 | [29](../../docs/build/29-ui-preemption-modifier-viz.md) | — |
+| 29 | UI preemption/modifier viz | ui, api | in-progress | 25, 26, 28 | [29](../../docs/build/29-ui-preemption-modifier-viz.md) | — |
 | 30 | UI multi-guideline rec list | ui | pending | 21, 25, 26, 29 | [30](../../docs/build/30-ui-multi-guideline-rec-list.md) | — |
 
 ## v0.1 — stretch goals (deferred)

@@ -272,14 +272,15 @@
     },
     "PreemptionResolved": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "description": "Reserved for F25. Not emitted by the evaluator in F21.",
-      "required": ["seq", "type", "guideline_id", "preempted_recommendation_id", "preempting_recommendation_id", "preempted_by_edge_id"],
+      "description": "F25: emitted post-traversal when a PREEMPTED_BY edge resolves between two emitted Recs. Append-only; does not mutate prior events.",
+      "required": ["seq", "type", "guideline_id", "preempted_recommendation_id", "preempting_recommendation_id", "edge_priority", "reason"],
       "properties": {
         "type": { "const": "preemption_resolved" },
-        "guideline_id": { "type": "string" },
+        "guideline_id": { "type": ["string", "null"] },
         "preempted_recommendation_id": { "type": "string" },
         "preempting_recommendation_id": { "type": "string" },
-        "preempted_by_edge_id": { "type": "string" }
+        "edge_priority": { "type": "integer" },
+        "reason": { "type": "string" }
       }
     },
     "Recommendation": {
@@ -292,7 +293,8 @@
         "evidence_grade": { "type": "string" },
         "offered_strategies": { "type": "array", "items": { "type": "string" } },
         "satisfying_strategy": { "type": ["string", "null"] },
-        "reason": { "type": "string" }
+        "reason": { "type": "string" },
+        "preempted_by": { "type": ["string", "null"], "description": "recommendation_id of the winning Rec if this Rec is preempted; null otherwise. Computed from preemption_resolved events in the trace." }
       },
       "additionalProperties": false
     }

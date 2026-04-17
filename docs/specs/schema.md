@@ -76,7 +76,10 @@ If a future guideline requires distinguishing sub-types, add separate nodes of t
 - `-[:TRIGGERED_BY {criteria}]->` `(Observation | Condition | Medication)` — event trigger for non-default (non-patient_state) recs. **Not exercised in v0** (statins is patient-state only).
 - `-[:EXCLUDED_BY]->` `(Condition | Procedure | Medication)` — hard exclusions materialized from `structured_eligibility` for graph traversability.
 - `-[:TRIGGERS_FOLLOWUP {on}]->` `(Recommendation)` — cascade chains. **Not exercised in v0.**
-- `-[:PREEMPTED_BY {condition, priority, rationale}]->` `(Recommendation)` — cross-guideline conflict resolution. **Not exercised in v0** (single guideline). Attrs remain specified for future use: `condition` (predicate to evaluate against patient state), `priority` (integer tie-breaker), `rationale` (human-readable string).
+- `-[:PREEMPTED_BY {priority, rationale}]->` `(Recommendation)` — cross-guideline conflict resolution. **Activated in F25** (USPSTF ↔ ACC/AHA). Edge direction: FROM the preempted (losing) Rec TO the winning Rec. Preemption only activates when both the preempted and winning Recs match the patient (both emitted in the trace). Attrs:
+  - `priority` (integer) — higher value wins; default USPSTF=100, ACC/AHA=200 per ADR 0018.
+  - `rationale` (string) — human-readable explanation of why this preemption exists.
+  - Per ADR 0018: no transitive preemption, single edge per Rec pair, tie-break on `published_at` then lexicographic `recommendation_id`. Cross-edges live in dedicated seed files (`graph/seeds/cross-edges-*.cypher`).
 
 ### From Strategy (outbound)
 

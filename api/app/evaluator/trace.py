@@ -276,6 +276,26 @@ class TraceBuilder:
             fields["satisfying_strategy"] = satisfying_strategy
         self.emit("recommendation_emitted", **fields)
 
+    def preemption_resolved(
+        self,
+        preempted_rec_id: str,
+        winning_rec_id: str,
+        edge_priority: int,
+        reason: str,
+    ) -> None:
+        """Append a preemption_resolved event (post-traversal, F25).
+
+        Emitted after all guideline traversals complete but before
+        evaluation_completed. Does not mutate prior events (append-only).
+        """
+        self.emit(
+            "preemption_resolved",
+            preempted_recommendation_id=preempted_rec_id,
+            preempting_recommendation_id=winning_rec_id,
+            edge_priority=edge_priority,
+            reason=reason,
+        )
+
     def evaluation_completed(
         self, recommendations_emitted: int, duration_ms: int
     ) -> None:

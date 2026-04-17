@@ -1,0 +1,19 @@
+{
+  "description": "62M post-MI on simvastatin (moderate-intensity). ACC/AHA secondary prevention recommends high-intensity statin upgrade. No USPSTF actions — secondary prevention is out of USPSTF scope.",
+  "actions": [
+    {
+      "id": "upgrade-to-high-intensity-statin",
+      "label": "Switch to high-intensity statin therapy (atorvastatin 40-80mg or rosuvastatin 20-40mg)",
+      "rationale": "ACC/AHA COR I, LOE A: patients with clinical ASCVD aged ≤75 should be on high-intensity statin therapy (≥50% LDL-C reduction). Patient is currently on simvastatin (moderate-intensity). Upgrade to atorvastatin 40-80mg or rosuvastatin 20-40mg.",
+      "source_rec_id": "rec:accaha-statin-secondary-prevention",
+      "priority": 1
+    },
+    {
+      "id": "blood-pressure-monitoring",
+      "label": "Continue blood pressure management",
+      "rationale": "Patient has hypertension (BP 134/82 on lisinopril). Ongoing BP control is important for secondary prevention.",
+      "priority": 2
+    }
+  ],
+  "contraindications": []
+}

@@ -2147,7 +2147,8 @@
       "offered_strategies": [
         "strategy:accaha-statin-high-intensity",
         "strategy:accaha-statin-moderate-intensity"
-      ]
+      ],
+      "preempted_by": null
     },
     {
       "recommendation_id": "rec:statin-initiate-grade-b",
@@ -2157,7 +2158,8 @@
       "reason": "Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.",
       "offered_strategies": [
         "strategy:statin-moderate-intensity"
-      ]
+      ],
+      "preempted_by": null
     }
   ],
   "recommendations_by_guideline": {
@@ -2171,7 +2173,8 @@
         "offered_strategies": [
           "strategy:accaha-statin-high-intensity",
           "strategy:accaha-statin-moderate-intensity"
-        ]
+        ],
+        "preempted_by": null
       }
     ],
     "guideline:uspstf-statin-2022": [
@@ -2183,7 +2186,8 @@
         "reason": "Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.",
         "offered_strategies": [
           "strategy:statin-moderate-intensity"
-        ]
+        ],
+        "preempted_by": null
       }
     ]
   }

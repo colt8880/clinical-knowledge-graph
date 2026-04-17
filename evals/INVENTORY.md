@@ -54,6 +54,20 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 - Dialysis patients (eGFR < 15 / G5D).
 - CKD + diabetes deep integration.
 
+## Cross-domain (v1 — USPSTF ↔ ACC/AHA preemption)
+
+### Landed
+
+| ID | Directory | Coverage |
+|---|---|---|
+| 01 | `fixtures/cross-domain/case-01/` | 62M post-MI (ASCVD), on simvastatin. USPSTF exits (secondary prevention). ACC/AHA R1 matches. No preemption fires. |
+| 02 | `fixtures/cross-domain/case-02/` | 55M, HTN, LDL 165, ASCVD risk 8.5%. Both USPSTF Grade C and ACC/AHA R4 match. ACC/AHA preempts USPSTF (priority 200 > 100). |
+
+### Deferred
+
+- Diabetes overlap fixture (USPSTF Grade B + ACC/AHA R3) — candidate for F27 full harness run.
+- ASCVD risk ≥10% overlap (USPSTF Grade B + ACC/AHA R4) — candidate for F27.
+
 ## Archived
 
 - `archive/` — CRC-era fixtures and inventory retained for reference. Not loaded by the evaluator.

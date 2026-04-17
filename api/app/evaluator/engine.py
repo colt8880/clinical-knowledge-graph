@@ -18,9 +18,10 @@ from __future__ import annotations
 from typing import Any
 
 from app.config import settings
-from app.evaluator.graph import GraphSnapshot, CodeRef, RecommendationNode
+from app.evaluator.graph import GraphSnapshot, CodeRef, PreemptionEdge, RecommendationNode
 from app.evaluator.predicates.registry import get_predicate
 from app.evaluator.predicates.composites import eval_all_of, eval_any_of, eval_none_of
+from app.evaluator.preemption import resolve_preemptions
 from app.evaluator.trace import TraceBuilder, compute_age, patient_fingerprint
 
 
@@ -754,10 +755,11 @@ def _evaluate_guideline(
 def evaluate(
     patient_context: dict[str, Any],
     graphs: list[GraphSnapshot],
+    preemption_edges: list[PreemptionEdge] | None = None,
 ) -> dict[str, Any]:
     """Run the trace-first evaluator across all guidelines (forest traversal).
 
-    Pure function: same (patient_context, graphs) -> same trace.
+    Pure function: same (patient_context, graphs, preemption_edges) -> same trace.
     Guidelines are visited in ascending lexical order of guideline_id
     (deterministic traversal order per F21 spec).
 
@@ -765,7 +767,14 @@ def evaluate(
     evaluation_completed.duration_ms) are NOT set here — the caller
     (route handler) stamps them after evaluate() returns. This keeps
     evaluate() free of datetime.now() calls.
+
+    After the guideline loop, preemption resolution runs as a post-traversal
+    step (F25). For each PREEMPTED_BY edge where both the preempted and
+    winning Recs were emitted, a preemption_resolved event is appended.
     """
+    if preemption_edges is None:
+        preemption_edges = []
+
     # Sort graphs by guideline_id for deterministic traversal
     sorted_graphs = sorted(graphs, key=lambda g: g.guideline_id)
 
@@ -788,7 +797,38 @@ def evaluate(
         count = _evaluate_guideline(patient_context, graph, trace, age)
         total_recommendations_emitted += count
 
-    # 3. evaluation_completed (envelope-level, guideline_id=None)
+    # 3. Preemption resolution (post-traversal, F25)
+    # Collect emitted rec IDs and their guideline mappings
+    emitted_rec_ids: set[str] = set()
+    rec_to_guideline: dict[str, str] = {}
+    for e in trace.events:
+        if e["type"] == "recommendation_emitted":
+            rec_id = e["recommendation_id"]
+            emitted_rec_ids.add(rec_id)
+            rec_to_guideline[rec_id] = e["guideline_id"]
+
+    # Build guideline published_at map for tie-breaking (ADR 0018)
+    guideline_published_at: dict[str, str] = {
+        g.guideline_id: g.effective_date for g in sorted_graphs
+    }
+
+    if preemption_edges and emitted_rec_ids:
+        trace.set_guideline_context(None)
+        preemption_results = resolve_preemptions(
+            emitted_rec_ids=emitted_rec_ids,
+            preemption_edges=preemption_edges,
+            guideline_published_at=guideline_published_at,
+            rec_to_guideline=rec_to_guideline,
+        )
+        for pr in preemption_results:
+            trace.preemption_resolved(
+                preempted_rec_id=pr.preempted_rec_id,
+                winning_rec_id=pr.winning_rec_id,
+                edge_priority=pr.edge_priority,
+                reason=pr.reason,
+            )
+
+    # 4. evaluation_completed (envelope-level, guideline_id=None)
     trace.set_guideline_context(None)
     trace.evaluation_completed(total_recommendations_emitted, duration_ms=0)
 
@@ -801,6 +841,12 @@ def evaluate(
         "patient_fingerprint": fingerprint,
     }
 
+    # Build preemption lookup from preemption_resolved events
+    preempted_by_map: dict[str, str] = {}
+    for e in trace.events:
+        if e["type"] == "preemption_resolved":
+            preempted_by_map[e["preempted_recommendation_id"]] = e["preempting_recommendation_id"]
+
     # Derive flat recommendation list from trace events
     flat_recommendations = [
         {
@@ -809,6 +855,7 @@ def evaluate(
             "status": e["status"],
             "evidence_grade": e["evidence_grade"],
             "reason": e["reason"],
+            "preempted_by": preempted_by_map.get(e["recommendation_id"]),
             **({"offered_strategies": e["offered_strategies"]} if "offered_strategies" in e else {}),
             **({"satisfying_strategy": e["satisfying_strategy"]} if "satisfying_strategy" in e else {}),
         }

@@ -1,0 +1,19 @@
+{
+  "description": "55M, HTN, LDL 165, ASCVD risk 8.5%. ACC/AHA primary prevention preempts USPSTF Grade C. ACC/AHA provides definitive COR I recommendation for moderate-to-high-intensity statin; USPSTF Grade C (shared decision-making) is superseded.",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-to-high-intensity",
+      "label": "Initiate moderate-to-high-intensity statin therapy",
+      "rationale": "ACC/AHA COR I, LOE A: adults 40-75 without diabetes, LDL 70-189 mg/dL, and 10-year ASCVD risk ≥7.5% should initiate moderate-to-high-intensity statin. Patient has LDL 165, ASCVD risk 8.5%. ACC/AHA preempts USPSTF Grade C (which would require shared decision-making) by providing more specific guidance.",
+      "source_rec_id": "rec:accaha-statin-primary-prevention",
+      "priority": 1
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure management",
+      "rationale": "BP 142/88 mmHg is above target despite HTN diagnosis. No current antihypertensive on medication list. HTN is a modifiable CVD risk factor.",
+      "priority": 2
+    }
+  ],
+  "contraindications": []
+}

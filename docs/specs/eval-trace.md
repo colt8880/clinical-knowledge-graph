@@ -156,17 +156,18 @@ Events are ordered by `seq`. `seq` is the only index the UI stepper uses. A trac
     - `recommendations_emitted: int`
     - `duration_ms: int`
 
-**Cross-guideline events** — reserved for F25/F26. Schema defines the types; evaluator does not emit them in F21.
+**Cross-guideline events** — F25 implements `preemption_resolved`; `cross_guideline_match` reserved for F26.
 
-16. **`cross_guideline_match`** — reserved for F25/F26. Indicates a cross-guideline relationship was found during traversal.
+16. **`cross_guideline_match`** — reserved for F26. Indicates a cross-guideline relationship was found during traversal.
     - `source_guideline_id: string`
     - `target_guideline_id: string`
     - `match_type: string`
 
-17. **`preemption_resolved`** — reserved for F25. Indicates a preemption edge was resolved.
-    - `preempted_recommendation_id: string`
-    - `preempting_recommendation_id: string`
-    - `preempted_by_edge_id: string`
+17. **`preemption_resolved`** — emitted post-traversal (F25) when a `PREEMPTED_BY` edge resolves between two emitted Recs. `guideline_id` is null (envelope-level, runs after all guidelines). Append-only: does not mutate prior `recommendation_emitted` events.
+    - `preempted_recommendation_id: string` — the Rec being overridden
+    - `preempting_recommendation_id: string` — the winning Rec
+    - `edge_priority: int` — the priority value from the PREEMPTED_BY edge
+    - `reason: string` — human-readable rationale from the edge
 
 ### `InputRead` shape
 
@@ -195,7 +196,8 @@ The trace event sequence for a multi-guideline evaluation is:
    - `guideline_entered`
    - [exit checks, recommendation evaluation, strategy checks — same as v0]
    - `guideline_exited`
-3. `evaluation_completed` (guideline_id: null)
+3. Preemption resolution (F25): zero or more `preemption_resolved` events (guideline_id: null)
+4. `evaluation_completed` (guideline_id: null)
 
 ## Ordering guarantees
 

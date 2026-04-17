@@ -2069,7 +2069,8 @@
       "offered_strategies": [
         "strategy:accaha-statin-high-intensity",
         "strategy:accaha-statin-moderate-intensity"
-      ]
+      ],
+      "preempted_by": null
     },
     {
       "recommendation_id": "rec:statin-selective-grade-c",
@@ -2080,7 +2081,8 @@
       "offered_strategies": [
         "strategy:statin-moderate-intensity",
         "strategy:statin-shared-decision-discussion"
-      ]
+      ],
+      "preempted_by": null
     }
   ],
   "recommendations_by_guideline": {
@@ -2094,7 +2096,8 @@
         "offered_strategies": [
           "strategy:accaha-statin-high-intensity",
           "strategy:accaha-statin-moderate-intensity"
-        ]
+        ],
+        "preempted_by": null
       }
     ],
     "guideline:uspstf-statin-2022": [
@@ -2107,7 +2110,8 @@
         "offered_strategies": [
           "strategy:statin-moderate-intensity",
           "strategy:statin-shared-decision-discussion"
-        ]
+        ],
+        "preempted_by": null
       }
     ]
   }

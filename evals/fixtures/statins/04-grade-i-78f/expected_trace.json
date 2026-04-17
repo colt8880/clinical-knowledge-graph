@@ -1053,7 +1053,8 @@
       "guideline_id": "guideline:uspstf-statin-2022",
       "status": "insufficient_evidence",
       "evidence_grade": "I",
-      "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms."
+      "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms.",
+      "preempted_by": null
     }
   ],
   "recommendations_by_guideline": {
@@ -1063,7 +1064,8 @@
         "guideline_id": "guideline:uspstf-statin-2022",
         "status": "insufficient_evidence",
         "evidence_grade": "I",
-        "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms."
+        "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms.",
+        "preempted_by": null
       }
     ]
   }

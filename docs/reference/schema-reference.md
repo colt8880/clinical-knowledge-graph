@@ -131,6 +131,7 @@ Every edge carries these, regardless of type:
 | `EXCLUDED_BY` | Recommendation → Condition / Procedure / Medication | Hard exclusions materialized from `structured_eligibility`. Regenerated from JSON on ingestion. |
 | `TRIGGERS_FOLLOWUP` | Recommendation → Recommendation | Cascade chain (e.g., screening → FIT+ diagnostic → post-polypectomy surveillance). |
 | `PREEMPTED_BY` | Recommendation → Recommendation | Conditional cross-guideline conflict resolution. Evaluated against patient state at query time. |
+| `MODIFIES` | Recommendation → Recommendation / Strategy | Cross-guideline additive annotation. Target still fires; modifier annotates (e.g., intensity reduction). Per ADR 0019. |
 
 ### Edge-specific attributes
 
@@ -163,9 +164,15 @@ Only edge types with attributes beyond the global set are listed.
 
 | Attribute | Type | Description |
 |---|---|---|
-| `condition` | JSON | Predicate (same DSL as `structured_eligibility`) that must evaluate true against patient state for preemption to apply. |
-| `priority` | integer | Higher priority wins when multiple preemption edges match. Lets us layer (genetic syndrome > strong family hx > avg risk). |
-| `rationale` | string | Human-readable audit string surfaced in the review tool and logs (e.g., `"Patient has Lynch syndrome; USPSTF avg-risk does not apply"`). |
+| `priority` | integer | Higher priority wins when multiple preemption edges match. Default: USPSTF=100, ACC/AHA=200, KDIGO=200 per ADR 0018. |
+| `rationale` | string | Human-readable audit string surfaced in the review tool and logs. |
+
+#### `MODIFIES` (Recommendation → Recommendation / Strategy)
+
+| Attribute | Type | Description |
+|---|---|---|
+| `nature` | enum | Controlled vocabulary: `intensity_reduction`, `dose_adjustment`, `monitoring`, `contraindication_warning`. New values require ADR + schema update. Per ADR 0019. |
+| `note` | string | Human-readable explanation of the modification. |
 
 ## Quick visual: traversal shape
 

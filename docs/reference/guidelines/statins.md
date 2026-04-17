@@ -212,6 +212,56 @@ Equations: Goff DC Jr, Lloyd-Jones DM, Bennett G, et al. *2013 ACC/AHA Guideline
 - Primary prevention in diabetes per ADA Standards of Care (preempts USPSTF when both apply).
 - Serum creatinine / eGFR as an ASCVD refinement (not in the 2013 PCE).
 
+## Guideline prose (for eval harness Arm B chunking) {#prose}
+
+The following sections render the USPSTF 2022 statin recommendation as continuous prose suitable for text chunking and retrieval. Each section has a stable anchor for chunk boundary alignment.
+
+### Overview {#prose-overview}
+
+The US Preventive Services Task Force (USPSTF) recommends that clinicians prescribe a statin for the primary prevention of cardiovascular disease (CVD) for adults aged 40 to 75 years who have one or more cardiovascular risk factors (dyslipidemia, diabetes, hypertension, or smoking) and an estimated 10-year risk of a cardiovascular event of 10% or greater. This is a Grade B recommendation, meaning there is high certainty of moderate net benefit or moderate certainty of moderate to substantial net benefit.
+
+### Grade B recommendation: Statin initiation for high-risk adults {#prose-grade-b}
+
+Adults aged 40 to 75 years who have at least one cardiovascular risk factor and a calculated 10-year ASCVD risk of 10% or greater should be started on moderate-intensity statin therapy for primary prevention of cardiovascular disease. Cardiovascular risk factors include dyslipidemia (elevated LDL cholesterol, low HDL cholesterol, elevated triglycerides), diabetes mellitus (type 1 or type 2), hypertension (including treated hypertension), and current tobacco smoking.
+
+The 10-year ASCVD risk is calculated using the Pooled Cohort Equations (Goff et al., 2013), which incorporate age, sex, race (Black vs. non-Black), total cholesterol, HDL cholesterol, systolic blood pressure, blood pressure treatment status, diabetes status, and current smoking status. A 10-year risk of 10% or greater places the patient in the Grade B recommendation band.
+
+Moderate-intensity statin therapy includes atorvastatin 10-20 mg, rosuvastatin 5-10 mg, simvastatin 20-40 mg, pravastatin 40 mg, lovastatin 40 mg, fluvastatin 80 mg, or pitavastatin 2-4 mg daily. The USPSTF does not recommend a specific agent within the moderate-intensity class; any of these agents is acceptable.
+
+### Grade C recommendation: Selective statin offer for borderline-risk adults {#prose-grade-c}
+
+For adults aged 40 to 75 years who have at least one cardiovascular risk factor and a calculated 10-year ASCVD risk of 7.5% to less than 10%, the USPSTF recommends that clinicians selectively offer a statin. This is a Grade C recommendation, meaning there is at least moderate certainty of a small net benefit.
+
+The decision to initiate statin therapy in this group should be an individual one, based on shared decision-making between the patient and clinician. The discussion should consider the potential benefits (modest reduction in cardiovascular events), potential harms (muscle symptoms, slightly increased diabetes risk), patient preferences and values, comorbid conditions, life expectancy, and the overall cardiovascular risk factor profile.
+
+If the shared decision-making discussion results in a decision to initiate therapy, moderate-intensity statin therapy is recommended. A documented shared decision-making encounter satisfies the recommendation's counseling strategy.
+
+### Grade I statement: Insufficient evidence for adults 76 and older {#prose-grade-i}
+
+For adults aged 76 years and older, the USPSTF concludes that the current evidence is insufficient to assess the balance of benefits and harms of initiating a statin for the primary prevention of CVD events and mortality. This is a Grade I statement.
+
+This does not mean that statins are contraindicated in older adults. Rather, the evidence base for initiating statin therapy specifically for primary prevention in this age group is limited. Clinicians should use clinical judgment and consider individual patient circumstances, including existing cardiovascular risk, life expectancy, and patient preferences, when discussing statin therapy with adults 76 and older.
+
+Adults already taking a statin before age 76 should not automatically discontinue therapy upon reaching that age. The Grade I statement applies specifically to new initiation, not continuation of existing therapy.
+
+### Exclusions from this recommendation {#prose-exclusions}
+
+The USPSTF statin primary prevention recommendation does not apply to the following populations, who are managed under separate clinical pathways:
+
+**Established atherosclerotic cardiovascular disease (secondary prevention):** Patients with a history of myocardial infarction, stroke, peripheral arterial disease, or other established ASCVD are managed under secondary prevention guidelines (ACC/AHA 2018 Cholesterol). These patients typically require high-intensity statin therapy and have different LDL targets.
+
+**Familial hypercholesterolemia:** Patients with LDL cholesterol >= 190 mg/dL or a diagnosis of familial hypercholesterolemia fall outside the Pooled Cohort Equation calibration range. They require specialized lipid management and are not addressed by this USPSTF recommendation.
+
+**Adults under age 40:** The USPSTF does not make a recommendation about statin use for primary prevention in adults younger than 40. Risk assessment tools like the Pooled Cohort Equations are not validated below age 40.
+
+### ASCVD risk calculation {#prose-ascvd}
+
+The 10-year atherosclerotic cardiovascular disease risk is estimated using the 2013 Pooled Cohort Equations (Goff et al.). Required inputs are: age, sex, race (Black vs. non-Black), total cholesterol (mg/dL), HDL cholesterol (mg/dL), systolic blood pressure (mmHg), blood pressure treatment status, diabetes status, and current smoking status.
+
+The equations may overestimate risk in some populations and underestimate it in others, particularly in populations not well-represented in the derivation cohorts. The USPSTF acknowledges this limitation and recommends that clinicians discuss the potential for mis-estimation with patients.
+
+If a pre-computed ASCVD score is available from the electronic health record, it may be used directly. If not, the score should be calculated from the most recent available clinical data.
+
 ## Related
 
 - `docs/specs/schema.md`

@@ -5,17 +5,42 @@
       "recommendation_id": "rec:statin-selective-grade-c",
       "status": "due",
       "evidence_grade": "C",
-      "offered_strategies": ["strategy:statin-moderate-intensity", "strategy:statin-shared-decision-discussion"]
+      "offered_strategies": [
+        "strategy:statin-moderate-intensity",
+        "strategy:statin-shared-decision-discussion"
+      ],
+      "guideline_id": "guideline:uspstf-statin-2022"
     }
   ],
   "expected_trace_contains": [
-    { "type": "risk_score_lookup", "resolution": "supplied", "supplied_value": 8.4 },
-    { "type": "recommendation_considered", "recommendation_id": "rec:statin-initiate-grade-b" },
-    { "type": "eligibility_evaluation_completed", "recommendation_id": "rec:statin-initiate-grade-b", "result": "ineligible" },
-    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-selective-grade-c", "status": "due", "evidence_grade": "C" }
+    {
+      "type": "risk_score_lookup",
+      "resolution": "supplied",
+      "supplied_value": 8.4
+    },
+    {
+      "type": "recommendation_considered",
+      "recommendation_id": "rec:statin-initiate-grade-b"
+    },
+    {
+      "type": "eligibility_evaluation_completed",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "result": "ineligible"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "status": "due",
+      "evidence_grade": "C"
+    }
   ],
   "must_not_contain": [
-    { "type": "exit_condition_triggered" },
-    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-initiate-grade-b" }
+    {
+      "type": "exit_condition_triggered"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-initiate-grade-b"
+    }
   ]
 }

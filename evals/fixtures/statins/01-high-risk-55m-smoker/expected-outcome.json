@@ -5,14 +5,28 @@
       "recommendation_id": "rec:statin-initiate-grade-b",
       "status": "due",
       "evidence_grade": "B",
-      "offered_strategies": ["strategy:statin-moderate-intensity"]
+      "offered_strategies": [
+        "strategy:statin-moderate-intensity"
+      ],
+      "guideline_id": "guideline:uspstf-statin-2022"
     }
   ],
   "expected_trace_contains": [
-    { "type": "risk_score_lookup", "resolution": "supplied", "supplied_value": 18.2 },
-    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-initiate-grade-b", "status": "due", "evidence_grade": "B" }
+    {
+      "type": "risk_score_lookup",
+      "resolution": "supplied",
+      "supplied_value": 18.2
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "status": "due",
+      "evidence_grade": "B"
+    }
   ],
   "must_not_contain": [
-    { "type": "exit_condition_triggered" }
+    {
+      "type": "exit_condition_triggered"
+    }
   ]
 }

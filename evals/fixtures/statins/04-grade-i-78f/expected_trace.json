@@ -14,7 +14,8 @@
       "patient_sex": "female",
       "guidelines_in_scope": [
         "guideline:uspstf-statin-2022"
-      ]
+      ],
+      "guideline_id": null
     },
     {
       "seq": 2,
@@ -29,12 +30,14 @@
       "recommendation_title": "Initiate statin for primary prevention of CVD (Grade B)",
       "evidence_grade": "B",
       "intent": "primary_prevention",
-      "trigger": "patient_state"
+      "trigger": "patient_state",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 4,
       "type": "eligibility_evaluation_started",
-      "recommendation_id": "rec:statin-initiate-grade-b"
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 5,
@@ -46,7 +49,8 @@
       "inputs_read": [],
       "computed_value": null,
       "method": null,
-      "note": "Risk score not supplied in patient context; v0 does not compute ASCVD via PCE."
+      "note": "Risk score not supplied in patient context; v0 does not compute ASCVD via PCE.",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 6,
@@ -77,7 +81,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 7,
@@ -88,14 +93,16 @@
       ],
       "operator": "all_of",
       "result": "false",
-      "short_circuited": true
+      "short_circuited": true,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 8,
       "type": "eligibility_evaluation_completed",
       "recommendation_id": "rec:statin-initiate-grade-b",
       "result": "ineligible",
-      "final_value": "false"
+      "final_value": "false",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 9,
@@ -104,12 +111,14 @@
       "recommendation_title": "Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)",
       "evidence_grade": "I",
       "intent": "primary_prevention",
-      "trigger": "patient_state"
+      "trigger": "patient_state",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 10,
       "type": "eligibility_evaluation_started",
-      "recommendation_id": "rec:statin-insufficient-evidence-grade-i"
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 11,
@@ -139,7 +148,8 @@
       ],
       "result": "true",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 12,
@@ -167,7 +177,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 13,
@@ -180,7 +191,8 @@
       ],
       "operator": "none_of",
       "result": "true",
-      "short_circuited": false
+      "short_circuited": false,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 14,
@@ -191,14 +203,16 @@
       ],
       "operator": "all_of",
       "result": "true",
-      "short_circuited": false
+      "short_circuited": false,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 15,
       "type": "eligibility_evaluation_completed",
       "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
       "result": "eligible",
-      "final_value": "true"
+      "final_value": "true",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 16,
@@ -206,7 +220,8 @@
       "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
       "status": "insufficient_evidence",
       "evidence_grade": "I",
-      "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms."
+      "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms.",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 17,
@@ -215,12 +230,14 @@
       "recommendation_title": "Selectively offer statin based on shared decision-making (Grade C)",
       "evidence_grade": "C",
       "intent": "shared_decision",
-      "trigger": "patient_state"
+      "trigger": "patient_state",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 18,
       "type": "eligibility_evaluation_started",
-      "recommendation_id": "rec:statin-selective-grade-c"
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 19,
@@ -251,7 +268,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 20,
@@ -262,20 +280,29 @@
       ],
       "operator": "all_of",
       "result": "false",
-      "short_circuited": true
+      "short_circuited": true,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 21,
       "type": "eligibility_evaluation_completed",
       "recommendation_id": "rec:statin-selective-grade-c",
       "result": "ineligible",
-      "final_value": "false"
+      "final_value": "false",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 22,
+      "type": "guideline_exited",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendations_emitted": 1
+    },
+    {
+      "seq": 23,
       "type": "evaluation_completed",
       "recommendations_emitted": 1,
-      "duration_ms": 0
+      "duration_ms": 0,
+      "guideline_id": null
     }
   ],
   "recommendations": [
@@ -283,7 +310,19 @@
       "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
       "status": "insufficient_evidence",
       "evidence_grade": "I",
-      "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms."
+      "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms.",
+      "guideline_id": "guideline:uspstf-statin-2022"
     }
-  ]
+  ],
+  "recommendations_by_guideline": {
+    "guideline:uspstf-statin-2022": [
+      {
+        "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+        "status": "insufficient_evidence",
+        "evidence_grade": "I",
+        "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms.",
+        "guideline_id": "guideline:uspstf-statin-2022"
+      }
+    ]
+  }
 }

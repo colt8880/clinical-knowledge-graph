@@ -14,7 +14,8 @@
       "patient_sex": "female",
       "guidelines_in_scope": [
         "guideline:uspstf-statin-2022"
-      ]
+      ],
+      "guideline_id": null
     },
     {
       "seq": 2,
@@ -29,12 +30,14 @@
       "recommendation_title": "Initiate statin for primary prevention of CVD (Grade B)",
       "evidence_grade": "B",
       "intent": "primary_prevention",
-      "trigger": "patient_state"
+      "trigger": "patient_state",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 4,
       "type": "eligibility_evaluation_started",
-      "recommendation_id": "rec:statin-initiate-grade-b"
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 5,
@@ -46,7 +49,8 @@
       "inputs_read": [],
       "computed_value": null,
       "method": "pooled_cohort_equations_2013_goff",
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 6,
@@ -77,7 +81,8 @@
       ],
       "result": "true",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 7,
@@ -105,7 +110,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 8,
@@ -135,7 +141,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 9,
@@ -163,7 +170,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 10,
@@ -176,7 +184,8 @@
       ],
       "operator": "none_of",
       "result": "true",
-      "short_circuited": false
+      "short_circuited": false,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 11,
@@ -204,7 +213,8 @@
       ],
       "result": "true",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 12,
@@ -217,7 +227,8 @@
       ],
       "operator": "any_of",
       "result": "true",
-      "short_circuited": true
+      "short_circuited": true,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 13,
@@ -243,7 +254,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 14,
@@ -254,14 +266,16 @@
       ],
       "operator": "all_of",
       "result": "false",
-      "short_circuited": false
+      "short_circuited": false,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 15,
       "type": "eligibility_evaluation_completed",
       "recommendation_id": "rec:statin-initiate-grade-b",
       "result": "ineligible",
-      "final_value": "false"
+      "final_value": "false",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 16,
@@ -270,12 +284,14 @@
       "recommendation_title": "Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)",
       "evidence_grade": "I",
       "intent": "primary_prevention",
-      "trigger": "patient_state"
+      "trigger": "patient_state",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 17,
       "type": "eligibility_evaluation_started",
-      "recommendation_id": "rec:statin-insufficient-evidence-grade-i"
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 18,
@@ -305,7 +321,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 19,
@@ -316,14 +333,16 @@
       ],
       "operator": "all_of",
       "result": "false",
-      "short_circuited": true
+      "short_circuited": true,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 20,
       "type": "eligibility_evaluation_completed",
       "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
       "result": "ineligible",
-      "final_value": "false"
+      "final_value": "false",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 21,
@@ -332,12 +351,14 @@
       "recommendation_title": "Selectively offer statin based on shared decision-making (Grade C)",
       "evidence_grade": "C",
       "intent": "shared_decision",
-      "trigger": "patient_state"
+      "trigger": "patient_state",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 22,
       "type": "eligibility_evaluation_started",
-      "recommendation_id": "rec:statin-selective-grade-c"
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 23,
@@ -368,7 +389,8 @@
       ],
       "result": "true",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 24,
@@ -396,7 +418,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 25,
@@ -426,7 +449,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 26,
@@ -454,7 +478,8 @@
       ],
       "result": "false",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 27,
@@ -467,7 +492,8 @@
       ],
       "operator": "none_of",
       "result": "true",
-      "short_circuited": false
+      "short_circuited": false,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 28,
@@ -495,7 +521,8 @@
       ],
       "result": "true",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 29,
@@ -508,7 +535,8 @@
       ],
       "operator": "any_of",
       "result": "true",
-      "short_circuited": true
+      "short_circuited": true,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 30,
@@ -534,7 +562,8 @@
       ],
       "result": "true",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 31,
@@ -560,7 +589,8 @@
       ],
       "result": "true",
       "missing_data_policy_applied": null,
-      "note": null
+      "note": null,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 32,
@@ -571,21 +601,24 @@
       ],
       "operator": "all_of",
       "result": "true",
-      "short_circuited": false
+      "short_circuited": false,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 33,
       "type": "eligibility_evaluation_completed",
       "recommendation_id": "rec:statin-selective-grade-c",
       "result": "eligible",
-      "final_value": "true"
+      "final_value": "true",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 34,
       "type": "strategy_considered",
       "recommendation_id": "rec:statin-selective-grade-c",
       "strategy_id": "strategy:statin-moderate-intensity",
-      "strategy_name": "Moderate-intensity statin therapy"
+      "strategy_name": "Moderate-intensity statin therapy",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 35,
@@ -605,7 +638,8 @@
         }
       ],
       "satisfied": false,
-      "note": "No active medication matching med:atorvastatin"
+      "note": "No active medication matching med:atorvastatin",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 36,
@@ -625,7 +659,8 @@
         }
       ],
       "satisfied": false,
-      "note": "No active medication matching med:fluvastatin"
+      "note": "No active medication matching med:fluvastatin",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 37,
@@ -645,7 +680,8 @@
         }
       ],
       "satisfied": false,
-      "note": "No active medication matching med:lovastatin"
+      "note": "No active medication matching med:lovastatin",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 38,
@@ -665,7 +701,8 @@
         }
       ],
       "satisfied": false,
-      "note": "No active medication matching med:pitavastatin"
+      "note": "No active medication matching med:pitavastatin",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 39,
@@ -685,7 +722,8 @@
         }
       ],
       "satisfied": false,
-      "note": "No active medication matching med:pravastatin"
+      "note": "No active medication matching med:pravastatin",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 40,
@@ -705,7 +743,8 @@
         }
       ],
       "satisfied": false,
-      "note": "No active medication matching med:rosuvastatin"
+      "note": "No active medication matching med:rosuvastatin",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 41,
@@ -725,21 +764,24 @@
         }
       ],
       "satisfied": false,
-      "note": "No active medication matching med:simvastatin"
+      "note": "No active medication matching med:simvastatin",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 42,
       "type": "strategy_resolved",
       "recommendation_id": "rec:statin-selective-grade-c",
       "strategy_id": "strategy:statin-moderate-intensity",
-      "satisfied": false
+      "satisfied": false,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 43,
       "type": "strategy_considered",
       "recommendation_id": "rec:statin-selective-grade-c",
       "strategy_id": "strategy:statin-shared-decision-discussion",
-      "strategy_name": "Shared decision-making discussion about statin therapy"
+      "strategy_name": "Shared decision-making discussion about statin therapy",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 44,
@@ -759,14 +801,16 @@
         }
       ],
       "satisfied": false,
-      "note": "No procedure record matching proc:sdm-statin-discussion"
+      "note": "No procedure record matching proc:sdm-statin-discussion",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 45,
       "type": "strategy_resolved",
       "recommendation_id": "rec:statin-selective-grade-c",
       "strategy_id": "strategy:statin-shared-decision-discussion",
-      "satisfied": false
+      "satisfied": false,
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 46,
@@ -778,13 +822,21 @@
       "offered_strategies": [
         "strategy:statin-moderate-intensity",
         "strategy:statin-shared-decision-discussion"
-      ]
+      ],
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 47,
+      "type": "guideline_exited",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendations_emitted": 1
+    },
+    {
+      "seq": 48,
       "type": "evaluation_completed",
       "recommendations_emitted": 1,
-      "duration_ms": 0
+      "duration_ms": 0,
+      "guideline_id": null
     }
   ],
   "recommendations": [
@@ -796,7 +848,23 @@
       "offered_strategies": [
         "strategy:statin-moderate-intensity",
         "strategy:statin-shared-decision-discussion"
-      ]
+      ],
+      "guideline_id": "guideline:uspstf-statin-2022"
     }
-  ]
+  ],
+  "recommendations_by_guideline": {
+    "guideline:uspstf-statin-2022": [
+      {
+        "recommendation_id": "rec:statin-selective-grade-c",
+        "status": "due",
+        "evidence_grade": "C",
+        "reason": "Patient is eligible per C-grade evidence; no offered strategy is currently satisfied.",
+        "offered_strategies": [
+          "strategy:statin-moderate-intensity",
+          "strategy:statin-shared-decision-discussion"
+        ],
+        "guideline_id": "guideline:uspstf-statin-2022"
+      }
+    ]
+  }
 }

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "npx playwright test",
-    "test:unit": "vitest run --exclude 'tests/**'",
+    "test:unit": "vitest run",
     "generate-api": "npx tsx scripts/generate-api.ts"
   },
   "dependencies": {
@@ -22,12 +22,16 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/cytoscape": "^3.21.9",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
+    "jsdom": "^29.0.2",
     "openapi-typescript": "^7.13.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",

@@ -39,31 +39,70 @@ Node labels must render the human-readable `name` or `title`, not the id. This i
 
 ### Goal
 
-A curator or clinician reviewer can find any node in the graph, see its properties, and walk outward through its edges. Port of the existing `crc-graph.html` sensibilities into React.
+Whole-forest graph canvas showing all guideline subgraphs simultaneously. A domain filter toggles which guidelines are visible. Shared clinical entities (Medications, Conditions, etc.) always render. Clicking any node opens a detail panel with provenance, codes, and domain badge.
+
+This replaced the v0 hierarchical column navigator (F05) as of F28. The column model didn't scale to multiple guidelines or cross-guideline edges.
 
 ### Surfaces
 
-- **Search bar** (top). Calls `GET /search` with free-text `q` and optional `node_types` chips. Debounced.
-- **Result list** (left panel). Clicking a result loads the center-node view.
-- **`GraphCanvas` view** (center). Shows the center node and its 1-hop neighbors from `GET /nodes/{id}/neighbors`.
-- **Detail panel** (right). When a node is selected, renders:
-  - `labels` (node type), `id`, human-readable `name` / `title`.
-  - Properties in a flat key/value list. `structured_eligibility` JSON pretty-printed; no in-place English-ification in v0 (defer the DSL→English render).
-  - Code list.
-  - Provenance block (`source_guideline_id`, `source_section`, `effective_date`) — always visible, never behind a click.
-- **URL state.** The selected node id lives in the URL (`/explore?node=rec:statin-initiate-grade-b`). Refresh reloads the same view. Links are copy-pasteable.
+- **Domain filter** (left sidebar). Multi-select chip control for USPSTF / ACC-AHA / KDIGO. Toggling a domain hides/shows the relevant guideline-scoped nodes via Cytoscape `.style("display")` — no re-fetch. Shared entities remain visible even when all guidelines are hidden.
+- **`GraphCanvas` view** (center). Renders the full forest using cose-bilkent layout with compound nodes (one per guideline cluster). Shared entities sit outside compound nodes. Domain coloring: USPSTF blue, ACC/AHA purple, KDIGO green. Shared entities use neutral type-based colors (Medication pink, Condition red, etc.). Rec/Strategy nodes display a domain label in the node body.
+- **Detail panel** (right). When a node is selected:
+  - `labels` (node types), `id`, human-readable `name` / `title`.
+  - Domain badge for guideline-scoped nodes.
+  - Full codes list (RxNorm / SNOMED / ICD-10-CM / LOINC / CPT) for shared entities.
+  - Properties in a flat key/value list. `structured_eligibility` rendered as a predicate tree.
+  - Provenance block — always visible, never behind a click.
+- **URL state.** `?domains=uspstf,acc-aha,kdigo&focus=<node_id>`. Default (no params) = all three domains. URL updates are push (back button navigates filter history). Filter state also persisted to localStorage; URL wins on conflict.
+
+### Data flow
+
+Explore fetches the entire forest via `GET /subgraph` (one bulk call, no pagination). The client filters visibility client-side using Cytoscape's `.style("display", "none")` / `.style("display", "element")`. Re-toggling a domain is instant (< 100ms).
+
+### Layout
+
+**Algorithm:** cose-bilkent with compound nodes. Each guideline domain gets a compound parent node; guideline-scoped nodes are children of their domain's compound. Shared entities sit outside all compounds and are positioned centrally by the layout engine. This produces tree-ish clusters per guideline with shared entities bridging them.
+
+**Choice rationale:** cose-bilkent handles compound nodes well and was already a dependency. Preferred over dagre-per-cluster (too rigid with shared entities) and plain fcose (less structured).
 
 ### Interactions
 
-- Click a neighbor in the graph → it becomes the new center node (pushes a history entry).
-- Browser back returns to previous center node.
-- Clicking an edge selects the edge and shows edge properties in the detail panel. Edge provenance is required.
+- Click a node → opens detail panel, syncs URL `?focus=<id>`, focus ring on node, pan/zoom to center it.
+- Click background → closes detail panel, clears focus.
+- Toggle domain chip → hides/shows that domain's nodes and edges. No re-fetch.
+- Escape key → closes detail panel.
+- URL-driven: loading `/explore?focus=X` selects and centers that node.
+- Loading `/explore?domains=kdigo` shows only KDIGO + shared entities.
+- Loading `/explore?domains=` shows only shared entities.
 
-### Out of scope in v0
+### Legacy URL handling
 
+v0's `?g=&r=&s=` params are deprecated. If detected, a console warning is logged and the page loads with all guidelines visible and no focus. No redirect.
+
+### Accessibility
+
+- DomainFilter is a group of checkboxes with keyboard navigation (Space/Enter to toggle, arrow keys to move).
+- Node detail panel closes with Escape, is keyboard-navigable via Tab.
+- Cytoscape canvas has known a11y limitations (no screen reader support for graph nodes). Documented as v2 item.
+- Domain badges use sufficient color contrast.
+
+### Performance targets
+
+- Initial render: < 2s for ~400–600 nodes (full v1 graph).
+- Filter toggle: < 100ms.
+- Node click to detail panel: < 50ms.
+- Bulk subgraph fetch: < 500ms server-side.
+
+### Out of scope
+
+- Search / find-by-name (deferred to v2).
 - Editing nodes or edges.
 - Flagging or commenting.
 - Diff view between graph versions.
+- Alternative layout toggle.
+- Mobile / narrow viewport.
+- Keyboard-driven canvas navigation.
+- Export as PNG/SVG.
 
 ## Eval tab (`/app/eval`)
 

@@ -3,7 +3,7 @@
 import type { GraphNode, GraphEdge } from "@/lib/api/client";
 
 interface NodeDetailProps {
-  node: GraphNode | null;
+  node: (GraphNode & { domain?: string | null }) | null;
   edge: GraphEdge | null;
 }
 
@@ -25,6 +25,18 @@ const TYPE_BADGE_COLORS: Record<string, string> = {
   Medication: "bg-pink-100 text-pink-800 border-pink-300",
 };
 
+const DOMAIN_BADGE_COLORS: Record<string, string> = {
+  USPSTF: "bg-blue-100 text-blue-800 border-blue-300",
+  ACC_AHA: "bg-purple-100 text-purple-800 border-purple-300",
+  KDIGO: "bg-emerald-100 text-emerald-800 border-emerald-300",
+};
+
+const DOMAIN_DISPLAY: Record<string, string> = {
+  USPSTF: "USPSTF",
+  ACC_AHA: "ACC/AHA",
+  KDIGO: "KDIGO",
+};
+
 function Badge({ label }: { label: string }) {
   const colors =
     TYPE_BADGE_COLORS[label] ?? "bg-slate-100 text-slate-700 border-slate-300";
@@ -33,6 +45,19 @@ function Badge({ label }: { label: string }) {
       className={`inline-block px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide rounded border ${colors}`}
     >
       {label}
+    </span>
+  );
+}
+
+function DomainBadge({ domain }: { domain: string }) {
+  const colors = DOMAIN_BADGE_COLORS[domain] ?? "bg-slate-100 text-slate-700 border-slate-300";
+  const display = DOMAIN_DISPLAY[domain] ?? domain;
+  return (
+    <span
+      className={`inline-block px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide rounded border ${colors}`}
+      data-testid="domain-badge"
+    >
+      {display}
     </span>
   );
 }
@@ -214,7 +239,7 @@ function ProvenanceBlock({ properties }: { properties: Record<string, unknown> }
   );
 }
 
-function NodePanel({ node }: { node: GraphNode }) {
+function NodePanel({ node }: { node: GraphNode & { domain?: string | null } }) {
   const displayName =
     (node.properties.title as string) ??
     (node.properties.name as string) ??
@@ -238,6 +263,7 @@ function NodePanel({ node }: { node: GraphNode }) {
         {node.labels.map((l) => (
           <Badge key={l} label={l} />
         ))}
+        {node.domain && <DomainBadge domain={node.domain} />}
       </div>
       <div className="text-xs text-slate-500 mb-4 font-mono">{node.id}</div>
 

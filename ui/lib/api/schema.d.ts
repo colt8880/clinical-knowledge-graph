@@ -218,6 +218,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/subgraph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch the whole-forest subgraph for selected guideline domains.
+         * @description Returns all guideline-scoped nodes with the requested domain labels
+         *     plus all shared entity nodes referenced by any of them. Edges included
+         *     only when both endpoints are in the returned node set. Default (no
+         *     `domains` param) returns all guidelines. Empty `domains=` returns
+         *     only shared entities.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /**
+                     * @description Comma-separated domain labels (USPSTF, ACC_AHA, KDIGO).
+                     *     Default (absent) returns all. Empty string returns shared entities only.
+                     */
+                    domains?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Subgraph covering the requested domains. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ForestSubgraph"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/search": {
         parameters: {
             query?: never;
@@ -298,7 +347,12 @@ export interface components {
                 recompute_risk_scores: boolean;
             };
         };
-        /** @description Must validate against eval-trace.schema.json. */
+        /**
+         * @description Must validate against eval-trace.schema.json.
+         *     v1 (F21): every event carries guideline_id; response includes
+         *     per-guideline rec lists (recommendations_by_guideline) plus a
+         *     flat recommendation list for backwards-compatible consumers.
+         */
         EvalTrace: components["schemas"]["eval-trace.schema"];
         GraphNode: {
             /** @description Stable node id, e.g., med:atorvastatin. */
@@ -326,6 +380,39 @@ export interface components {
             properties: {
                 [key: string]: unknown;
             };
+        };
+        /**
+         * @description Whole-forest subgraph for the Explore UI. Includes guideline-scoped
+         *     nodes for requested domains plus shared entities. Nodes sorted by id;
+         *     edges sorted by (start, end, type).
+         */
+        ForestSubgraph: {
+            nodes: {
+                id: string;
+                labels: string[];
+                properties: {
+                    [key: string]: unknown;
+                };
+                codes?: {
+                    system: string;
+                    code: string;
+                    display?: string;
+                }[];
+                /**
+                 * @description Domain label for guideline-scoped nodes; null for shared entities.
+                 * @enum {string|null}
+                 */
+                domain: "USPSTF" | "ACC_AHA" | "KDIGO" | null;
+            }[];
+            edges: {
+                id: string;
+                type: string;
+                start: string;
+                end: string;
+                properties: {
+                    [key: string]: unknown;
+                };
+            }[];
         };
         Subgraph: {
             center: string;
@@ -559,36 +646,48 @@ export interface components {
         BaseEvent: {
             seq: number;
             type: string;
+            /** @description The guideline being evaluated when this event was emitted. Null for envelope-level events (evaluation_started, evaluation_completed). */
+            guideline_id: string | null;
             /** Format: date-time */
             at?: string;
         };
         EvaluationStarted: {
             /** @constant */
             type: "evaluation_started";
+            /** @constant */
+            guideline_id: unknown;
             patient_age_years: number;
             patient_sex: string;
             guidelines_in_scope: string[];
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         GuidelineEntered: {
             /** @constant */
             type: "guideline_entered";
             guideline_id: string;
             guideline_title: string;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
+        GuidelineExited: {
+            /** @constant */
+            type: "guideline_exited";
+            guideline_id: string;
+            recommendations_emitted: number;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         RecommendationConsidered: {
             /** @constant */
             type: "recommendation_considered";
+            guideline_id: string;
             recommendation_id: string;
             recommendation_title: string;
             evidence_grade: string;
             intent: string;
             trigger: string;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         EligibilityEvaluationStarted: {
             /** @constant */
             type: "eligibility_evaluation_started";
+            guideline_id: string;
             recommendation_id: string;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         InputRead: {
             /** @enum {string} */
             source: "patient.demographics" | "patient.conditions" | "patient.observations" | "patient.medications" | "patient.social_history" | "patient.risk_scores" | "patient.completeness" | "derived";
@@ -601,6 +700,7 @@ export interface components {
         PredicateEvaluated: {
             /** @constant */
             type: "predicate_evaluated";
+            guideline_id: string;
             recommendation_id: string;
             path: (string | number)[];
             predicate: string;
@@ -610,35 +710,39 @@ export interface components {
             /** @enum {string|null} */
             missing_data_policy_applied?: "require" | "fail_open" | "fail_closed" | null;
             note?: string | null;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         CompositeResolved: {
             /** @constant */
             type: "composite_resolved";
+            guideline_id: string;
             recommendation_id: string;
             path: (string | number)[];
             /** @enum {string} */
             operator: "all_of" | "any_of" | "none_of";
             result: components["schemas"]["TriState"];
             short_circuited: boolean;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         EligibilityEvaluationCompleted: {
             /** @constant */
             type: "eligibility_evaluation_completed";
+            guideline_id: string;
             recommendation_id: string;
             /** @enum {string} */
             result: "eligible" | "ineligible" | "unknown";
             final_value: components["schemas"]["TriState"];
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         StrategyConsidered: {
             /** @constant */
             type: "strategy_considered";
+            guideline_id: string;
             recommendation_id: string;
             strategy_id: string;
             strategy_name: string;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         ActionChecked: {
             /** @constant */
             type: "action_checked";
+            guideline_id: string;
             recommendation_id: string;
             strategy_id: string;
             action_node_id: string;
@@ -649,17 +753,19 @@ export interface components {
             inputs_read: components["schemas"]["InputRead"][];
             satisfied: boolean;
             note?: string | null;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         StrategyResolved: {
             /** @constant */
             type: "strategy_resolved";
+            guideline_id: string;
             recommendation_id: string;
             strategy_id: string;
             satisfied: boolean;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         RiskScoreLookup: {
             /** @constant */
             type: "risk_score_lookup";
+            guideline_id: string;
             score_name: string;
             /** @enum {string} */
             resolution: "supplied" | "computed" | "unavailable";
@@ -669,17 +775,19 @@ export interface components {
             computed_value?: number | null;
             method?: string | null;
             note?: string | null;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         ExitConditionTriggered: {
             /** @constant */
             type: "exit_condition_triggered";
+            guideline_id: string;
             recommendation_id: string;
             exit: string;
             rationale: string;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         RecommendationEmitted: {
             /** @constant */
             type: "recommendation_emitted";
+            guideline_id: string;
             recommendation_id: string;
             /** @enum {string} */
             status: "due" | "up_to_date" | "not_applicable" | "insufficient_evidence";
@@ -687,13 +795,40 @@ export interface components {
             offered_strategies?: string[];
             satisfying_strategy?: string | null;
             reason: string;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         EvaluationCompleted: {
             /** @constant */
             type: "evaluation_completed";
+            /** @constant */
+            guideline_id: unknown;
             recommendations_emitted: number;
             duration_ms: number;
-        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
+        /** @description F26: emitted post-traversal when a MODIFIES edge activates between two emitted Recs. Append-only; does not mutate prior events. Emitted after preemption resolution, before evaluation_completed. */
+        CrossGuidelineMatch: {
+            /** @constant */
+            type: "cross_guideline_match";
+            guideline_id: string | null;
+            /** @description The modifying Recommendation ID */
+            source_rec_id: string;
+            /** @description The modified Recommendation ID */
+            target_rec_id: string;
+            /** @enum {string} */
+            nature: "intensity_reduction" | "dose_adjustment" | "monitoring" | "contraindication_warning";
+            note: string;
+            source_guideline_id: string;
+            target_guideline_id: string;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
+        /** @description F25: emitted post-traversal when a PREEMPTED_BY edge resolves between two emitted Recs. Append-only; does not mutate prior events. */
+        PreemptionResolved: {
+            /** @constant */
+            type: "preemption_resolved";
+            guideline_id: string | null;
+            preempted_recommendation_id: string;
+            preempting_recommendation_id: string;
+            edge_priority: number;
+            reason: string;
+        } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
         Envelope: {
             spec_tag: string;
             graph_version: string;
@@ -706,25 +841,43 @@ export interface components {
             /** Format: date-time */
             completed_at?: string;
         };
-        Event: components["schemas"]["EvaluationStarted"] | components["schemas"]["GuidelineEntered"] | components["schemas"]["RecommendationConsidered"] | components["schemas"]["EligibilityEvaluationStarted"] | components["schemas"]["PredicateEvaluated"] | components["schemas"]["CompositeResolved"] | components["schemas"]["EligibilityEvaluationCompleted"] | components["schemas"]["StrategyConsidered"] | components["schemas"]["ActionChecked"] | components["schemas"]["StrategyResolved"] | components["schemas"]["RiskScoreLookup"] | components["schemas"]["ExitConditionTriggered"] | components["schemas"]["RecommendationEmitted"] | components["schemas"]["EvaluationCompleted"];
+        Event: components["schemas"]["EvaluationStarted"] | components["schemas"]["GuidelineEntered"] | components["schemas"]["GuidelineExited"] | components["schemas"]["RecommendationConsidered"] | components["schemas"]["EligibilityEvaluationStarted"] | components["schemas"]["PredicateEvaluated"] | components["schemas"]["CompositeResolved"] | components["schemas"]["EligibilityEvaluationCompleted"] | components["schemas"]["StrategyConsidered"] | components["schemas"]["ActionChecked"] | components["schemas"]["StrategyResolved"] | components["schemas"]["RiskScoreLookup"] | components["schemas"]["ExitConditionTriggered"] | components["schemas"]["RecommendationEmitted"] | components["schemas"]["EvaluationCompleted"] | components["schemas"]["CrossGuidelineMatch"] | components["schemas"]["PreemptionResolved"];
         Recommendation: {
             recommendation_id: string;
+            guideline_id: string;
             /** @enum {string} */
             status: "due" | "up_to_date" | "not_applicable" | "insufficient_evidence";
             evidence_grade: string;
             offered_strategies?: string[];
             satisfying_strategy?: string | null;
             reason: string;
+            /** @description recommendation_id of the winning Rec if this Rec is preempted; null otherwise. Computed from preemption_resolved events in the trace. */
+            preempted_by?: string | null;
+            /**
+             * @description List of active modifiers from cross-guideline MODIFIES edges. Empty if no modifiers. Computed from cross_guideline_match events in the trace.
+             * @default []
+             */
+            modifiers: {
+                source_rec_id: string;
+                source_guideline_id: string;
+                /** @enum {string} */
+                nature: "intensity_reduction" | "dose_adjustment" | "monitoring" | "contraindication_warning";
+                note: string;
+            }[];
         };
         /**
          * EvalTrace
-         * @description v0 (ADR 0013, 0014). Machine-readable pairing of docs/specs/eval-trace.md. The evaluator's primary output.
+         * @description v1 (F21). Machine-readable pairing of docs/specs/eval-trace.md. The evaluator's primary output. Every event carries a guideline_id field; envelope-level events (evaluation_started, evaluation_completed) use null.
          */
         "eval-trace.schema": {
             envelope: components["schemas"]["Envelope"];
             events: components["schemas"]["Event"][];
             /** @default [] */
             recommendations: components["schemas"]["Recommendation"][];
+            /** @description Per-guideline breakdown of recommendations, keyed by guideline_id. Derived from the same trace as the flat recommendations list. */
+            recommendations_by_guideline: {
+                [key: string]: components["schemas"]["Recommendation"][];
+            };
             $defs: {
                 Envelope: {
                     spec_tag: string;
@@ -747,43 +900,56 @@ export interface components {
                     value?: unknown;
                     present: boolean;
                 };
-                Event: components["schemas"]["EvaluationStarted"] | components["schemas"]["GuidelineEntered"] | components["schemas"]["RecommendationConsidered"] | components["schemas"]["EligibilityEvaluationStarted"] | components["schemas"]["PredicateEvaluated"] | components["schemas"]["CompositeResolved"] | components["schemas"]["EligibilityEvaluationCompleted"] | components["schemas"]["StrategyConsidered"] | components["schemas"]["ActionChecked"] | components["schemas"]["StrategyResolved"] | components["schemas"]["RiskScoreLookup"] | components["schemas"]["ExitConditionTriggered"] | components["schemas"]["RecommendationEmitted"] | components["schemas"]["EvaluationCompleted"];
+                Event: components["schemas"]["EvaluationStarted"] | components["schemas"]["GuidelineEntered"] | components["schemas"]["GuidelineExited"] | components["schemas"]["RecommendationConsidered"] | components["schemas"]["EligibilityEvaluationStarted"] | components["schemas"]["PredicateEvaluated"] | components["schemas"]["CompositeResolved"] | components["schemas"]["EligibilityEvaluationCompleted"] | components["schemas"]["StrategyConsidered"] | components["schemas"]["ActionChecked"] | components["schemas"]["StrategyResolved"] | components["schemas"]["RiskScoreLookup"] | components["schemas"]["ExitConditionTriggered"] | components["schemas"]["RecommendationEmitted"] | components["schemas"]["EvaluationCompleted"] | components["schemas"]["CrossGuidelineMatch"] | components["schemas"]["PreemptionResolved"];
                 BaseEvent: {
                     seq: number;
                     type: string;
+                    /** @description The guideline being evaluated when this event was emitted. Null for envelope-level events (evaluation_started, evaluation_completed). */
+                    guideline_id: string | null;
                     /** Format: date-time */
                     at?: string;
                 };
                 EvaluationStarted: {
                     /** @constant */
                     type: "evaluation_started";
+                    /** @constant */
+                    guideline_id: unknown;
                     patient_age_years: number;
                     patient_sex: string;
                     guidelines_in_scope: string[];
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 GuidelineEntered: {
                     /** @constant */
                     type: "guideline_entered";
                     guideline_id: string;
                     guideline_title: string;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
+                GuidelineExited: {
+                    /** @constant */
+                    type: "guideline_exited";
+                    guideline_id: string;
+                    recommendations_emitted: number;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 RecommendationConsidered: {
                     /** @constant */
                     type: "recommendation_considered";
+                    guideline_id: string;
                     recommendation_id: string;
                     recommendation_title: string;
                     evidence_grade: string;
                     intent: string;
                     trigger: string;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 EligibilityEvaluationStarted: {
                     /** @constant */
                     type: "eligibility_evaluation_started";
+                    guideline_id: string;
                     recommendation_id: string;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 PredicateEvaluated: {
                     /** @constant */
                     type: "predicate_evaluated";
+                    guideline_id: string;
                     recommendation_id: string;
                     path: (string | number)[];
                     predicate: string;
@@ -793,35 +959,39 @@ export interface components {
                     /** @enum {string|null} */
                     missing_data_policy_applied?: "require" | "fail_open" | "fail_closed" | null;
                     note?: string | null;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 CompositeResolved: {
                     /** @constant */
                     type: "composite_resolved";
+                    guideline_id: string;
                     recommendation_id: string;
                     path: (string | number)[];
                     /** @enum {string} */
                     operator: "all_of" | "any_of" | "none_of";
                     result: components["schemas"]["TriState"];
                     short_circuited: boolean;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 EligibilityEvaluationCompleted: {
                     /** @constant */
                     type: "eligibility_evaluation_completed";
+                    guideline_id: string;
                     recommendation_id: string;
                     /** @enum {string} */
                     result: "eligible" | "ineligible" | "unknown";
                     final_value: components["schemas"]["TriState"];
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 StrategyConsidered: {
                     /** @constant */
                     type: "strategy_considered";
+                    guideline_id: string;
                     recommendation_id: string;
                     strategy_id: string;
                     strategy_name: string;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 ActionChecked: {
                     /** @constant */
                     type: "action_checked";
+                    guideline_id: string;
                     recommendation_id: string;
                     strategy_id: string;
                     action_node_id: string;
@@ -832,17 +1002,19 @@ export interface components {
                     inputs_read: components["schemas"]["InputRead"][];
                     satisfied: boolean;
                     note?: string | null;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 StrategyResolved: {
                     /** @constant */
                     type: "strategy_resolved";
+                    guideline_id: string;
                     recommendation_id: string;
                     strategy_id: string;
                     satisfied: boolean;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 RiskScoreLookup: {
                     /** @constant */
                     type: "risk_score_lookup";
+                    guideline_id: string;
                     score_name: string;
                     /** @enum {string} */
                     resolution: "supplied" | "computed" | "unavailable";
@@ -852,17 +1024,19 @@ export interface components {
                     computed_value?: number | null;
                     method?: string | null;
                     note?: string | null;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 ExitConditionTriggered: {
                     /** @constant */
                     type: "exit_condition_triggered";
+                    guideline_id: string;
                     recommendation_id: string;
                     exit: string;
                     rationale: string;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 RecommendationEmitted: {
                     /** @constant */
                     type: "recommendation_emitted";
+                    guideline_id: string;
                     recommendation_id: string;
                     /** @enum {string} */
                     status: "due" | "up_to_date" | "not_applicable" | "insufficient_evidence";
@@ -870,21 +1044,62 @@ export interface components {
                     offered_strategies?: string[];
                     satisfying_strategy?: string | null;
                     reason: string;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 EvaluationCompleted: {
                     /** @constant */
                     type: "evaluation_completed";
+                    /** @constant */
+                    guideline_id: unknown;
                     recommendations_emitted: number;
                     duration_ms: number;
-                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type">;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
+                /** @description F26: emitted post-traversal when a MODIFIES edge activates between two emitted Recs. Append-only; does not mutate prior events. Emitted after preemption resolution, before evaluation_completed. */
+                CrossGuidelineMatch: {
+                    /** @constant */
+                    type: "cross_guideline_match";
+                    guideline_id: string | null;
+                    /** @description The modifying Recommendation ID */
+                    source_rec_id: string;
+                    /** @description The modified Recommendation ID */
+                    target_rec_id: string;
+                    /** @enum {string} */
+                    nature: "intensity_reduction" | "dose_adjustment" | "monitoring" | "contraindication_warning";
+                    note: string;
+                    source_guideline_id: string;
+                    target_guideline_id: string;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
+                /** @description F25: emitted post-traversal when a PREEMPTED_BY edge resolves between two emitted Recs. Append-only; does not mutate prior events. */
+                PreemptionResolved: {
+                    /** @constant */
+                    type: "preemption_resolved";
+                    guideline_id: string | null;
+                    preempted_recommendation_id: string;
+                    preempting_recommendation_id: string;
+                    edge_priority: number;
+                    reason: string;
+                } & WithRequired<components["schemas"]["BaseEvent"], "seq" | "type" | "guideline_id">;
                 Recommendation: {
                     recommendation_id: string;
+                    guideline_id: string;
                     /** @enum {string} */
                     status: "due" | "up_to_date" | "not_applicable" | "insufficient_evidence";
                     evidence_grade: string;
                     offered_strategies?: string[];
                     satisfying_strategy?: string | null;
                     reason: string;
+                    /** @description recommendation_id of the winning Rec if this Rec is preempted; null otherwise. Computed from preemption_resolved events in the trace. */
+                    preempted_by?: string | null;
+                    /**
+                     * @description List of active modifiers from cross-guideline MODIFIES edges. Empty if no modifiers. Computed from cross_guideline_match events in the trace.
+                     * @default []
+                     */
+                    modifiers: {
+                        source_rec_id: string;
+                        source_guideline_id: string;
+                        /** @enum {string} */
+                        nature: "intensity_reduction" | "dose_adjustment" | "monitoring" | "contraindication_warning";
+                        note: string;
+                    }[];
                 };
             };
         };

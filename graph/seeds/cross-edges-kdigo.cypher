@@ -10,7 +10,7 @@
 // Preemption takes precedence: if the target Rec is preempted, its modifiers
 // are not emitted (ADR 0019).
 //
-// Seven edges covering three clinical scenarios:
+// Six edges covering six clinical scenarios:
 //
 //   1. CKD + ACC/AHA secondary prevention: KDIGO statin-for-CKD modifies
 //      ACC/AHA high-intensity statin to moderate-intensity. Patient has

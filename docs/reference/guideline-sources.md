@@ -55,6 +55,26 @@ Running log of guidelines modeled into the graph. Append-only; supersession is t
   - Adults >75, ezetimibe, PCSK9 inhibitors, non-statin lipid therapies deferred to v2.
   - See `docs/reference/guidelines/cholesterol.md` for concrete nodes, edges, and code mappings.
 
+#### `kdigo-ckd-2024`
+
+- **Publisher:** Kidney Disease: Improving Global Outcomes (KDIGO)
+- **Title:** KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease
+- **Version / effective date:** 2024 / 2024-03-14
+- **URL:** https://doi.org/10.1016/j.kint.2023.10.018
+- **Ingestion date:** 2026-04-17 (hand-authored)
+- **Reviewer:** TBD
+- **Notes:**
+  - Scope: four CKD management decision points. Not the full guideline.
+  - Decision points modeled: (1) CKD monitoring (eGFR + ACR), (2) SGLT2 inhibitor for CKD with T2DM or significant albuminuria, (3) statin for CKD age ≥50 not on dialysis, (4) ACEi/ARB for albuminuric CKD.
+  - Evidence grades use the GRADE system (e.g., "1A" = strong recommendation, high evidence).
+  - CKD staging modeled as derived predicates over eGFR and ACR observations, not as synthesized Condition nodes.
+  - eGFR < 20 contraindication for SGLT2 initiation encoded in eligibility predicate.
+  - Statin-for-CKD Rec is the primary modifier anchor for F26 (KDIGO recommends moderate-intensity in CKD G3-G5).
+  - New shared entities: eGFR observation, urine ACR observation, CKD condition, SGLT2 inhibitors (empagliflozin, dapagliflozin), ACEi (lisinopril, enalapril, ramipril), ARBs (losartan, valsartan, irbesartan).
+  - No cross-guideline edges to USPSTF or ACC/AHA in this feature; those land in F26.
+  - Dialysis-specific, transplant, pediatric, AKI, and CKD-MBD recommendations deferred to v2.
+  - See `docs/reference/guidelines/kdigo-ckd.md` for concrete nodes, edges, and code mappings.
+
 ### Archived
 
 - `uspstf-crc-2021`, `acp-crc-2019` — see `docs/archive/` for notes. Superseded by ADR 0013.

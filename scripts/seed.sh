@@ -8,6 +8,8 @@
 #   1. constraints.cypher     — uniqueness constraints (idempotent)
 #   2. clinical-entities.cypher — canonical shared entity registry (MERGE by id)
 #   3. statins.cypher          — guideline-scoped nodes + edges (MERGE entities, CREATE Rec/Strategy)
+#   4. cholesterol.cypher      — ACC/AHA 2018 subgraph
+#   5. kdigo-ckd.cypher        — KDIGO 2024 CKD subgraph
 #
 # Expected environment:
 #   NEO4J_URI       bolt://neo4j:7687
@@ -28,14 +30,17 @@ cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seed
 echo "==> Applying cholesterol seed..."
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/cholesterol.cypher
 
+echo "==> Applying KDIGO CKD seed..."
+cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/kdigo-ckd.cypher
+
 echo "==> Verifying node count..."
 NODE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH (n) RETURN count(n) AS c" | tail -1 | tr -d '[:space:]')
 
-# 23 (statins) + 7 new ACC/AHA nodes (1 Guideline + 4 Recs + 2 Strategies) = 30
-echo "    Node count: $NODE_COUNT (expected 30)"
-if [ "$NODE_COUNT" -ne 30 ]; then
-  echo "ERROR: Expected 30 nodes, got $NODE_COUNT"
+# 30 (statins+ACC/AHA) + 11 KDIGO entities + 9 KDIGO guideline-scoped = 50
+echo "    Node count: $NODE_COUNT (expected 50)"
+if [ "$NODE_COUNT" -ne 50 ]; then
+  echo "ERROR: Expected 50 nodes, got $NODE_COUNT"
   exit 1
 fi
 
@@ -43,11 +48,11 @@ echo "==> Verifying edge count..."
 EDGE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH ()-[r]->() RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
-# 14 (statins) + 19 new ACC/AHA edges = 33
-# FROM_GUIDELINE: 4, OFFERS_STRATEGY: 6, INCLUDES_ACTION: 9 (2 high + 7 moderate) = 19
-echo "    Edge count: $EDGE_COUNT (expected 33)"
-if [ "$EDGE_COUNT" -ne 33 ]; then
-  echo "ERROR: Expected 33 edges, got $EDGE_COUNT"
+# 33 (statins+ACC/AHA) + 29 KDIGO = 62
+# KDIGO: FROM_GUIDELINE 4 + OFFERS_STRATEGY 4 + INCLUDES_ACTION 17 + FOR_CONDITION 4 = 29
+echo "    Edge count: $EDGE_COUNT (expected 62)"
+if [ "$EDGE_COUNT" -ne 62 ]; then
+  echo "ERROR: Expected 62 edges, got $EDGE_COUNT"
   exit 1
 fi
 
@@ -63,7 +68,7 @@ fi
 
 echo "==> Verifying domain labels..."
 UNLABELED_RECS=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
-  --format plain "MATCH (r:Recommendation) WHERE NOT r:USPSTF AND NOT r:ACC_AHA RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
+  --format plain "MATCH (r:Recommendation) WHERE NOT r:USPSTF AND NOT r:ACC_AHA AND NOT r:KDIGO RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
 echo "    Unlabeled Recommendations: $UNLABELED_RECS (expected 0)"
 if [ "$UNLABELED_RECS" -ne 0 ]; then
@@ -91,6 +96,26 @@ if [ "$ACCAHA_GUIDELINE" -ne 1 ]; then
   exit 1
 fi
 
+echo "==> Verifying KDIGO Recommendation count..."
+KDIGO_RECS=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
+  --format plain "MATCH (r:Recommendation:KDIGO) RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
+
+echo "    KDIGO Recommendations: $KDIGO_RECS (expected 4)"
+if [ "$KDIGO_RECS" -ne 4 ]; then
+  echo "ERROR: Expected 4 KDIGO Recommendation nodes, got $KDIGO_RECS"
+  exit 1
+fi
+
+echo "==> Verifying KDIGO Guideline node..."
+KDIGO_GUIDELINE=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
+  --format plain "MATCH (g:Guideline {id: 'guideline:kdigo-ckd-2024'}) RETURN count(g) AS c" | tail -1 | tr -d '[:space:]')
+
+echo "    KDIGO Guideline: $KDIGO_GUIDELINE (expected 1)"
+if [ "$KDIGO_GUIDELINE" -ne 1 ]; then
+  echo "ERROR: Expected 1 KDIGO Guideline node, got $KDIGO_GUIDELINE"
+  exit 1
+fi
+
 echo "==> Verifying no orphan medications..."
 ORPHAN_MEDS=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH (m:Medication) WHERE NOT (m)<-[:INCLUDES_ACTION|TARGETS]-() RETURN count(m) AS c" | tail -1 | tr -d '[:space:]')
@@ -101,4 +126,4 @@ if [ "$ORPHAN_MEDS" -ne 0 ]; then
   exit 1
 fi
 
-echo "==> Seed complete. 30 nodes, 33 edges. All checks passed."
+echo "==> Seed complete. 50 nodes, 62 edges. All checks passed."

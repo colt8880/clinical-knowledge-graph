@@ -1,0 +1,61 @@
+{
+  "description": "71M with CKD 4 (eGFR 22), albuminuria A2 (ACR 85), T2DM, HTN. All four KDIGO Recs fire: monitoring (R1), SGLT2 via diabetes path (R2, eGFR 22 ≥20), statin (R3, eGFR 22 ≥15), ACEi/ARB (R4, ACR 85 ≥30).",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "status": "due",
+      "evidence_grade": "1B",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd",
+      "status": "due",
+      "evidence_grade": "1A",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "status": "due",
+      "evidence_grade": "1A",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+      "status": "due",
+      "evidence_grade": "1B",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "guideline_entered",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "status": "due"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd",
+      "status": "due"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "status": "due"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+      "status": "due"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "exit_condition_triggered",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    }
+  ]
+}

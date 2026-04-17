@@ -7,7 +7,7 @@
 
 ## Context
 
-Once preemption (F25) and modifier (F26) edges exist and the evaluator emits their events, the Eval tab needs to render the semantics. A preempted Rec is rendered dimmed with a visible `PREEMPTED_BY` arrow to its winner. Modifier edges render as annotations attached to the target Rec. The trace stepper shows `PREEMPTION_RESOLVED` and `CROSS_GUIDELINE_MATCH` events inline so users can step through the reasoning.
+Once preemption (F25) and modifier (F26) edges exist and the evaluator emits their events, the Eval tab needs to render the semantics. A preempted Rec is rendered dimmed with a visible `PREEMPTED_BY` arrow to its winner. Modifier edges render as annotations attached to the target Rec. The trace stepper shows `preemption_resolved` and `cross_guideline_match` events inline so users can step through the reasoning.
 
 ## Required reading
 
@@ -21,7 +21,7 @@ Once preemption (F25) and modifier (F26) edges exist and the evaluator emits the
 ## Scope
 
 - `ui/components/Eval/GraphCanvas.tsx` (or equivalent) — add rendering modes for preempted nodes and modifier annotations.
-- `ui/components/Eval/TraceStepper.tsx` — render `PREEMPTION_RESOLVED` and `CROSS_GUIDELINE_MATCH` events with distinct visual treatment.
+- `ui/components/Eval/TraceStepper.tsx` — render `preemption_resolved` and `cross_guideline_match` events with distinct visual treatment.
 - `ui/components/Eval/PreemptionArrow.tsx` — new; renders a thick arrow from preempted Rec to winner with edge priority label.
 - `ui/components/Eval/ModifierBadge.tsx` — new; small icon/badge attached to a Rec indicating "modified by [source guideline]" with tooltip showing `nature` and `note`.
 - `ui/pages/eval.tsx` — wire new components.
@@ -36,7 +36,7 @@ Once preemption (F25) and modifier (F26) edges exist and the evaluator emits the
 - **Preempted Rec visual:** node opacity 0.4 (tunable via `ui.md`); outline stroke-dashed; label suffix `(preempted)`.
 - **Preemption arrow:** thicker than normal edges; distinct color (recommend desaturated red or neutral gray); arrowhead points from preempted to winner; hover reveals priority values and `reason` from the event.
 - **Modifier badge:** small icon next to Rec label; hover reveals the modifier's `nature`, `note`, and source guideline. If a Rec has multiple modifiers, badge shows a count.
-- **Trace stepper event styling:** `PREEMPTION_RESOLVED` events render with a strikethrough-style icon; clicking navigates the canvas to highlight both preempted and winner nodes. `CROSS_GUIDELINE_MATCH` events render with a link icon; clicking highlights target Rec and pulses the modifier badge.
+- **Trace stepper event styling:** `preemption_resolved` events render with a strikethrough-style icon; clicking navigates the canvas to highlight both preempted and winner nodes. `cross_guideline_match` events render with a link icon; clicking highlights target Rec and pulses the modifier badge.
 - **Stepper playback:** existing behavior preserved. New event types are regular stoppable steps.
 - **No change to trace event semantics.** UI consumes what F21/F25/F26 emit; UI does not reinterpret.
 - **Domain filter interaction:** if the domain filter (F28) hides the source of a preemption or modifier edge, the UI hides the edge too and marks the target node with a small indicator "hidden by filter" so users understand why a Rec shows no preemption when one exists in the graph.
@@ -65,7 +65,7 @@ Once preemption (F25) and modifier (F26) edges exist and the evaluator emits the
 - Animation of the trace stepper beyond existing behavior.
 - Customizable visual theming. Colors picked in this feature are baseline; no settings UI.
 - Editing preemption/modifier edges from the UI. Read-only rendering.
-- Visualization of `MODIFIER_SUPPRESSED` sub-field from F26. The trace stepper shows it as plain text in the event details; no custom treatment in v1.
+- Visualization of `modifier_suppressed` sub-field from F26. The trace stepper shows it as plain text in the event details; no custom treatment in v1.
 - Rec list rendering (F30) — separate feature.
 
 ## Design notes (not blocking, worth review)

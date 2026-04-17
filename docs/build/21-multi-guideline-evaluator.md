@@ -33,10 +33,10 @@ Today the evaluator traverses a single guideline. v1 requires it to walk the ful
 
 - **Deterministic traversal order:** guidelines visited in ascending lexical order of `guideline_id`. Document this in `docs/specs/eval-trace.md` so it's contract, not implementation detail.
 - **New event types added:**
-  - `GUIDELINE_ENTERED` — emitted at the start of each guideline's traversal. Carries `guideline_id`, `version`.
-  - `GUIDELINE_EXITED` — emitted at end.
-  - `CROSS_GUIDELINE_MATCH` — placeholder type for F25/F26; schema reserves it but evaluator does not emit in this feature.
-  - `PREEMPTION_RESOLVED` — same; reserved for F25.
+  - `guideline_entered` — emitted at the start of each guideline's traversal. Carries `guideline_id`, `version`.
+  - `guideline_exited` — emitted at end.
+  - `cross_guideline_match` — placeholder type for F25/F26; schema reserves it but evaluator does not emit in this feature.
+  - `preemption_resolved` — same; reserved for F25.
 - **`guideline_id` required on every event.** For existing single-guideline event types, the field is set from the enclosing guideline context.
 - **Determinism invariant:** re-running any fixture produces a byte-identical trace. This holds today for single-guideline and must hold after the refactor for single-guideline fixtures. Multi-guideline determinism is tested with a synthetic two-guideline fixture in this feature since ACC/AHA content doesn't land until F23.
 - **Backwards compat on trace shape:** the `guideline_id` field is additive. Consumers that ignore unknown fields still parse v0-style traces. v0 fixtures must have their `expected-trace.json` golden files updated in this feature to include `guideline_id` (mechanical update, not a semantic change).
@@ -48,7 +48,7 @@ Today the evaluator traverses a single guideline. v1 requires it to walk the ful
 
 - `cd api && uv run pytest api/tests/test_evaluator_multi_guideline.py` — exits 0.
 - All 5 v0 statin fixtures produce traces where every event carries `guideline_id = "uspstf-statin-primary-prevention-2022"`.
-- Running an evaluator against a synthetic two-guideline graph emits `GUIDELINE_ENTERED` events in lexical guideline-id order.
+- Running an evaluator against a synthetic two-guideline graph emits `guideline_entered` events in lexical guideline-id order.
 - `docs/contracts/eval-trace.schema.json` validates against all 5 updated v0 goldens.
 - Re-running any fixture twice produces byte-identical trace output (checked in test).
 

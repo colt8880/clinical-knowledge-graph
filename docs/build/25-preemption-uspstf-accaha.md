@@ -19,7 +19,7 @@ Preemption scenarios this feature handles:
 
 - `docs/build/v1-spec.md` — preemption described in the macro spec; this feature implements it.
 - `docs/specs/schema.md` — `PREEMPTED_BY` edge definition; amend to include `priority` property.
-- `docs/specs/eval-trace.md` — `PREEMPTION_RESOLVED` event schema reserved in F21; implement in this feature.
+- `docs/specs/eval-trace.md` — `preemption_resolved` event schema reserved in F21; implement in this feature.
 - `docs/build/21-multi-guideline-evaluator.md` — structural foundation.
 - `docs/reference/guidelines/statins.md` and `docs/reference/guidelines/cholesterol.md` — the two guideline references.
 - **`docs/decisions/0018-preemption-precedence.md`** — NEW ADR authored alongside this feature. Documents the priority-integer-plus-published-at approach and the default priority assignments per guideline. MUST be merged before this feature's PR opens.
@@ -32,7 +32,7 @@ Preemption scenarios this feature handles:
 - `docs/specs/schema.md` — document the `priority` property and the precedence rule.
 - `docs/contracts/` — update schema contract for the edge.
 - `api/app/evaluator/preemption.py` — new module; resolves preemption on the trace.
-- `api/app/evaluator/trace.py` — emit `PREEMPTION_RESOLVED` events; mark preempted Recs with `preempted: true` on the corresponding `REC_MATCHED` event.
+- `api/app/evaluator/trace.py` — add `preemption_resolved(preempted_rec_id, winning_rec_id, edge_priority, reason)` method on `TraceBuilder`. Append-only; does not mutate prior events.
 - `api/tests/test_preemption.py` — unit tests for precedence resolution with priority ties, published_at tiebreaks, transitive preemption (disallowed; must raise or log).
 - `evals/fixtures/cross-domain/case-01/` — clinical ASCVD patient; USPSTF Recs preempted by ACC/AHA secondary prevention.
 - `evals/fixtures/cross-domain/case-02/` — primary prevention patient with LDL 165, ASCVD risk 8.5%; both USPSTF and ACC/AHA apply; tests threshold overlap.
@@ -48,7 +48,8 @@ Preemption scenarios this feature handles:
   - No transitive preemption. If A preempts B and B preempts C, A does not automatically preempt C. Authors must explicitly add the A → C edge if intended. Evaluator raises on detected transitive chains.
 - **Default priorities:** USPSTF = 100, ACC/AHA = 200. Specialty society overrides federal task force within the specialty's domain. Documented in ADR.
 - **`PREEMPTED_BY` direction:** edge points FROM the preempted Rec TO the winning Rec. `(loser:Recommendation)-[:PREEMPTED_BY {priority: 200}]->(winner:Recommendation)`. Preemption only activates if the winning Rec also matches the patient; an unmatched winner does not preempt.
-- **Trace emission:** when preemption fires, evaluator emits `PREEMPTION_RESOLVED` after the corresponding `REC_MATCHED` events, with payload `{preempted_rec_id, winning_rec_id, edge_priority, reason}`. The preempted Rec's `REC_MATCHED` event also gets `preempted: true`.
+- **Trace emission (append-only, post-traversal):** preemption resolution runs as a post-traversal step after the guideline loop in `evaluate()` completes, before `flat_recommendations` / `recommendations_by_guideline` are derived. For each firing preemption, the evaluator appends a `preemption_resolved` event to `trace.events` (continuing the monotonic `seq`) with payload `{preempted_rec_id, winning_rec_id, edge_priority, reason}`. F21 established an append-only convention; prior `recommendation_emitted` events are NOT mutated.
+- **Derivation enhancement:** `flat_recommendations` and `recommendations_by_guideline` derivations in `evaluate()` include a `preempted_by` field per Rec (null if not preempted, `winning_rec_id` string if preempted). The field is computed by scanning the newly-appended `preemption_resolved` events during derivation. Gives consumers ergonomic access to preemption state without requiring trace-event traversal.
 - **Preempted Recs stay in the trace.** They are not removed. Consumers (UI, harness) can filter. This keeps the trace auditable.
 - **Determinism preserved:** adding `PREEMPTED_BY` edges must not change trace order for fixtures that don't trigger preemption. Regression against v0 statin fixtures and F23 standalone cholesterol fixtures is required.
 - **Cross-edges live in their own seed file.** Not in `statins.cypher` or `cholesterol.cypher`. This keeps each guideline authored in isolation; cross-edges are reviewable as a unit.
@@ -61,7 +62,7 @@ Preemption scenarios this feature handles:
 - `MATCH ()-[r:PREEMPTED_BY]->() RETURN count(r)` returns the expected count (documented in `preemption-map.md`).
 - v0 statin fixtures: unchanged traces (no preemption fires because no ACC/AHA Recs match).
 - F23 cholesterol fixtures: unchanged traces (no preemption from the other direction since USPSTF Recs also don't match these patient profiles).
-- Cross-domain fixtures: `PREEMPTION_RESOLVED` events present and correct.
+- Cross-domain fixtures: `preemption_resolved` events present and correct.
 - Transitive preemption test: constructed graph with A → B → C triggers evaluator error/warning.
 - `cd evals && uv run python -m harness.runner --fixture cross-domain/case-01 --arm c` runs clean and scores ≥ 4.0 on completeness and integration.
 

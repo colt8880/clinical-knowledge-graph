@@ -1,1 +1,2190 @@
-{"envelope":{"spec_tag":"v0.1.0","graph_version":"2022-08-23","evaluator_version":"0.1.0","evaluation_time":"2026-04-15T10:00:00Z","patient_fingerprint":"a72696b08f11a6c612deb21f24968a99f83f0d3e5633a0f1d31fa0debb0204c8","started_at":"2026-04-17T16:00:15.213382Z","completed_at":"2026-04-17T16:00:15.213889Z"},"events":[{"seq":1,"type":"evaluation_started","guideline_id":null,"patient_age_years":55,"patient_sex":"male","guidelines_in_scope":["guideline:acc-aha-cholesterol-2018","guideline:uspstf-statin-2022"]},{"seq":2,"type":"guideline_entered","guideline_id":"guideline:acc-aha-cholesterol-2018","guideline_title":"2018 AHA/ACC Guideline on the Management of Blood Cholesterol"},{"seq":3,"type":"recommendation_considered","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-diabetes","recommendation_title":"Moderate-intensity statin for diabetes mellitus, age 40-75","evidence_grade":"COR I, LOE A","intent":"primary_prevention","trigger":"patient_state"},{"seq":4,"type":"eligibility_evaluation_started","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-diabetes"},{"seq":5,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-diabetes","path":["all_of",0],"predicate":"age_between","args":{"min":40,"max":75},"inputs_read":[{"source":"patient.demographics","locator":"patient.date_of_birth","value":"1970-08-12","present":true},{"source":"derived","locator":"evaluation_time","value":"2026-04-15T10:00:00Z","present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":6,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-diabetes","path":["all_of",1],"predicate":"has_active_condition","args":{"codes":["cond:diabetes"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":7,"type":"composite_resolved","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-diabetes","path":["all_of"],"operator":"all_of","result":"false","short_circuited":true},{"seq":8,"type":"eligibility_evaluation_completed","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-diabetes","result":"ineligible","final_value":"false"},{"seq":9,"type":"recommendation_considered","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","recommendation_title":"Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk ≥7.5%)","evidence_grade":"COR I, LOE A","intent":"primary_prevention","trigger":"patient_state"},{"seq":10,"type":"eligibility_evaluation_started","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention"},{"seq":11,"type":"risk_score_lookup","guideline_id":"guideline:acc-aha-cholesterol-2018","score_name":"ascvd_10yr","resolution":"supplied","supplied_value":18.2,"supplied_computed_date":"2026-03-02","inputs_read":[],"computed_value":null,"method":"pooled_cohort_equations_2013_goff","note":null},{"seq":12,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of",0],"predicate":"age_between","args":{"min":40,"max":75},"inputs_read":[{"source":"patient.demographics","locator":"patient.date_of_birth","value":"1970-08-12","present":true},{"source":"derived","locator":"evaluation_time","value":"2026-04-15T10:00:00Z","present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":13,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of",1,"none_of",0],"predicate":"has_active_condition","args":{"codes":["cond:ascvd-established"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":14,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of",1,"none_of",1],"predicate":"most_recent_observation_value","args":{"code":"obs:ldl-cholesterol","window":"P2Y","comparator":"gte","threshold":190,"unit":"mg/dL"},"inputs_read":[{"source":"patient.observations","locator":"observations[code=obs:ldl-cholesterol]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":15,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of",1,"none_of",2],"predicate":"has_active_condition","args":{"codes":["cond:diabetes"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":16,"type":"composite_resolved","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of",1,"none_of"],"operator":"none_of","result":"true","short_circuited":false},{"seq":17,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of",2],"predicate":"most_recent_observation_value","args":{"code":"obs:ldl-cholesterol","window":"P2Y","comparator":"gte","threshold":70,"unit":"mg/dL"},"inputs_read":[{"source":"patient.observations","locator":"observations[code=obs:ldl-cholesterol]","value":null,"present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":18,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of",3],"predicate":"most_recent_observation_value","args":{"code":"obs:ldl-cholesterol","window":"P2Y","comparator":"lte","threshold":189,"unit":"mg/dL"},"inputs_read":[{"source":"patient.observations","locator":"observations[code=obs:ldl-cholesterol]","value":null,"present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":19,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of",4],"predicate":"risk_score_compares","args":{"name":"ascvd_10yr","comparator":"gte","threshold":7.5},"inputs_read":[{"source":"patient.risk_scores","locator":"risk_scores.ascvd_10yr","value":18.2,"present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":20,"type":"composite_resolved","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","path":["all_of"],"operator":"all_of","result":"true","short_circuited":false},{"seq":21,"type":"eligibility_evaluation_completed","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","result":"eligible","final_value":"true"},{"seq":22,"type":"strategy_considered","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-high-intensity","strategy_name":"High-intensity statin therapy"},{"seq":23,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-high-intensity","action_node_id":"med:atorvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:atorvastatin"},{"seq":24,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-high-intensity","action_node_id":"med:rosuvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:rosuvastatin"},{"seq":25,"type":"strategy_resolved","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-high-intensity","satisfied":false},{"seq":26,"type":"strategy_considered","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","strategy_name":"Moderate-intensity statin therapy"},{"seq":27,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","action_node_id":"med:atorvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:atorvastatin"},{"seq":28,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","action_node_id":"med:fluvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:fluvastatin"},{"seq":29,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","action_node_id":"med:lovastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:lovastatin"},{"seq":30,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","action_node_id":"med:pitavastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:pitavastatin"},{"seq":31,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","action_node_id":"med:pravastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:pravastatin"},{"seq":32,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","action_node_id":"med:rosuvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:rosuvastatin"},{"seq":33,"type":"action_checked","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","action_node_id":"med:simvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:simvastatin"},{"seq":34,"type":"strategy_resolved","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","strategy_id":"strategy:accaha-statin-moderate-intensity","satisfied":false},{"seq":35,"type":"recommendation_emitted","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-primary-prevention","status":"due","evidence_grade":"COR I, LOE A","reason":"Patient is eligible per COR I, LOE A-grade evidence; no offered strategy is currently satisfied.","offered_strategies":["strategy:accaha-statin-high-intensity","strategy:accaha-statin-moderate-intensity"]},{"seq":36,"type":"recommendation_considered","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-secondary-prevention","recommendation_title":"High-intensity statin for secondary prevention in clinical ASCVD (age ≤75)","evidence_grade":"COR I, LOE A","intent":"treatment","trigger":"patient_state"},{"seq":37,"type":"eligibility_evaluation_started","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-secondary-prevention"},{"seq":38,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-secondary-prevention","path":["all_of",0],"predicate":"has_active_condition","args":{"codes":["cond:ascvd-established"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":39,"type":"composite_resolved","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-secondary-prevention","path":["all_of"],"operator":"all_of","result":"false","short_circuited":true},{"seq":40,"type":"eligibility_evaluation_completed","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-secondary-prevention","result":"ineligible","final_value":"false"},{"seq":41,"type":"recommendation_considered","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-severe-hypercholesterolemia","recommendation_title":"High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75)","evidence_grade":"COR I, LOE B-NR","intent":"treatment","trigger":"patient_state"},{"seq":42,"type":"eligibility_evaluation_started","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-severe-hypercholesterolemia"},{"seq":43,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-severe-hypercholesterolemia","path":["all_of",0],"predicate":"age_between","args":{"min":20,"max":75},"inputs_read":[{"source":"patient.demographics","locator":"patient.date_of_birth","value":"1970-08-12","present":true},{"source":"derived","locator":"evaluation_time","value":"2026-04-15T10:00:00Z","present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":44,"type":"predicate_evaluated","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-severe-hypercholesterolemia","path":["all_of",1],"predicate":"most_recent_observation_value","args":{"code":"obs:ldl-cholesterol","window":"P2Y","comparator":"gte","threshold":190,"unit":"mg/dL"},"inputs_read":[{"source":"patient.observations","locator":"observations[code=obs:ldl-cholesterol]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":45,"type":"composite_resolved","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-severe-hypercholesterolemia","path":["all_of"],"operator":"all_of","result":"false","short_circuited":true},{"seq":46,"type":"eligibility_evaluation_completed","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendation_id":"rec:accaha-statin-severe-hypercholesterolemia","result":"ineligible","final_value":"false"},{"seq":47,"type":"guideline_exited","guideline_id":"guideline:acc-aha-cholesterol-2018","recommendations_emitted":1},{"seq":48,"type":"guideline_entered","guideline_id":"guideline:uspstf-statin-2022","guideline_title":"Statin Use for the Primary Prevention of Cardiovascular Disease in Adults: Preventive Medication"},{"seq":49,"type":"recommendation_considered","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","recommendation_title":"Initiate statin for primary prevention of CVD (Grade B)","evidence_grade":"B","intent":"primary_prevention","trigger":"patient_state"},{"seq":50,"type":"eligibility_evaluation_started","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b"},{"seq":51,"type":"risk_score_lookup","guideline_id":"guideline:uspstf-statin-2022","score_name":"ascvd_10yr","resolution":"supplied","supplied_value":18.2,"supplied_computed_date":"2026-03-02","inputs_read":[],"computed_value":null,"method":"pooled_cohort_equations_2013_goff","note":null},{"seq":52,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",0],"predicate":"age_between","args":{"min":40,"max":75},"inputs_read":[{"source":"patient.demographics","locator":"patient.date_of_birth","value":"1970-08-12","present":true},{"source":"derived","locator":"evaluation_time","value":"2026-04-15T10:00:00Z","present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":53,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",1,"none_of",0],"predicate":"has_condition_history","args":{"codes":["cond:ascvd-established"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":54,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",1,"none_of",1],"predicate":"most_recent_observation_value","args":{"code":"obs:ldl-cholesterol","window":"P2Y","comparator":"gte","threshold":190,"unit":"mg/dL"},"inputs_read":[{"source":"patient.observations","locator":"observations[code=obs:ldl-cholesterol]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":55,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",1,"none_of",2],"predicate":"has_condition_history","args":{"codes":["cond:familial-hypercholesterolemia"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":56,"type":"composite_resolved","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",1,"none_of"],"operator":"none_of","result":"true","short_circuited":false},{"seq":57,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",2,"any_of",0],"predicate":"has_active_condition","args":{"codes":["cond:dyslipidemia"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":58,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",2,"any_of",1],"predicate":"has_active_condition","args":{"codes":["cond:diabetes"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":59,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",2,"any_of",2],"predicate":"has_active_condition","args":{"codes":["cond:hypertension"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":60,"type":"composite_resolved","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",2,"any_of"],"operator":"any_of","result":"true","short_circuited":true},{"seq":61,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of",3],"predicate":"risk_score_compares","args":{"name":"ascvd_10yr","comparator":"gte","threshold":10},"inputs_read":[{"source":"patient.risk_scores","locator":"risk_scores.ascvd_10yr","value":18.2,"present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":62,"type":"composite_resolved","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","path":["all_of"],"operator":"all_of","result":"true","short_circuited":false},{"seq":63,"type":"eligibility_evaluation_completed","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","result":"eligible","final_value":"true"},{"seq":64,"type":"strategy_considered","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","strategy_name":"Moderate-intensity statin therapy"},{"seq":65,"type":"action_checked","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","action_node_id":"med:atorvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:atorvastatin"},{"seq":66,"type":"action_checked","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","action_node_id":"med:fluvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:fluvastatin"},{"seq":67,"type":"action_checked","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","action_node_id":"med:lovastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:lovastatin"},{"seq":68,"type":"action_checked","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","action_node_id":"med:pitavastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:pitavastatin"},{"seq":69,"type":"action_checked","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","action_node_id":"med:pravastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:pravastatin"},{"seq":70,"type":"action_checked","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","action_node_id":"med:rosuvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:rosuvastatin"},{"seq":71,"type":"action_checked","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","action_node_id":"med:simvastatin","action_entity_type":"Medication","cadence":null,"lookback":null,"inputs_read":[{"source":"patient.medications","locator":"medications[]","value":null,"present":false}],"satisfied":false,"note":"No active medication matching med:simvastatin"},{"seq":72,"type":"strategy_resolved","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","strategy_id":"strategy:statin-moderate-intensity","satisfied":false},{"seq":73,"type":"recommendation_emitted","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-initiate-grade-b","status":"due","evidence_grade":"B","reason":"Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.","offered_strategies":["strategy:statin-moderate-intensity"]},{"seq":74,"type":"recommendation_considered","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-insufficient-evidence-grade-i","recommendation_title":"Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)","evidence_grade":"I","intent":"primary_prevention","trigger":"patient_state"},{"seq":75,"type":"eligibility_evaluation_started","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-insufficient-evidence-grade-i"},{"seq":76,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-insufficient-evidence-grade-i","path":["all_of",0],"predicate":"age_greater_than_or_equal","args":{"value":76},"inputs_read":[{"source":"patient.demographics","locator":"patient.date_of_birth","value":"1970-08-12","present":true},{"source":"derived","locator":"evaluation_time","value":"2026-04-15T10:00:00Z","present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":77,"type":"composite_resolved","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-insufficient-evidence-grade-i","path":["all_of"],"operator":"all_of","result":"false","short_circuited":true},{"seq":78,"type":"eligibility_evaluation_completed","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-insufficient-evidence-grade-i","result":"ineligible","final_value":"false"},{"seq":79,"type":"recommendation_considered","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","recommendation_title":"Selectively offer statin based on shared decision-making (Grade C)","evidence_grade":"C","intent":"shared_decision","trigger":"patient_state"},{"seq":80,"type":"eligibility_evaluation_started","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c"},{"seq":81,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",0],"predicate":"age_between","args":{"min":40,"max":75},"inputs_read":[{"source":"patient.demographics","locator":"patient.date_of_birth","value":"1970-08-12","present":true},{"source":"derived","locator":"evaluation_time","value":"2026-04-15T10:00:00Z","present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":82,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",1,"none_of",0],"predicate":"has_condition_history","args":{"codes":["cond:ascvd-established"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":83,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",1,"none_of",1],"predicate":"most_recent_observation_value","args":{"code":"obs:ldl-cholesterol","window":"P2Y","comparator":"gte","threshold":190,"unit":"mg/dL"},"inputs_read":[{"source":"patient.observations","locator":"observations[code=obs:ldl-cholesterol]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":84,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",1,"none_of",2],"predicate":"has_condition_history","args":{"codes":["cond:familial-hypercholesterolemia"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":85,"type":"composite_resolved","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",1,"none_of"],"operator":"none_of","result":"true","short_circuited":false},{"seq":86,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",2,"any_of",0],"predicate":"has_active_condition","args":{"codes":["cond:dyslipidemia"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":87,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",2,"any_of",1],"predicate":"has_active_condition","args":{"codes":["cond:diabetes"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":88,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",2,"any_of",2],"predicate":"has_active_condition","args":{"codes":["cond:hypertension"]},"inputs_read":[{"source":"patient.conditions","locator":"conditions[]","value":null,"present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":89,"type":"composite_resolved","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",2,"any_of"],"operator":"any_of","result":"true","short_circuited":true},{"seq":90,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",3],"predicate":"risk_score_compares","args":{"name":"ascvd_10yr","comparator":"gte","threshold":7.5},"inputs_read":[{"source":"patient.risk_scores","locator":"risk_scores.ascvd_10yr","value":18.2,"present":true}],"result":"true","missing_data_policy_applied":null,"note":null},{"seq":91,"type":"predicate_evaluated","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of",4],"predicate":"risk_score_compares","args":{"name":"ascvd_10yr","comparator":"lt","threshold":10},"inputs_read":[{"source":"patient.risk_scores","locator":"risk_scores.ascvd_10yr","value":18.2,"present":true}],"result":"false","missing_data_policy_applied":null,"note":null},{"seq":92,"type":"composite_resolved","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","path":["all_of"],"operator":"all_of","result":"false","short_circuited":false},{"seq":93,"type":"eligibility_evaluation_completed","guideline_id":"guideline:uspstf-statin-2022","recommendation_id":"rec:statin-selective-grade-c","result":"ineligible","final_value":"false"},{"seq":94,"type":"guideline_exited","guideline_id":"guideline:uspstf-statin-2022","recommendations_emitted":1},{"seq":95,"type":"evaluation_completed","guideline_id":null,"recommendations_emitted":2,"duration_ms":0}],"recommendations":[{"recommendation_id":"rec:accaha-statin-primary-prevention","guideline_id":"guideline:acc-aha-cholesterol-2018","status":"due","evidence_grade":"COR I, LOE A","reason":"Patient is eligible per COR I, LOE A-grade evidence; no offered strategy is currently satisfied.","offered_strategies":["strategy:accaha-statin-high-intensity","strategy:accaha-statin-moderate-intensity"]},{"recommendation_id":"rec:statin-initiate-grade-b","guideline_id":"guideline:uspstf-statin-2022","status":"due","evidence_grade":"B","reason":"Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.","offered_strategies":["strategy:statin-moderate-intensity"]}],"recommendations_by_guideline":{"guideline:acc-aha-cholesterol-2018":[{"recommendation_id":"rec:accaha-statin-primary-prevention","guideline_id":"guideline:acc-aha-cholesterol-2018","status":"due","evidence_grade":"COR I, LOE A","reason":"Patient is eligible per COR I, LOE A-grade evidence; no offered strategy is currently satisfied.","offered_strategies":["strategy:accaha-statin-high-intensity","strategy:accaha-statin-moderate-intensity"]}],"guideline:uspstf-statin-2022":[{"recommendation_id":"rec:statin-initiate-grade-b","guideline_id":"guideline:uspstf-statin-2022","status":"due","evidence_grade":"B","reason":"Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.","offered_strategies":["strategy:statin-moderate-intensity"]}]}}
+{
+  "envelope": {
+    "spec_tag": "v0.1.0",
+    "graph_version": "2022-08-23",
+    "evaluator_version": "0.1.0",
+    "evaluation_time": "2026-04-15T10:00:00Z",
+    "patient_fingerprint": "a72696b08f11a6c612deb21f24968a99f83f0d3e5633a0f1d31fa0debb0204c8",
+    "started_at": "2026-04-17T17:32:42.294739Z",
+    "completed_at": "2026-04-17T17:32:42.295149Z"
+  },
+  "events": [
+    {
+      "seq": 1,
+      "type": "evaluation_started",
+      "guideline_id": null,
+      "patient_age_years": 55,
+      "patient_sex": "male",
+      "guidelines_in_scope": [
+        "guideline:acc-aha-cholesterol-2018",
+        "guideline:kdigo-ckd-2024",
+        "guideline:uspstf-statin-2022"
+      ]
+    },
+    {
+      "seq": 2,
+      "type": "guideline_entered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "guideline_title": "2018 AHA/ACC Guideline on the Management of Blood Cholesterol"
+    },
+    {
+      "seq": 3,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-diabetes",
+      "recommendation_title": "Moderate-intensity statin for diabetes mellitus, age 40-75",
+      "evidence_grade": "COR I, LOE A",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 4,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-diabetes"
+    },
+    {
+      "seq": 5,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-diabetes",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 40,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 6,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-diabetes",
+      "path": [
+        "all_of",
+        1
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:diabetes"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 7,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-diabetes",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 8,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-diabetes",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 9,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "recommendation_title": "Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk \u22657.5%)",
+      "evidence_grade": "COR I, LOE A",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 10,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention"
+    },
+    {
+      "seq": 11,
+      "type": "risk_score_lookup",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "score_name": "ascvd_10yr",
+      "resolution": "supplied",
+      "supplied_value": 18.2,
+      "supplied_computed_date": "2026-03-02",
+      "inputs_read": [],
+      "computed_value": null,
+      "method": "pooled_cohort_equations_2013_goff",
+      "note": null
+    },
+    {
+      "seq": 12,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 40,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 13,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        0
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:ascvd-established"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 14,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:ldl-cholesterol",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 190,
+        "unit": "mg/dL"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:ldl-cholesterol]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 15,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        2
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:diabetes"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 16,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of",
+        1,
+        "none_of"
+      ],
+      "operator": "none_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 17,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of",
+        2
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:ldl-cholesterol",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 70,
+        "unit": "mg/dL"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:ldl-cholesterol]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 18,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of",
+        3
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:ldl-cholesterol",
+        "window": "P2Y",
+        "comparator": "lte",
+        "threshold": 189,
+        "unit": "mg/dL"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:ldl-cholesterol]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 19,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of",
+        4
+      ],
+      "predicate": "risk_score_compares",
+      "args": {
+        "name": "ascvd_10yr",
+        "comparator": "gte",
+        "threshold": 7.5
+      },
+      "inputs_read": [
+        {
+          "source": "patient.risk_scores",
+          "locator": "risk_scores.ascvd_10yr",
+          "value": 18.2,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 20,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 21,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "result": "eligible",
+      "final_value": "true"
+    },
+    {
+      "seq": 22,
+      "type": "strategy_considered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-high-intensity",
+      "strategy_name": "High-intensity statin therapy"
+    },
+    {
+      "seq": 23,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-high-intensity",
+      "action_node_id": "med:atorvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:atorvastatin"
+    },
+    {
+      "seq": 24,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-high-intensity",
+      "action_node_id": "med:rosuvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:rosuvastatin"
+    },
+    {
+      "seq": 25,
+      "type": "strategy_resolved",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-high-intensity",
+      "satisfied": false
+    },
+    {
+      "seq": 26,
+      "type": "strategy_considered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "strategy_name": "Moderate-intensity statin therapy"
+    },
+    {
+      "seq": 27,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "action_node_id": "med:atorvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:atorvastatin"
+    },
+    {
+      "seq": 28,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "action_node_id": "med:fluvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:fluvastatin"
+    },
+    {
+      "seq": 29,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "action_node_id": "med:lovastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:lovastatin"
+    },
+    {
+      "seq": 30,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "action_node_id": "med:pitavastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:pitavastatin"
+    },
+    {
+      "seq": 31,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "action_node_id": "med:pravastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:pravastatin"
+    },
+    {
+      "seq": 32,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "action_node_id": "med:rosuvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:rosuvastatin"
+    },
+    {
+      "seq": 33,
+      "type": "action_checked",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "action_node_id": "med:simvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:simvastatin"
+    },
+    {
+      "seq": 34,
+      "type": "strategy_resolved",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "strategy_id": "strategy:accaha-statin-moderate-intensity",
+      "satisfied": false
+    },
+    {
+      "seq": 35,
+      "type": "recommendation_emitted",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A",
+      "reason": "Patient is eligible per COR I, LOE A-grade evidence; no offered strategy is currently satisfied.",
+      "offered_strategies": [
+        "strategy:accaha-statin-high-intensity",
+        "strategy:accaha-statin-moderate-intensity"
+      ]
+    },
+    {
+      "seq": 36,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "recommendation_title": "High-intensity statin for secondary prevention in clinical ASCVD (age \u226475)",
+      "evidence_grade": "COR I, LOE A",
+      "intent": "treatment",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 37,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-secondary-prevention"
+    },
+    {
+      "seq": 38,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:ascvd-established"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 39,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 40,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 41,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "recommendation_title": "High-intensity statin for severe hypercholesterolemia (LDL \u2265190, age 20-75)",
+      "evidence_grade": "COR I, LOE B-NR",
+      "intent": "treatment",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 42,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-severe-hypercholesterolemia"
+    },
+    {
+      "seq": 43,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 20,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 44,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "path": [
+        "all_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:ldl-cholesterol",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 190,
+        "unit": "mg/dL"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:ldl-cholesterol]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 45,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 46,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendation_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 47,
+      "type": "guideline_exited",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "recommendations_emitted": 1
+    },
+    {
+      "seq": 48,
+      "type": "guideline_entered",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "guideline_title": "KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease"
+    },
+    {
+      "seq": 49,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+      "recommendation_title": "ACE inhibitor or ARB for CKD with albuminuria (ACR \u226530)",
+      "evidence_grade": "1B",
+      "intent": "treatment",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 50,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd"
+    },
+    {
+      "seq": 51,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 18,
+        "max": 120
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 52,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+      "path": [
+        "all_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:urine-acr",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 30,
+        "unit": "mg/g"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:urine-acr]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 53,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": false
+    },
+    {
+      "seq": 54,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 55,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "recommendation_title": "Monitor eGFR and urine ACR in patients with CKD",
+      "evidence_grade": "1B",
+      "intent": "surveillance",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 56,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-ckd-monitoring"
+    },
+    {
+      "seq": 57,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 18,
+        "max": 120
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 58,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "path": [
+        "all_of",
+        1,
+        "any_of",
+        0
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:egfr",
+        "window": "P2Y",
+        "comparator": "lt",
+        "threshold": 60,
+        "unit": "mL/min/1.73m2"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:egfr]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 59,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "path": [
+        "all_of",
+        1,
+        "any_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:urine-acr",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 30,
+        "unit": "mg/g"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:urine-acr]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 60,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "path": [
+        "all_of",
+        1,
+        "any_of"
+      ],
+      "operator": "any_of",
+      "result": "false",
+      "short_circuited": false
+    },
+    {
+      "seq": 61,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": false
+    },
+    {
+      "seq": 62,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 63,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd",
+      "recommendation_title": "SGLT2 inhibitor for CKD with T2DM or significant albuminuria",
+      "evidence_grade": "1A",
+      "intent": "treatment",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 64,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd"
+    },
+    {
+      "seq": 65,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 18,
+        "max": 120
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 66,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd",
+      "path": [
+        "all_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:egfr",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 20,
+        "unit": "mL/min/1.73m2"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:egfr]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 67,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 68,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 69,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "recommendation_title": "Moderate-intensity statin for CKD patients aged \u226550, not on dialysis",
+      "evidence_grade": "1A",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 70,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-statin-for-ckd"
+    },
+    {
+      "seq": 71,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_greater_than_or_equal",
+      "args": {
+        "value": 50
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 72,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "path": [
+        "all_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:egfr",
+        "window": "P2Y",
+        "comparator": "lt",
+        "threshold": 60,
+        "unit": "mL/min/1.73m2"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:egfr]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 73,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 74,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 75,
+      "type": "guideline_exited",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "recommendations_emitted": 0
+    },
+    {
+      "seq": 76,
+      "type": "guideline_entered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "guideline_title": "Statin Use for the Primary Prevention of Cardiovascular Disease in Adults: Preventive Medication"
+    },
+    {
+      "seq": 77,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "recommendation_title": "Initiate statin for primary prevention of CVD (Grade B)",
+      "evidence_grade": "B",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 78,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b"
+    },
+    {
+      "seq": 79,
+      "type": "risk_score_lookup",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "score_name": "ascvd_10yr",
+      "resolution": "supplied",
+      "supplied_value": 18.2,
+      "supplied_computed_date": "2026-03-02",
+      "inputs_read": [],
+      "computed_value": null,
+      "method": "pooled_cohort_equations_2013_goff",
+      "note": null
+    },
+    {
+      "seq": 80,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 40,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 81,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        0
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:ascvd-established"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 82,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:ldl-cholesterol",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 190,
+        "unit": "mg/dL"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:ldl-cholesterol]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 83,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        2
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:familial-hypercholesterolemia"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 84,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        1,
+        "none_of"
+      ],
+      "operator": "none_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 85,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        0
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:dyslipidemia"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 86,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        1
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:diabetes"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 87,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        2
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:hypertension"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 88,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        2,
+        "any_of"
+      ],
+      "operator": "any_of",
+      "result": "true",
+      "short_circuited": true
+    },
+    {
+      "seq": 89,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of",
+        3
+      ],
+      "predicate": "risk_score_compares",
+      "args": {
+        "name": "ascvd_10yr",
+        "comparator": "gte",
+        "threshold": 10
+      },
+      "inputs_read": [
+        {
+          "source": "patient.risk_scores",
+          "locator": "risk_scores.ascvd_10yr",
+          "value": 18.2,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 90,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 91,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "result": "eligible",
+      "final_value": "true"
+    },
+    {
+      "seq": 92,
+      "type": "strategy_considered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "strategy_name": "Moderate-intensity statin therapy"
+    },
+    {
+      "seq": 93,
+      "type": "action_checked",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:atorvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:atorvastatin"
+    },
+    {
+      "seq": 94,
+      "type": "action_checked",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:fluvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:fluvastatin"
+    },
+    {
+      "seq": 95,
+      "type": "action_checked",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:lovastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:lovastatin"
+    },
+    {
+      "seq": 96,
+      "type": "action_checked",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:pitavastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:pitavastatin"
+    },
+    {
+      "seq": 97,
+      "type": "action_checked",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:pravastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:pravastatin"
+    },
+    {
+      "seq": 98,
+      "type": "action_checked",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:rosuvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:rosuvastatin"
+    },
+    {
+      "seq": 99,
+      "type": "action_checked",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "action_node_id": "med:simvastatin",
+      "action_entity_type": "Medication",
+      "cadence": null,
+      "lookback": null,
+      "inputs_read": [
+        {
+          "source": "patient.medications",
+          "locator": "medications[]",
+          "value": null,
+          "present": false
+        }
+      ],
+      "satisfied": false,
+      "note": "No active medication matching med:simvastatin"
+    },
+    {
+      "seq": 100,
+      "type": "strategy_resolved",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "strategy_id": "strategy:statin-moderate-intensity",
+      "satisfied": false
+    },
+    {
+      "seq": 101,
+      "type": "recommendation_emitted",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "status": "due",
+      "evidence_grade": "B",
+      "reason": "Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.",
+      "offered_strategies": [
+        "strategy:statin-moderate-intensity"
+      ]
+    },
+    {
+      "seq": 102,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "recommendation_title": "Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)",
+      "evidence_grade": "I",
+      "intent": "primary_prevention",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 103,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i"
+    },
+    {
+      "seq": 104,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_greater_than_or_equal",
+      "args": {
+        "value": 76
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 105,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": true
+    },
+    {
+      "seq": 106,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 107,
+      "type": "recommendation_considered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "recommendation_title": "Selectively offer statin based on shared decision-making (Grade C)",
+      "evidence_grade": "C",
+      "intent": "shared_decision",
+      "trigger": "patient_state"
+    },
+    {
+      "seq": 108,
+      "type": "eligibility_evaluation_started",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c"
+    },
+    {
+      "seq": 109,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        0
+      ],
+      "predicate": "age_between",
+      "args": {
+        "min": 40,
+        "max": 75
+      },
+      "inputs_read": [
+        {
+          "source": "patient.demographics",
+          "locator": "patient.date_of_birth",
+          "value": "1970-08-12",
+          "present": true
+        },
+        {
+          "source": "derived",
+          "locator": "evaluation_time",
+          "value": "2026-04-15T10:00:00Z",
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 110,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        0
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:ascvd-established"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 111,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        1
+      ],
+      "predicate": "most_recent_observation_value",
+      "args": {
+        "code": "obs:ldl-cholesterol",
+        "window": "P2Y",
+        "comparator": "gte",
+        "threshold": 190,
+        "unit": "mg/dL"
+      },
+      "inputs_read": [
+        {
+          "source": "patient.observations",
+          "locator": "observations[code=obs:ldl-cholesterol]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 112,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        1,
+        "none_of",
+        2
+      ],
+      "predicate": "has_condition_history",
+      "args": {
+        "codes": [
+          "cond:familial-hypercholesterolemia"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 113,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        1,
+        "none_of"
+      ],
+      "operator": "none_of",
+      "result": "true",
+      "short_circuited": false
+    },
+    {
+      "seq": 114,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        0
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:dyslipidemia"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 115,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        1
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:diabetes"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 116,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        2,
+        "any_of",
+        2
+      ],
+      "predicate": "has_active_condition",
+      "args": {
+        "codes": [
+          "cond:hypertension"
+        ]
+      },
+      "inputs_read": [
+        {
+          "source": "patient.conditions",
+          "locator": "conditions[]",
+          "value": null,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 117,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        2,
+        "any_of"
+      ],
+      "operator": "any_of",
+      "result": "true",
+      "short_circuited": true
+    },
+    {
+      "seq": 118,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        3
+      ],
+      "predicate": "risk_score_compares",
+      "args": {
+        "name": "ascvd_10yr",
+        "comparator": "gte",
+        "threshold": 7.5
+      },
+      "inputs_read": [
+        {
+          "source": "patient.risk_scores",
+          "locator": "risk_scores.ascvd_10yr",
+          "value": 18.2,
+          "present": true
+        }
+      ],
+      "result": "true",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 119,
+      "type": "predicate_evaluated",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of",
+        4
+      ],
+      "predicate": "risk_score_compares",
+      "args": {
+        "name": "ascvd_10yr",
+        "comparator": "lt",
+        "threshold": 10
+      },
+      "inputs_read": [
+        {
+          "source": "patient.risk_scores",
+          "locator": "risk_scores.ascvd_10yr",
+          "value": 18.2,
+          "present": true
+        }
+      ],
+      "result": "false",
+      "missing_data_policy_applied": null,
+      "note": null
+    },
+    {
+      "seq": 120,
+      "type": "composite_resolved",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "path": [
+        "all_of"
+      ],
+      "operator": "all_of",
+      "result": "false",
+      "short_circuited": false
+    },
+    {
+      "seq": 121,
+      "type": "eligibility_evaluation_completed",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "result": "ineligible",
+      "final_value": "false"
+    },
+    {
+      "seq": 122,
+      "type": "guideline_exited",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendations_emitted": 1
+    },
+    {
+      "seq": 123,
+      "type": "evaluation_completed",
+      "guideline_id": null,
+      "recommendations_emitted": 2,
+      "duration_ms": 0
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A",
+      "reason": "Patient is eligible per COR I, LOE A-grade evidence; no offered strategy is currently satisfied.",
+      "offered_strategies": [
+        "strategy:accaha-statin-high-intensity",
+        "strategy:accaha-statin-moderate-intensity"
+      ]
+    },
+    {
+      "recommendation_id": "rec:statin-initiate-grade-b",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "status": "due",
+      "evidence_grade": "B",
+      "reason": "Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.",
+      "offered_strategies": [
+        "strategy:statin-moderate-intensity"
+      ]
+    }
+  ],
+  "recommendations_by_guideline": {
+    "guideline:acc-aha-cholesterol-2018": [
+      {
+        "recommendation_id": "rec:accaha-statin-primary-prevention",
+        "guideline_id": "guideline:acc-aha-cholesterol-2018",
+        "status": "due",
+        "evidence_grade": "COR I, LOE A",
+        "reason": "Patient is eligible per COR I, LOE A-grade evidence; no offered strategy is currently satisfied.",
+        "offered_strategies": [
+          "strategy:accaha-statin-high-intensity",
+          "strategy:accaha-statin-moderate-intensity"
+        ]
+      }
+    ],
+    "guideline:uspstf-statin-2022": [
+      {
+        "recommendation_id": "rec:statin-initiate-grade-b",
+        "guideline_id": "guideline:uspstf-statin-2022",
+        "status": "due",
+        "evidence_grade": "B",
+        "reason": "Patient is eligible per B-grade evidence; no offered strategy is currently satisfied.",
+        "offered_strategies": [
+          "strategy:statin-moderate-intensity"
+        ]
+      }
+    ]
+  }
+}

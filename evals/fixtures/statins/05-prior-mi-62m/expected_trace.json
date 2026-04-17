@@ -1009,7 +1009,8 @@
         "strategy:accaha-statin-high-intensity"
       ],
       "satisfying_strategy": "strategy:accaha-statin-high-intensity",
-      "preempted_by": null
+      "preempted_by": null,
+      "modifiers": []
     }
   ],
   "recommendations_by_guideline": {
@@ -1024,7 +1025,8 @@
           "strategy:accaha-statin-high-intensity"
         ],
         "satisfying_strategy": "strategy:accaha-statin-high-intensity",
-        "preempted_by": null
+        "preempted_by": null,
+        "modifiers": []
       }
     ]
   }

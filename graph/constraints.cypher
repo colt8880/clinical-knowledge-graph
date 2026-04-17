@@ -49,3 +49,15 @@ CREATE CONSTRAINT observation_code_unique IF NOT EXISTS
 
 CREATE CONSTRAINT procedure_code_unique IF NOT EXISTS
   FOR (n:Procedure) REQUIRE (n.code, n.code_system) IS UNIQUE;
+
+// ---------------------------------------------------------------------------
+// Index on PREEMPTED_BY.priority for preemption resolution (F25, ADR 0018).
+//
+// Neo4j Community doesn't support relationship property indexes natively
+// on all versions, so this is a range index on the relationship type.
+// The evaluator loads all PREEMPTED_BY edges at query time; this index
+// helps ORDER BY priority in the load query.
+// ---------------------------------------------------------------------------
+
+CREATE INDEX preempted_by_priority IF NOT EXISTS
+  FOR ()-[r:PREEMPTED_BY]-() ON (r.priority);

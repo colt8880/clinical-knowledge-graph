@@ -69,6 +69,7 @@ class PreemptionEdge:
 class GraphSnapshot:
     guideline_id: str
     guideline_title: str
+    effective_date: str = ""  # Guideline.effective_date; used for preemption tiebreak
     recommendations: list[RecommendationNode] = field(default_factory=list)
     entities: dict[str, ClinicalEntity] = field(default_factory=dict)
     strategies: dict[str, StrategyNode] = field(default_factory=dict)
@@ -135,6 +136,7 @@ async def load_graph(guideline_id: str = "guideline:uspstf-statin-2022") -> Grap
             raise ValueError(f"Guideline {guideline_id} not found in graph")
         g_props = dict(g_record["g"].items())
         guideline_title = g_props.get("title") or g_props.get("publisher") or guideline_id
+        effective_date = g_props.get("effective_date", "")
 
         # Load recommendations linked to guideline, ordered by id
         result = await session.run(
@@ -242,6 +244,7 @@ async def load_graph(guideline_id: str = "guideline:uspstf-statin-2022") -> Grap
         return GraphSnapshot(
             guideline_id=guideline_id,
             guideline_title=guideline_title,
+            effective_date=effective_date,
             recommendations=recommendations,
             entities=entities,
             strategies=strategies,

@@ -75,14 +75,24 @@ def resolve_preemptions(
     preempted_set: set[str] = set()
 
     for preempted_id, edges in sorted(candidates.items()):
-        # Sort by priority desc, then published_at desc, then winner_id asc
-        def sort_key(e: PreemptionEdge) -> tuple[int, str, str]:
-            winner_gid = rec_to_guideline.get(e.winning_rec_id, "")
-            pub_at = guideline_published_at.get(winner_gid, "")
-            return (-e.priority, pub_at, e.winning_rec_id)
+        # Pick the best winner: highest priority, then newest published_at, then
+        # lexicographically smallest winner_id as final deterministic tiebreak.
+        def is_better(a: PreemptionEdge, b: PreemptionEdge) -> bool:
+            """Return True if a is a better winner than b."""
+            if a.priority != b.priority:
+                return a.priority > b.priority
+            a_gid = rec_to_guideline.get(a.winning_rec_id, "")
+            b_gid = rec_to_guideline.get(b.winning_rec_id, "")
+            a_pub = guideline_published_at.get(a_gid, "")
+            b_pub = guideline_published_at.get(b_gid, "")
+            if a_pub != b_pub:
+                return a_pub > b_pub  # newer (lexicographically larger) wins
+            return a.winning_rec_id < b.winning_rec_id
 
-        edges_sorted = sorted(edges, key=sort_key)
-        best = edges_sorted[0]
+        best = edges[0]
+        for e in edges[1:]:
+            if is_better(e, best):
+                best = e
 
         results.append(PreemptionResult(
             preempted_rec_id=preempted_id,

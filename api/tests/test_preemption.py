@@ -165,10 +165,8 @@ class TestResolvePreemptions:
             rec_to_guideline={"rec:a": "g1", "rec:b": "g2", "rec:c": "g3"},
         )
         assert len(result) == 1
-        # g3 has newer published_at, but sort_key uses -priority then pub_at
-        # With same priority, we sort by pub_at ascending (lexicographic),
-        # so "2018-11-10" < "2022-08-23" → rec:b comes first
-        assert result[0].winning_rec_id == "rec:b"
+        # g3 has newer published_at (2022 > 2018) → rec:c wins per ADR 0018
+        assert result[0].winning_rec_id == "rec:c"
 
     def test_multiple_preemptions(self):
         """Multiple losers, each with their own winner."""

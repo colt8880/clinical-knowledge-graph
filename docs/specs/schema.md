@@ -132,7 +132,7 @@ The vocabulary and registry design was worked out in the CRC archive: see `docs/
 
 ## Related docs
 
-- Predicate DSL used in `structured_eligibility`, `trigger_criteria`, and `PREEMPTED_BY.condition`: see `predicate-dsl.md`
+- Predicate DSL used in `structured_eligibility` and `trigger_criteria`: see `predicate-dsl.md`
 - API primitives that traverse this schema: see `api-primitives.md`
 - Eval trace events emitted during traversal: see `eval-trace.md`
 - Concrete v0 instantiation: see `docs/reference/guidelines/statins.md`

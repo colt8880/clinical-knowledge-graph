@@ -807,20 +807,10 @@ def evaluate(
             emitted_rec_ids.add(rec_id)
             rec_to_guideline[rec_id] = e["guideline_id"]
 
-    # Build guideline published_at map for tie-breaking
-    guideline_published_at: dict[str, str] = {}
-    for graph in sorted_graphs:
-        # guideline_entered events carry the guideline_id; we use the
-        # graph's metadata directly since it's available
-        for e in trace.events:
-            if e["type"] == "guideline_entered" and e.get("guideline_id"):
-                guideline_published_at.setdefault(e["guideline_id"], "")
-
-    # Use effective_date from the graph objects for tie-breaking
-    # (GraphSnapshot doesn't carry published_at directly, but the
-    # Guideline node's effective_date serves the same purpose)
-    # For now, we use empty strings; the caller can populate from Neo4j.
-    # In practice, tie-breaks on published_at are rare (priority differs).
+    # Build guideline published_at map for tie-breaking (ADR 0018)
+    guideline_published_at: dict[str, str] = {
+        g.guideline_id: g.effective_date for g in sorted_graphs
+    }
 
     if preemption_edges and emitted_rec_ids:
         trace.set_guideline_context(None)

@@ -461,6 +461,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
 
     cyRef.current = cy;
     setCyVersion((v) => v + 1);
+  // Deps: isForestMode determines which data path; nodes/columns/edges drive re-render.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isForestMode, props.nodes, props.columns, props.edges]);
 

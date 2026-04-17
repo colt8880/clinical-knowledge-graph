@@ -56,6 +56,15 @@ class RecommendationNode:
     strategy_ids: list[str] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class PreemptionEdge:
+    """A PREEMPTED_BY edge between two Recommendation nodes."""
+    preempted_rec_id: str
+    winning_rec_id: str
+    priority: int
+    rationale: str
+
+
 @dataclass
 class GraphSnapshot:
     guideline_id: str
@@ -237,3 +246,35 @@ async def load_graph(guideline_id: str = "guideline:uspstf-statin-2022") -> Grap
             entities=entities,
             strategies=strategies,
         )
+
+
+async def load_preemption_edges() -> list[PreemptionEdge]:
+    """Load all PREEMPTED_BY edges from Neo4j.
+
+    These are cross-guideline edges that live in dedicated seed files
+    (e.g., cross-edges-uspstf-accaha.cypher). Returns an empty list if
+    no preemption edges exist in the graph.
+    """
+    driver = get_driver()
+    async with driver.session() as session:
+        result = await session.run(
+            """
+            MATCH (preempted:Recommendation)-[r:PREEMPTED_BY]->(winner:Recommendation)
+            RETURN preempted.id AS preempted_id,
+                   winner.id AS winner_id,
+                   r.priority AS priority,
+                   r.rationale AS rationale
+            ORDER BY preempted.id, winner.id
+            """
+        )
+        records = [record async for record in result]
+
+    edges: list[PreemptionEdge] = []
+    for record in records:
+        edges.append(PreemptionEdge(
+            preempted_rec_id=record["preempted_id"],
+            winning_rec_id=record["winner_id"],
+            priority=record["priority"],
+            rationale=record["rationale"] or "",
+        ))
+    return edges

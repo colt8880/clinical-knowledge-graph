@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.evaluator.engine import evaluate
-from app.evaluator.graph import load_all_guidelines
+from app.evaluator.graph import load_all_guidelines, load_preemption_edges
 
 router = APIRouter(tags=["evaluate"])
 
@@ -68,11 +68,12 @@ async def post_evaluate(request: EvaluateRequest) -> Any:
         )
 
     graphs = await load_all_guidelines()
+    preemption_edges = await load_preemption_edges()
 
     # Wall-clock timing is the route handler's responsibility, not the
     # pure evaluator's. Stamp before/after and inject into the trace.
     started_at = datetime.now(timezone.utc)
-    trace = evaluate(pc, graphs)
+    trace = evaluate(pc, graphs, preemption_edges=preemption_edges)
     completed_at = datetime.now(timezone.utc)
 
     duration_ms = int((completed_at - started_at).total_seconds() * 1000)

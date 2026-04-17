@@ -11,7 +11,7 @@ from collections import Counter
 
 import pytest
 
-from app.db import read_tx
+from app.db import read_tx, get_driver
 
 
 # ---------------------------------------------------------------------------
@@ -168,6 +168,45 @@ class TestConditionCodings:
             """,
         )
         assert rows[0]["c"] == 0, "Found Condition nodes sharing coding entries"
+
+    @pytest.mark.asyncio
+    async def test_duplicate_coding_detected(self, client):
+        """Constructed duplicate: two Conditions sharing an ICD-10 code must be caught.
+
+        Creates a temporary Condition node that shares 'ICD10:I10' with
+        cond:hypertension, verifies the seed-time uniqueness check returns
+        a non-zero count, then cleans up.
+        """
+        driver = get_driver()
+        async with driver.session() as session:
+            # Create a duplicate Condition sharing ICD10:I10 with cond:hypertension
+            await session.run(
+                """
+                CREATE (c:Condition {
+                    id: 'cond:test-duplicate',
+                    display_name: 'Test duplicate',
+                    codings: ['SNOMED:999999999', 'ICD10:I10']
+                })
+                """
+            )
+            try:
+                # Run the same uniqueness check used in clinical-entities.cypher
+                result = await session.run(
+                    """
+                    MATCH (a:Condition), (b:Condition)
+                    WHERE a <> b AND ANY(c IN a.codings WHERE c IN b.codings)
+                    RETURN count(*) AS c
+                    """
+                )
+                record = await result.single()
+                assert record["c"] > 0, (
+                    "Seed-time uniqueness check failed to detect duplicate ICD10:I10 coding"
+                )
+            finally:
+                # Clean up the test node
+                await session.run(
+                    "MATCH (c:Condition {id: 'cond:test-duplicate'}) DETACH DELETE c"
+                )
 
     @pytest.mark.asyncio
     async def test_expected_condition_count(self, client):

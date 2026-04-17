@@ -196,7 +196,11 @@ components:
               description: Force recomputation even when a recent supplied score exists.
 
     EvalTrace:
-      description: Must validate against eval-trace.schema.json.
+      description: |
+        Must validate against eval-trace.schema.json.
+        v1 (F21): every event carries guideline_id; response includes
+        per-guideline rec lists (recommendations_by_guideline) plus a
+        flat recommendation list for backwards-compatible consumers.
       $ref: "./eval-trace.schema.json"
 
     GraphNode:

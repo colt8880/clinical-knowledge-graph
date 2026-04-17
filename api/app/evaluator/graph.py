@@ -81,6 +81,29 @@ def _extract_codes(props: dict[str, Any]) -> list[CodeRef]:
     return codes
 
 
+async def load_all_guidelines() -> list[GraphSnapshot]:
+    """Load all guideline subgraphs from Neo4j.
+
+    Returns a list of GraphSnapshots, one per Guideline node in the database.
+    The caller (engine.evaluate) sorts by guideline_id for deterministic
+    traversal order. Each snapshot includes the guideline's recommendations,
+    strategies, and the full set of shared clinical entities.
+    """
+    driver = get_driver()
+    async with driver.session() as session:
+        result = await session.run(
+            "MATCH (g:Guideline) RETURN g.id AS gid ORDER BY g.id"
+        )
+        records = [r async for r in result]
+        guideline_ids = [r["gid"] for r in records]
+
+    snapshots = []
+    for gid in guideline_ids:
+        snapshot = await load_graph(gid)
+        snapshots.append(snapshot)
+    return snapshots
+
+
 async def load_graph(guideline_id: str = "guideline:uspstf-statin-2022") -> GraphSnapshot:
     """Load a guideline and its full subgraph from Neo4j into a GraphSnapshot.
 

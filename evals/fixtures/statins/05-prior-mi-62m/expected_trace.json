@@ -14,7 +14,8 @@
       "patient_sex": "male",
       "guidelines_in_scope": [
         "guideline:uspstf-statin-2022"
-      ]
+      ],
+      "guideline_id": null
     },
     {
       "seq": 2,
@@ -27,14 +28,23 @@
       "type": "exit_condition_triggered",
       "recommendation_id": "rec:statin-initiate-grade-b",
       "exit": "out_of_scope_secondary_prevention",
-      "rationale": "Established ASCVD is secondary prevention \u2014 addressed by ACC/AHA cholesterol guideline, not this USPSTF statement."
+      "rationale": "Established ASCVD is secondary prevention — addressed by ACC/AHA cholesterol guideline, not this USPSTF statement.",
+      "guideline_id": "guideline:uspstf-statin-2022"
     },
     {
       "seq": 4,
+      "type": "guideline_exited",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "recommendations_emitted": 0
+    },
+    {
+      "seq": 5,
       "type": "evaluation_completed",
       "recommendations_emitted": 0,
-      "duration_ms": 0
+      "duration_ms": 0,
+      "guideline_id": null
     }
   ],
-  "recommendations": []
+  "recommendations": [],
+  "recommendations_by_guideline": {}
 }

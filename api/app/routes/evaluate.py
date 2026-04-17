@@ -1,4 +1,8 @@
-"""POST /evaluate endpoint — accepts PatientContext, returns EvalTrace."""
+"""POST /evaluate endpoint — accepts PatientContext, returns EvalTrace.
+
+Multi-guideline (F21): loads all guideline subgraphs and runs forest
+traversal. Response includes per-guideline rec lists plus unified trace.
+"""
 
 from __future__ import annotations
 
@@ -10,7 +14,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.evaluator.engine import evaluate
-from app.evaluator.graph import load_graph
+from app.evaluator.graph import load_all_guidelines
 
 router = APIRouter(tags=["evaluate"])
 
@@ -37,8 +41,9 @@ class EvaluateRequest(BaseModel):
 async def post_evaluate(request: EvaluateRequest) -> Any:
     """Run the evaluator against a PatientContext, return the EvalTrace.
 
-    Loads the graph snapshot from Neo4j, then calls the pure evaluate()
-    function. The evaluator itself does no I/O.
+    Loads all guideline subgraphs from Neo4j, then calls the pure
+    evaluate() function for forest traversal. The evaluator itself
+    does no I/O.
     """
     pc = request.patient_context
 
@@ -62,12 +67,12 @@ async def post_evaluate(request: EvaluateRequest) -> Any:
             errors=missing,
         )
 
-    graph = await load_graph()
+    graphs = await load_all_guidelines()
 
     # Wall-clock timing is the route handler's responsibility, not the
     # pure evaluator's. Stamp before/after and inject into the trace.
     started_at = datetime.now(timezone.utc)
-    trace = evaluate(pc, graph)
+    trace = evaluate(pc, graphs)
     completed_at = datetime.now(timezone.utc)
 
     duration_ms = int((completed_at - started_at).total_seconds() * 1000)

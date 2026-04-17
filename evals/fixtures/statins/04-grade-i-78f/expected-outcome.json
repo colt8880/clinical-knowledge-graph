@@ -4,15 +4,29 @@
     {
       "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
       "status": "insufficient_evidence",
-      "evidence_grade": "I"
+      "evidence_grade": "I",
+      "guideline_id": "guideline:uspstf-statin-2022"
     }
   ],
   "expected_trace_contains": [
-    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-insufficient-evidence-grade-i", "status": "insufficient_evidence", "evidence_grade": "I" }
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
+      "status": "insufficient_evidence",
+      "evidence_grade": "I"
+    }
   ],
   "must_not_contain": [
-    { "type": "exit_condition_triggered" },
-    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-initiate-grade-b" },
-    { "type": "recommendation_emitted", "recommendation_id": "rec:statin-selective-grade-c" }
+    {
+      "type": "exit_condition_triggered"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-initiate-grade-b"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-selective-grade-c"
+    }
   ]
 }

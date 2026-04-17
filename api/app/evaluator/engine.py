@@ -1,10 +1,15 @@
 """Evaluator engine: top-level orchestration.
 
 evaluate() is pure — no wall-clock reads, no RNG, no external I/O.
-All inputs are PatientContext + a loaded GraphSnapshot.
+All inputs are PatientContext + a list of loaded GraphSnapshots.
 
-For v0, the statin model has three out-of-scope exits that are checked
-before iterating recommendations. See docs/reference/guidelines/statins.md §
+Multi-guideline forest traversal (F21): the evaluator walks every
+guideline in ascending lexical order of guideline_id. Each guideline
+is evaluated independently; preemption (F25) and modifier handling
+(F26) are not yet implemented.
+
+For the statin model, three out-of-scope exits are checked before
+iterating recommendations. See docs/reference/guidelines/statins.md §
 Out-of-scope exits.
 """
 
@@ -44,6 +49,12 @@ _STATIN_EXITS = [
         "check": "_check_age_below_range",
     },
 ]
+
+# Maps guideline_id to their exit-condition definitions.
+# Guidelines not in this map have no pre-flight exits.
+_GUIDELINE_EXITS: dict[str, list[dict[str, Any]]] = {
+    "guideline:uspstf-statin-2022": _STATIN_EXITS,
+}
 
 
 def _patient_has_condition_matching(
@@ -515,13 +526,6 @@ def _check_strategy_satisfaction(
 
         if not satisfied:
             all_satisfied = False
-            # For medication strategies with OR semantics (any one statin satisfies),
-            # we continue checking all actions but track overall satisfaction.
-            # However, the strategy is conjunction of ALL actions per schema.
-            # For statin-moderate-intensity, each Medication is a separate action,
-            # but the semantic is "any one active prescription satisfies" per
-            # guidelines/statins.md § Strategies. So we use OR for Medication-only
-            # strategies.
 
     # Determine strategy satisfaction:
     # Per guidelines/statins.md: statin strategy is satisfied if ANY statin is active.
@@ -693,37 +697,31 @@ def _walk_tree_for_risk_scores(node: dict[str, Any], names: list[str]) -> None:
                     _walk_tree_for_risk_scores(child, names)
 
 
-def evaluate(patient_context: dict[str, Any], graph: GraphSnapshot) -> dict[str, Any]:
-    """Run the trace-first evaluator.
+# ---------------------------------------------------------------------------
+# Per-guideline evaluation
+# ---------------------------------------------------------------------------
 
-    Pure function: same (patient_context, graph) -> same trace.
-    Wall-clock fields (envelope.started_at, envelope.completed_at,
-    evaluation_completed.duration_ms) are NOT set here — the caller
-    (route handler) stamps them after evaluate() returns. This keeps
-    evaluate() free of datetime.now() calls.
+def _evaluate_guideline(
+    patient_context: dict[str, Any],
+    graph: GraphSnapshot,
+    trace: TraceBuilder,
+    age: int,
+) -> int:
+    """Evaluate a single guideline's recommendations within a forest traversal.
+
+    Sets the guideline context on the trace, emits guideline_entered/exited,
+    and returns the count of recommendations emitted.
     """
-    trace = TraceBuilder()
+    trace.set_guideline_context(graph.guideline_id)
 
-    # Compute patient demographics
-    dob = patient_context["patient"]["date_of_birth"]
-    eval_time = patient_context["evaluation_time"]
-    age = compute_age(dob, eval_time)
-    sex = patient_context["patient"]["administrative_sex"]
-    fingerprint = patient_fingerprint(patient_context)
-
-    # 1. evaluation_started
-    trace.evaluation_started(age, sex, [graph.guideline_id])
-
-    # 2. guideline_entered
     trace.guideline_entered(graph.guideline_id, graph.guideline_title)
 
-    # 3. Exit-condition scan (statin-specific, per guidelines/statins.md)
-    #    The first recommendation is used as the recommendation_id for exit
-    #    events, since exits short-circuit eligibility evaluation at R1.
+    # Exit-condition scan (guideline-specific)
+    exit_defs = _GUIDELINE_EXITS.get(graph.guideline_id, [])
     exit_rec_id = graph.recommendations[0].id if graph.recommendations else graph.guideline_id
     exit_fired = False
 
-    for exit_def in _STATIN_EXITS:
+    for exit_def in exit_defs:
         checker = _EXIT_CHECKERS[exit_def["check"]]
         if checker(patient_context, age, graph):
             trace.exit_condition_triggered(
@@ -738,7 +736,6 @@ def evaluate(patient_context: dict[str, Any], graph: GraphSnapshot) -> dict[str,
     risk_score_emitted: set[str] = set()
 
     if not exit_fired:
-        # Full recommendation evaluation: iterate R1, R2, R3 in graph order.
         for rec in graph.recommendations:
             emitted = _evaluate_recommendation(
                 rec, patient_context, graph, trace, risk_score_emitted,
@@ -746,12 +743,56 @@ def evaluate(patient_context: dict[str, Any], graph: GraphSnapshot) -> dict[str,
             if emitted:
                 recommendations_emitted += 1
 
-    # Final event — duration_ms is set to 0 here; the route handler
-    # overwrites it with the actual wall-clock duration after evaluate() returns.
-    trace.evaluation_completed(recommendations_emitted, duration_ms=0)
+    trace.guideline_exited(graph.guideline_id, recommendations_emitted)
+    return recommendations_emitted
 
-    # Build the envelope — wall-clock fields (started_at, completed_at)
-    # are injected by the route handler, not by the pure evaluator.
+
+# ---------------------------------------------------------------------------
+# Forest traversal — multi-guideline entry point
+# ---------------------------------------------------------------------------
+
+def evaluate(
+    patient_context: dict[str, Any],
+    graphs: list[GraphSnapshot],
+) -> dict[str, Any]:
+    """Run the trace-first evaluator across all guidelines (forest traversal).
+
+    Pure function: same (patient_context, graphs) -> same trace.
+    Guidelines are visited in ascending lexical order of guideline_id
+    (deterministic traversal order per F21 spec).
+
+    Wall-clock fields (envelope.started_at, envelope.completed_at,
+    evaluation_completed.duration_ms) are NOT set here — the caller
+    (route handler) stamps them after evaluate() returns. This keeps
+    evaluate() free of datetime.now() calls.
+    """
+    # Sort graphs by guideline_id for deterministic traversal
+    sorted_graphs = sorted(graphs, key=lambda g: g.guideline_id)
+
+    trace = TraceBuilder()
+
+    # Compute patient demographics
+    dob = patient_context["patient"]["date_of_birth"]
+    eval_time = patient_context["evaluation_time"]
+    age = compute_age(dob, eval_time)
+    sex = patient_context["patient"]["administrative_sex"]
+    fingerprint = patient_fingerprint(patient_context)
+
+    # 1. evaluation_started (envelope-level, guideline_id=None)
+    guideline_ids = [g.guideline_id for g in sorted_graphs]
+    trace.evaluation_started(age, sex, guideline_ids)
+
+    # 2. Walk each guideline in lexical order
+    total_recommendations_emitted = 0
+    for graph in sorted_graphs:
+        count = _evaluate_guideline(patient_context, graph, trace, age)
+        total_recommendations_emitted += count
+
+    # 3. evaluation_completed (envelope-level, guideline_id=None)
+    trace.set_guideline_context(None)
+    trace.evaluation_completed(total_recommendations_emitted, duration_ms=0)
+
+    # Build the envelope
     envelope: dict[str, Any] = {
         "spec_tag": settings.spec_tag,
         "graph_version": settings.graph_version,
@@ -760,10 +801,11 @@ def evaluate(patient_context: dict[str, Any], graph: GraphSnapshot) -> dict[str,
         "patient_fingerprint": fingerprint,
     }
 
-    # Derive recommendation list from trace events (empty for exit paths)
-    derived_recommendations = [
+    # Derive flat recommendation list from trace events
+    flat_recommendations = [
         {
             "recommendation_id": e["recommendation_id"],
+            "guideline_id": e["guideline_id"],
             "status": e["status"],
             "evidence_grade": e["evidence_grade"],
             "reason": e["reason"],
@@ -774,8 +816,17 @@ def evaluate(patient_context: dict[str, Any], graph: GraphSnapshot) -> dict[str,
         if e["type"] == "recommendation_emitted"
     ]
 
+    # Derive per-guideline recommendation breakdown
+    per_guideline: dict[str, list[dict[str, Any]]] = {}
+    for rec in flat_recommendations:
+        gid = rec["guideline_id"]
+        if gid not in per_guideline:
+            per_guideline[gid] = []
+        per_guideline[gid].append(rec)
+
     return {
         "envelope": envelope,
         "events": trace.events,
-        "recommendations": derived_recommendations,
+        "recommendations": flat_recommendations,
+        "recommendations_by_guideline": per_guideline,
     }

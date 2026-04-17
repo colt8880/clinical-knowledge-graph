@@ -31,7 +31,7 @@ Required ADRs (draft alongside Phase 1; merge before the corresponding feature):
 | # | Feature | Components | Status | Depends on | Spec | PR |
 |---|---------|------------|--------|------------|------|----|
 | 20 | Shared clinical entity layer | graph, api, docs | shipped | v0 shipped | [20](../../docs/build/20-shared-clinical-entity-layer.md) | [#18](../../pull/18) |
-| 21 | Multi-guideline evaluator + trace extension | api, docs | pending | 20 | [21](../../docs/build/21-multi-guideline-evaluator.md) | — |
+| 21 | Multi-guideline evaluator + trace extension | api, docs | shipped | 20 | [21](../../docs/build/21-multi-guideline-evaluator.md) | [#19](../../pull/19) |
 | 22 | Eval harness skeleton (three arms + Braintrust) | evals, api, docs | pending | 21 | [22](../../docs/build/22-eval-harness-skeleton.md) | — |
 
 ### Phase 2: independent guideline graphs

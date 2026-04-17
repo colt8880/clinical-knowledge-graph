@@ -2,6 +2,11 @@
 
 All models follow docs/contracts/eval-trace.schema.json.
 The TraceBuilder assigns monotonic seq values and collects events.
+
+Every event carries a guideline_id field (v1, F21). For envelope-level
+events (evaluation_started, evaluation_completed) that sit outside any
+guideline bracket, guideline_id is null. For all other events, it is set
+from the enclosing guideline context via set_guideline_context().
 """
 
 from __future__ import annotations
@@ -35,11 +40,21 @@ def compute_age(date_of_birth: str, evaluation_time: str) -> int:
 
 
 class TraceBuilder:
-    """Accumulates trace events with monotonic seq assignment."""
+    """Accumulates trace events with monotonic seq assignment.
+
+    Every event carries a guideline_id field. Use set_guideline_context()
+    to set the current guideline; envelope-level events (before the first
+    guideline or after the last) get guideline_id=None.
+    """
 
     def __init__(self) -> None:
         self._seq = 0
         self.events: list[dict[str, Any]] = []
+        self._guideline_id: str | None = None
+
+    def set_guideline_context(self, guideline_id: str | None) -> None:
+        """Set the current guideline context for subsequent events."""
+        self._guideline_id = guideline_id
 
     def _next_seq(self) -> int:
         self._seq += 1
@@ -49,6 +64,7 @@ class TraceBuilder:
         event: dict[str, Any] = {
             "seq": self._next_seq(),
             "type": event_type,
+            "guideline_id": self._guideline_id,
             **fields,
         }
         self.events.append(event)
@@ -69,6 +85,14 @@ class TraceBuilder:
             "guideline_entered",
             guideline_id=guideline_id,
             guideline_title=guideline_title,
+        )
+
+    def guideline_exited(self, guideline_id: str, recommendations_emitted: int) -> None:
+        """Emitted at the end of each guideline's traversal."""
+        self.emit(
+            "guideline_exited",
+            guideline_id=guideline_id,
+            recommendations_emitted=recommendations_emitted,
         )
 
     def exit_condition_triggered(

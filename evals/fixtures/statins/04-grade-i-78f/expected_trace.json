@@ -1054,7 +1054,8 @@
       "status": "insufficient_evidence",
       "evidence_grade": "I",
       "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms.",
-      "preempted_by": null
+      "preempted_by": null,
+      "modifiers": []
     }
   ],
   "recommendations_by_guideline": {
@@ -1065,7 +1066,8 @@
         "status": "insufficient_evidence",
         "evidence_grade": "I",
         "reason": "USPSTF Grade I: Insufficient evidence to recommend for or against initiating statins (Grade I, >=76). Current evidence is insufficient to assess the balance of benefits and harms.",
-        "preempted_by": null
+        "preempted_by": null,
+        "modifiers": []
       }
     ]
   }

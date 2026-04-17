@@ -1,0 +1,27 @@
+{
+  "description": "55M, HTN, CKD 3a (eGFR 52), LDL 145, ASCVD risk 8.5%. ACC/AHA primary prevention with KDIGO intensity modification to moderate. Demonstrates preemption + modification interaction: USPSTF Grade C preempted by ACC/AHA, ACC/AHA modified by KDIGO.",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity-ckd-modified",
+      "label": "Initiate moderate-intensity statin therapy (intensity modified by CKD)",
+      "rationale": "ACC/AHA COR I, LOE A: adults 40-75 without diabetes, LDL 70-189, ASCVD risk ≥7.5% should initiate moderate-to-high-intensity statin. KDIGO modifies to moderate-intensity cap in CKD G3a (eGFR 52). ACC/AHA preempts USPSTF Grade C (which would also recommend statin but via shared decision-making). CKD is a cardiovascular risk enhancer that strengthens the case for statin initiation.",
+      "source_rec_id": "rec:accaha-statin-primary-prevention",
+      "modifier_source_rec_id": "rec:kdigo-statin-for-ckd",
+      "priority": 1
+    },
+    {
+      "id": "ckd-monitoring",
+      "label": "Monitor eGFR and urine ACR per KDIGO",
+      "rationale": "KDIGO 1B: regular monitoring of eGFR and urine ACR for CKD staging and progression tracking. CKD G3a (eGFR 52) with normal albuminuria (ACR 18) indicates moderate risk. Monitor at least annually.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 2
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure management",
+      "rationale": "BP 140/86 mmHg is above target. HTN is both a CVD risk factor and an accelerator of CKD progression. Target BP <130/80 per KDIGO for CKD patients.",
+      "priority": 3
+    }
+  ],
+  "contraindications": []
+}

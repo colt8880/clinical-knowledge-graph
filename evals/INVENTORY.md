@@ -54,7 +54,7 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 - Dialysis patients (eGFR < 15 / G5D).
 - CKD + diabetes deep integration.
 
-## Cross-domain (v1 — USPSTF ↔ ACC/AHA preemption)
+## Cross-domain (v1 — preemption + modification)
 
 ### Landed
 
@@ -62,6 +62,8 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 |---|---|---|
 | 01 | `fixtures/cross-domain/case-01/` | 62M post-MI (ASCVD), on simvastatin. USPSTF exits (secondary prevention). ACC/AHA R1 matches. No preemption fires. |
 | 02 | `fixtures/cross-domain/case-02/` | 55M, HTN, LDL 165, ASCVD risk 8.5%. Both USPSTF Grade C and ACC/AHA R4 match. ACC/AHA preempts USPSTF (priority 200 > 100). |
+| 03 | `fixtures/cross-domain/case-03/` | 65M post-MI, CKD 3b (eGFR 35), ACR 180. USPSTF exits. ACC/AHA R1 (secondary prevention) fires. KDIGO statin-for-CKD MODIFIES ACC/AHA R1 intensity to moderate. |
+| 04 | `fixtures/cross-domain/case-04/` | 55M, HTN, CKD 3a (eGFR 52), LDL 145, ASCVD risk 8.5%. ACC/AHA R4 preempts USPSTF Grade C. KDIGO MODIFIES ACC/AHA R4 (not preempted USPSTF). Demonstrates preemption + modification interaction. |
 
 ### Deferred
 

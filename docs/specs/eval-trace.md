@@ -158,10 +158,13 @@ Events are ordered by `seq`. `seq` is the only index the UI stepper uses. A trac
 
 **Cross-guideline events** — F25 implements `preemption_resolved`; `cross_guideline_match` reserved for F26.
 
-16. **`cross_guideline_match`** — reserved for F26. Indicates a cross-guideline relationship was found during traversal.
-    - `source_guideline_id: string`
-    - `target_guideline_id: string`
-    - `match_type: string`
+16. **`cross_guideline_match`** — emitted post-traversal (F26) when a `MODIFIES` edge activates between two emitted Recs. `guideline_id` is null (envelope-level). Emitted after preemption resolution, before `evaluation_completed`. Append-only.
+    - `source_rec_id: string` — the modifying Rec (e.g., KDIGO statin-for-CKD)
+    - `target_rec_id: string` — the modified Rec (e.g., ACC/AHA secondary prevention)
+    - `nature: string` — controlled enum: `intensity_reduction`, `dose_adjustment`, `monitoring`, `contraindication_warning`
+    - `note: string` — human-readable explanation
+    - `source_guideline_id: string` — guideline of the source Rec
+    - `target_guideline_id: string` — guideline of the target Rec
 
 17. **`preemption_resolved`** — emitted post-traversal (F25) when a `PREEMPTED_BY` edge resolves between two emitted Recs. `guideline_id` is null (envelope-level, runs after all guidelines). Append-only: does not mutate prior `recommendation_emitted` events.
     - `preempted_recommendation_id: string` — the Rec being overridden
@@ -197,7 +200,8 @@ The trace event sequence for a multi-guideline evaluation is:
    - [exit checks, recommendation evaluation, strategy checks — same as v0]
    - `guideline_exited`
 3. Preemption resolution (F25): zero or more `preemption_resolved` events (guideline_id: null)
-4. `evaluation_completed` (guideline_id: null)
+4. Modifier resolution (F26): zero or more `cross_guideline_match` events (guideline_id: null). Only for non-preempted target Recs. Ordered by `(source_guideline_id, source_rec_id, target_rec_id)`.
+5. `evaluation_completed` (guideline_id: null)
 
 ## Ordering guarantees
 

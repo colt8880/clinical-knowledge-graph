@@ -10,6 +10,8 @@
 #   3. statins.cypher          — guideline-scoped nodes + edges (MERGE entities, CREATE Rec/Strategy)
 #   4. cholesterol.cypher      — ACC/AHA 2018 subgraph
 #   5. kdigo-ckd.cypher        — KDIGO 2024 CKD subgraph
+#   6. cross-edges-uspstf-accaha.cypher — PREEMPTED_BY edges (F25)
+#   7. cross-edges-kdigo.cypher — MODIFIES edges (F26)
 #
 # Expected environment:
 #   NEO4J_URI       bolt://neo4j:7687
@@ -33,6 +35,12 @@ cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seed
 echo "==> Applying KDIGO CKD seed..."
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/kdigo-ckd.cypher
 
+echo "==> Applying cross-edges USPSTF ↔ ACC/AHA..."
+cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/cross-edges-uspstf-accaha.cypher
+
+echo "==> Applying cross-edges KDIGO → USPSTF/ACC-AHA..."
+cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/cross-edges-kdigo.cypher
+
 echo "==> Verifying node count..."
 NODE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH (n) RETURN count(n) AS c" | tail -1 | tr -d '[:space:]')
@@ -48,11 +56,10 @@ echo "==> Verifying edge count..."
 EDGE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH ()-[r]->() RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
-# 33 (statins+ACC/AHA) + 29 KDIGO = 62
-# KDIGO: FROM_GUIDELINE 4 + OFFERS_STRATEGY 4 + INCLUDES_ACTION 17 + FOR_CONDITION 4 = 29
-echo "    Edge count: $EDGE_COUNT (expected 62)"
-if [ "$EDGE_COUNT" -ne 62 ]; then
-  echo "ERROR: Expected 62 edges, got $EDGE_COUNT"
+# 33 (statins+ACC/AHA) + 29 KDIGO + 9 PREEMPTED_BY (F25) + 6 MODIFIES (F26) = 77
+echo "    Edge count: $EDGE_COUNT (expected 77)"
+if [ "$EDGE_COUNT" -ne 77 ]; then
+  echo "ERROR: Expected 77 edges, got $EDGE_COUNT"
   exit 1
 fi
 
@@ -126,4 +133,14 @@ if [ "$ORPHAN_MEDS" -ne 0 ]; then
   exit 1
 fi
 
-echo "==> Seed complete. 50 nodes, 62 edges. All checks passed."
+echo "==> Verifying MODIFIES edges are cross-guideline only..."
+INTRA_MODIFIES=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
+  --format plain "MATCH (s:Recommendation)-[r:MODIFIES]->(t:Recommendation) WHERE s.id STARTS WITH 'rec:kdigo' AND t.id STARTS WITH 'rec:kdigo' RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
+
+echo "    Intra-guideline MODIFIES: $INTRA_MODIFIES (expected 0)"
+if [ "$INTRA_MODIFIES" -ne 0 ]; then
+  echo "ERROR: Found $INTRA_MODIFIES intra-guideline MODIFIES edges"
+  exit 1
+fi
+
+echo "==> Seed complete. 50 nodes, 77 edges. All checks passed."

@@ -80,6 +80,14 @@ If a future guideline requires distinguishing sub-types, add separate nodes of t
   - `priority` (integer) — higher value wins; default USPSTF=100, ACC/AHA=200 per ADR 0018.
   - `rationale` (string) — human-readable explanation of why this preemption exists.
   - Per ADR 0018: no transitive preemption, single edge per Rec pair, tie-break on `published_at` then lexicographic `recommendation_id`. Cross-edges live in dedicated seed files (`graph/seeds/cross-edges-*.cypher`).
+- `-[:MODIFIES {nature, note}]->` `(Recommendation | Strategy)` — cross-guideline modification. **Activated in F26** (KDIGO → USPSTF, KDIGO → ACC/AHA). Edge direction: FROM the modifying Rec TO the modified Rec or Strategy. Unlike `PREEMPTED_BY`, the target still fires; the modifier annotates. Attrs:
+  - `nature` (enum: `intensity_reduction`, `dose_adjustment`, `monitoring`, `contraindication_warning`) — controlled vocabulary per ADR 0019. New values require ADR + schema update.
+  - `note` (string) — human-readable explanation of the modification.
+  - Cross-guideline only: source and target must have different `guideline_id`. Enforced at seed time.
+  - Additive, not gating: modifier does not suppress or replace the target Rec.
+  - Preemption takes precedence: if the target Rec is preempted, its modifiers are not emitted.
+  - No cascading: a `MODIFIES` edge does not trigger another `MODIFIES` edge.
+  - Per ADR 0019. Cross-edges live in dedicated seed files (`graph/seeds/cross-edges-*.cypher`).
 
 ### From Strategy (outbound)
 

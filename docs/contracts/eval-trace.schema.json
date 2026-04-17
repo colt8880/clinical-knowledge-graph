@@ -260,14 +260,17 @@
     },
     "CrossGuidelineMatch": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "description": "Reserved for F25/F26. Not emitted by the evaluator in F21.",
-      "required": ["seq", "type", "guideline_id", "source_guideline_id", "target_guideline_id", "match_type"],
+      "description": "F26: emitted post-traversal when a MODIFIES edge activates between two emitted Recs. Append-only; does not mutate prior events. Emitted after preemption resolution, before evaluation_completed.",
+      "required": ["seq", "type", "guideline_id", "source_rec_id", "target_rec_id", "nature", "note", "source_guideline_id", "target_guideline_id"],
       "properties": {
         "type": { "const": "cross_guideline_match" },
-        "guideline_id": { "type": "string" },
+        "guideline_id": { "type": ["string", "null"] },
+        "source_rec_id": { "type": "string", "description": "The modifying Recommendation ID" },
+        "target_rec_id": { "type": "string", "description": "The modified Recommendation ID" },
+        "nature": { "type": "string", "enum": ["intensity_reduction", "dose_adjustment", "monitoring", "contraindication_warning"] },
+        "note": { "type": "string" },
         "source_guideline_id": { "type": "string" },
-        "target_guideline_id": { "type": "string" },
-        "match_type": { "type": "string" }
+        "target_guideline_id": { "type": "string" }
       }
     },
     "PreemptionResolved": {
@@ -294,7 +297,23 @@
         "offered_strategies": { "type": "array", "items": { "type": "string" } },
         "satisfying_strategy": { "type": ["string", "null"] },
         "reason": { "type": "string" },
-        "preempted_by": { "type": ["string", "null"], "description": "recommendation_id of the winning Rec if this Rec is preempted; null otherwise. Computed from preemption_resolved events in the trace." }
+        "preempted_by": { "type": ["string", "null"], "description": "recommendation_id of the winning Rec if this Rec is preempted; null otherwise. Computed from preemption_resolved events in the trace." },
+        "modifiers": {
+          "type": "array",
+          "description": "List of active modifiers from cross-guideline MODIFIES edges. Empty if no modifiers. Computed from cross_guideline_match events in the trace.",
+          "items": {
+            "type": "object",
+            "required": ["source_rec_id", "source_guideline_id", "nature", "note"],
+            "properties": {
+              "source_rec_id": { "type": "string" },
+              "source_guideline_id": { "type": "string" },
+              "nature": { "type": "string", "enum": ["intensity_reduction", "dose_adjustment", "monitoring", "contraindication_warning"] },
+              "note": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "default": []
+        }
       },
       "additionalProperties": false
     }

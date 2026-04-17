@@ -1,0 +1,89 @@
+{
+  "description": "65M post-MI, CKD 3b (eGFR 35), ACR 180 (A2). USPSTF exits on secondary prevention. ACC/AHA R1 (secondary prevention, high-intensity statin) fires. KDIGO statin-for-CKD fires and MODIFIES ACC/AHA R1 intensity to moderate. KDIGO monitoring, SGLT2, and ACEi/ARB also fire.",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "preempted_by": null,
+      "modifiers": [
+        {
+          "source_rec_id": "rec:kdigo-statin-for-ckd",
+          "source_guideline_id": "guideline:kdigo-ckd-2024",
+          "nature": "intensity_reduction",
+          "note": "KDIGO 2024 recommends moderate-intensity statin in CKD G3-G5 not on dialysis. ACC/AHA secondary prevention recommends high-intensity statin. In patients with both ASCVD and CKD G3-G5, reduce intensity to moderate per KDIGO. Consider renal dosing adjustments and drug interactions."
+        }
+      ]
+    },
+    {
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "status": "due",
+      "evidence_grade": "1B",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "preempted_by": null,
+      "modifiers": []
+    },
+    {
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd",
+      "status": "due",
+      "evidence_grade": "1A",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "preempted_by": null,
+      "modifiers": []
+    },
+    {
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "status": "due",
+      "evidence_grade": "1A",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "preempted_by": null,
+      "modifiers": []
+    },
+    {
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+      "status": "due",
+      "evidence_grade": "1B",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "preempted_by": null,
+      "modifiers": []
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "evaluation_started",
+      "guideline_id": null
+    },
+    {
+      "type": "exit_condition_triggered",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "exit": "out_of_scope_secondary_prevention"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:accaha-statin-secondary-prevention",
+      "status": "due",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "status": "due",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "type": "cross_guideline_match",
+      "source_rec_id": "rec:kdigo-statin-for-ckd",
+      "target_rec_id": "rec:accaha-statin-secondary-prevention",
+      "nature": "intensity_reduction",
+      "source_guideline_id": "guideline:kdigo-ckd-2024",
+      "target_guideline_id": "guideline:acc-aha-cholesterol-2018"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "recommendation_emitted",
+      "guideline_id": "guideline:uspstf-statin-2022"
+    }
+  ]
+}

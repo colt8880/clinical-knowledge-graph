@@ -43,11 +43,11 @@ Required ADRs (draft alongside Phase 1; merge before the corresponding feature):
 
 ### Phase 3: cross-guideline connection + thesis test
 
-| # | Feature | Components | Status | Depends on | Spec | PR |
-|---|---------|------------|--------|------------|------|----|
-| 25 | Preemption, USPSTF ↔ ACC/AHA | graph, api, docs, evals | shipped | 23 | [25](../../docs/build/25-preemption-uspstf-accaha.md) | [#24](../../pull/24) |
-| 26 | MODIFIES edges from KDIGO | graph, api, docs, evals | pending | 24, 25 | [26](../../docs/build/26-modifies-edges-kdigo.md) | — |
-| 27 | Full harness run + thesis test | evals, docs | pending | 22, 23, 24, 25, 26 | [27](../../docs/build/27-full-harness-thesis-test.md) | — |
+| #   | Feature                        | Components              | Status  | Depends on         | Spec                                                  | PR                   |
+| --- | ------------------------------ | ----------------------- | ------- | ------------------ | ----------------------------------------------------- | -------------------- |
+| 25  | Preemption, USPSTF ↔ ACC/AHA   | graph, api, docs, evals | shipped | 23                 | [25](../../docs/build/25-preemption-uspstf-accaha.md) | [#24](../../pull/24) |
+| 26  | MODIFIES edges from KDIGO      | graph, api, docs, evals | shipped | 24, 25             | [26](../../docs/build/26-modifies-edges-kdigo.md)     | [#25](../../pull/25) |
+| 27  | Full harness run + thesis test | evals, docs             | pending | 22, 23, 24, 25, 26 | [27](../../docs/build/27-full-harness-thesis-test.md) | —                    |
 
 ### Phase 4: UI polish
 

@@ -28,12 +28,32 @@ The schema is split into a **knowledge layer** (Guideline, Recommendation, Strat
 
 ### Clinical entity layer (FHIR-aligned reference nodes)
 
+Clinical entity nodes are **shared reference data** — one canonical node per concept, referenced by every guideline that needs it. They live in `graph/seeds/clinical-entities.cypher`, loaded before any guideline seed. Guideline seeds reference them via `MERGE` on `id`; a `CREATE` on a shared entity is a bug. Shared entities carry **no domain labels** (no `:USPSTF`, `:ACC_AHA`, etc.); they are global.
+
 Each clinical entity node is a **semantic concept**, not a single code. Code attributes are **lists** so one node can match any surface form the concept appears as in an EHR.
 
-- **`Condition`** — FHIR Condition; `snomed_codes[]` + `icd10_codes[]`
-- **`Observation`** — FHIR Observation; `loinc_codes[]` + `snomed_codes[]`
-- **`Medication`** — FHIR Medication; `rxnorm_codes[]`
-- **`Procedure`** — FHIR Procedure; `cpt_codes[]` + `snomed_codes[]`
+- **`Condition`** — FHIR Condition; `snomed_codes[]` + `icd10_codes[]` + `codings[]` (multi-coding per ADR 0017)
+- **`Observation`** — FHIR Observation; `loinc_codes[]` + `snomed_codes[]` + primary key `code` / `code_system`
+- **`Medication`** — FHIR Medication; `rxnorm_codes[]` + primary key `code` / `code_system`
+- **`Procedure`** — FHIR Procedure; `cpt_codes[]` + `snomed_codes[]` + primary key `code` / `code_system`
+
+#### Primary-key conventions (ADR 0017)
+
+Medication, Observation, and Procedure each carry a **single-system primary key** stored as `code` (string) + `code_system` (string). A Neo4j uniqueness constraint enforces `(code, code_system)` per label.
+
+| Entity type | `code_system` | `code` value |
+|-------------|---------------|--------------|
+| Medication  | `RxNorm`      | RxCUI (class-level) |
+| Observation | `LOINC`       | Primary LOINC code |
+| Procedure   | `CPT`         | Most representative CPT code |
+
+Condition uses **multi-coding**: a `codings` list of `SYSTEM:CODE` concatenated strings (e.g., `['SNOMED:394659003', 'ICD10:I25']`). Neo4j cannot store lists of maps, so the concatenated-string format provides native Cypher queryability (`'SNOMED:X' IN c.codings`). Uniqueness is enforced by a seed-time check rather than a native constraint (Neo4j constraints can't enforce list-element uniqueness). See ADR 0017.
+
+Existing code-array properties (`rxnorm_codes`, `snomed_codes`, `icd10_codes`, `loinc_codes`, `cpt_codes`) are retained alongside primary keys for evaluator backward compatibility.
+
+#### Domain labels
+
+Guideline-scoped nodes (`Guideline`, `Recommendation`, `Strategy`) carry a domain label identifying their source: `:USPSTF`, `:ACC_AHA`, `:KDIGO`. This enables UI filtering and evaluator scoping. Shared entity nodes are global and do not carry domain labels.
 
 If a future guideline requires distinguishing sub-types, add separate nodes of the same type and connect them with `IS_A` edges for hierarchy traversal. Do not introduce aggregate/group node types; the entity node already *is* the semantic grouping.
 

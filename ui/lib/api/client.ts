@@ -53,6 +53,27 @@ export async function evaluate(
   });
 }
 
+/** Node with domain info, as returned by GET /subgraph. */
+export interface ForestNode extends GraphNode {
+  domain: "USPSTF" | "ACC_AHA" | "KDIGO" | null;
+}
+
+export interface ForestSubgraph {
+  nodes: ForestNode[];
+  edges: GraphEdge[];
+}
+
+export async function fetchSubgraph(
+  domains?: string[],
+): Promise<ForestSubgraph> {
+  const params = new URLSearchParams();
+  if (domains !== undefined) {
+    params.set("domains", domains.join(","));
+  }
+  const qs = params.toString();
+  return apiFetch<ForestSubgraph>(`/subgraph${qs ? `?${qs}` : ""}`);
+}
+
 export async function searchNodes(
   q: string,
   nodeTypes?: string[],

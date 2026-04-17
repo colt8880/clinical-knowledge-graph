@@ -1,86 +1,126 @@
 /**
- * Explore tab e2e tests — graph canvas with column layout.
+ * Explore tab e2e tests — whole-forest Cytoscape canvas with domain filter.
  *
- * Requires: API running at localhost:8000 with a seeded Neo4j graph.
+ * Requires: API running at localhost:8000 with all three guideline seeds loaded.
  * Run: cd ui && npm run test
  *
- * Tests verify the progressive column hierarchy rendered in Cytoscape:
- *   Guideline → Recommendations → Strategies → Actions
- *
  * Because Cytoscape renders to a <canvas>, we can't click individual
- * nodes via DOM selectors. Instead we test URL-driven state: navigating
- * to deep links and verifying the canvas renders + detail panel populates.
+ * nodes via DOM selectors. Instead we test URL-driven state, domain filter
+ * interaction, and verify the canvas renders.
  */
 import { test, expect } from "@playwright/test";
 
-test.describe("Explore tab", () => {
-  test("loads with graph canvas visible", async ({ page }) => {
+test.describe("Explore tab — whole-forest view", () => {
+  test("loads with graph canvas and domain filter visible", async ({ page }) => {
     await page.goto("/explore");
 
     await expect(page.getByTestId("explore-page")).toBeVisible();
     await expect(page.getByTestId("graph-canvas")).toBeVisible({
       timeout: 10_000,
     });
+    await expect(page.getByTestId("domain-filter")).toBeVisible();
   });
 
-  test("default load shows guideline detail", async ({ page }) => {
+  test("all three domain chips default to active", async ({ page }) => {
     await page.goto("/explore");
 
-    // The detail panel should auto-show the guideline node.
-    const detail = page.getByTestId("node-detail");
-    await expect(detail).toBeVisible({ timeout: 10_000 });
-    await expect(detail).toContainText("Guideline", { timeout: 10_000 });
+    await expect(page.getByTestId("domain-chip-uspstf")).toHaveAttribute(
+      "aria-checked",
+      "true",
+      { timeout: 5_000 },
+    );
+    await expect(page.getByTestId("domain-chip-acc-aha")).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    await expect(page.getByTestId("domain-chip-kdigo")).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
   });
 
-  test("deep link with ?r= shows recommendation detail and strategies", async ({
+  test("toggling a domain off updates URL", async ({ page }) => {
+    await page.goto("/explore");
+
+    // Wait for canvas to load.
+    await expect(page.getByTestId("graph-canvas")).toBeVisible({
+      timeout: 10_000,
+    });
+
+    // Toggle KDIGO off.
+    await page.getByTestId("domain-chip-kdigo").click();
+
+    // URL should reflect the change.
+    await expect(page).toHaveURL(/domains=/, { timeout: 5_000 });
+    const url = new URL(page.url());
+    const domains = url.searchParams.get("domains");
+    expect(domains).not.toContain("kdigo");
+    expect(domains).toContain("uspstf");
+  });
+
+  test("URL with single domain loads correctly", async ({ page }) => {
+    await page.goto("/explore?domains=kdigo");
+
+    await expect(page.getByTestId("graph-canvas")).toBeVisible({
+      timeout: 10_000,
+    });
+
+    // KDIGO chip should be active; others inactive.
+    await expect(page.getByTestId("domain-chip-kdigo")).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    await expect(page.getByTestId("domain-chip-uspstf")).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
+    await expect(page.getByTestId("domain-chip-acc-aha")).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
+  });
+
+  test("empty domains param still renders canvas (shared entities)", async ({
     page,
   }) => {
+    await page.goto("/explore?domains=");
+
+    await expect(page.getByTestId("graph-canvas")).toBeVisible({
+      timeout: 10_000,
+    });
+  });
+
+  test("legacy v0 URL loads without crash", async ({ page }) => {
     const g = encodeURIComponent("guideline:uspstf-statin-2022");
     const r = encodeURIComponent("rec:statin-initiate-grade-b");
     await page.goto(`/explore?g=${g}&r=${r}`);
 
+    // Should load the full forest view (legacy params ignored).
+    await expect(page.getByTestId("explore-page")).toBeVisible();
     await expect(page.getByTestId("graph-canvas")).toBeVisible({
       timeout: 10_000,
     });
 
-    // Detail panel should show the selected recommendation.
-    const detail = page.getByTestId("node-detail");
-    await expect(detail).toBeVisible({ timeout: 10_000 });
-    await expect(detail).toContainText("Grade B", { timeout: 10_000 });
+    // All domain chips should be active (default).
+    await expect(page.getByTestId("domain-chip-uspstf")).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
   });
 
-  test("deep link with ?r=&s= shows strategy detail and actions", async ({
-    page,
-  }) => {
-    const g = encodeURIComponent("guideline:uspstf-statin-2022");
-    const r = encodeURIComponent("rec:statin-initiate-grade-b");
-    const s = encodeURIComponent("strategy:statin-moderate-intensity");
-    await page.goto(`/explore?g=${g}&r=${r}&s=${s}`);
+  test("focus param in URL shows detail panel", async ({ page }) => {
+    await page.goto(
+      "/explore?focus=" +
+        encodeURIComponent("rec:statin-initiate-grade-b"),
+    );
 
     await expect(page.getByTestId("graph-canvas")).toBeVisible({
       timeout: 10_000,
     });
 
-    // Detail panel should show the selected strategy.
+    // Detail panel should show the focused node.
     const detail = page.getByTestId("node-detail");
     await expect(detail).toBeVisible({ timeout: 10_000 });
-    await expect(detail).toContainText("Strategy", { timeout: 10_000 });
-  });
-
-  test("navigating between recs updates detail panel content", async ({
-    page,
-  }) => {
-    // Start with Grade B rec selected.
-    const g = encodeURIComponent("guideline:uspstf-statin-2022");
-    const rB = encodeURIComponent("rec:statin-initiate-grade-b");
-    await page.goto(`/explore?g=${g}&r=${rB}`);
-
-    const detail = page.getByTestId("node-detail");
     await expect(detail).toContainText("Grade B", { timeout: 10_000 });
-
-    // Navigate to Grade C rec via URL.
-    const rC = encodeURIComponent("rec:statin-selective-grade-c");
-    await page.goto(`/explore?g=${g}&r=${rC}`);
-    await expect(detail).toContainText("Grade C", { timeout: 10_000 });
   });
 });

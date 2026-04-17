@@ -69,3 +69,5 @@ Do **not** write an ADR for:
 | 0014 | v0 scope reduction, repo restructure, Python for /api | Accepted |
 | 0015 | Build workflow and PR review loop | Accepted |
 | 0016 | Guideline content layout | Accepted |
+| 0017 | Shared clinical entity coding strategy | Accepted |
+| 0018 | Preemption precedence rules | Accepted |

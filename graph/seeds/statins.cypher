@@ -1,17 +1,24 @@
-// v0 statin knowledge-graph seed.
+// v0 statin knowledge-graph seed — guideline-scoped nodes only.
 //
 // Loads the USPSTF 2022 statin primary prevention model exactly as specified in
 // docs/reference/guidelines/statins.md. Structure:
 //
-//   Guideline  ── FROM_GUIDELINE ──  Recommendation{R1,R2,R3}
-//                                    │
-//                                    │ OFFERS_STRATEGY
-//                                    ▼
-//                                    Strategy{moderate-intensity, SDM}
-//                                    │
-//                                    │ INCLUDES_ACTION
-//                                    ▼
-//                                    Medication × 7 / Procedure × 1
+//   Guideline:USPSTF  ── FROM_GUIDELINE ──  Recommendation:USPSTF{R1,R2,R3}
+//                                           │
+//                                           │ OFFERS_STRATEGY
+//                                           ▼
+//                                           Strategy:USPSTF{moderate-intensity, SDM}
+//                                           │
+//                                           │ INCLUDES_ACTION
+//                                           ▼
+//                                           Medication × 7 / Procedure × 1
+//                                           (shared entities from clinical-entities.cypher)
+//
+// This seed contains only guideline-scoped nodes (Guideline, Recommendation,
+// Strategy) with the :USPSTF domain label. Clinical entity nodes (Medication,
+// Condition, Observation, Procedure) are defined in clinical-entities.cypher
+// and referenced here via MATCH. Per ADR 0017, shared entities are global
+// reference data with no domain label.
 //
 // Invariants:
 // - Fully idempotent. Every node and edge is MERGEd; properties are set via
@@ -31,7 +38,7 @@
 // endpoints by id. The uniqueness constraints from constraints.cypher keep
 // MATCH resolution unambiguous.
 //
-// Apply constraints.cypher before this file.
+// Apply order: constraints.cypher → clinical-entities.cypher → this file.
 //
 // Source: USPSTF. Statin Use for the Primary Prevention of CVD in Adults.
 //         Final recommendation, 2022-08-23.
@@ -41,7 +48,7 @@
 // Guideline
 // ---------------------------------------------------------------------------
 
-MERGE (g:Guideline {id: 'guideline:uspstf-statin-2022'})
+MERGE (g:Guideline:USPSTF {id: 'guideline:uspstf-statin-2022'})
 ON CREATE SET
   g.title = 'Statin Use for the Primary Prevention of Cardiovascular Disease in Adults: Preventive Medication',
   g.publisher = 'US Preventive Services Task Force',
@@ -59,7 +66,7 @@ ON CREATE SET
 // ---------------------------------------------------------------------------
 
 // R1 — Grade B: initiate statin
-MERGE (r1:Recommendation {id: 'rec:statin-initiate-grade-b'})
+MERGE (r1:Recommendation:USPSTF {id: 'rec:statin-initiate-grade-b'})
 ON CREATE SET
   r1.title = 'Initiate statin for primary prevention of CVD (Grade B)',
   r1.evidence_grade = 'B',
@@ -76,7 +83,7 @@ ON CREATE SET
 // R2 — Grade C: selectively offer statin / SDM
 // Eligibility matches R1 except the risk-score gate is 7.5 ≤ ascvd_10yr < 10.
 // Expressed via two risk_score_compares (gte 7.5, lt 10) per predicate catalog.
-MERGE (r2:Recommendation {id: 'rec:statin-selective-grade-c'})
+MERGE (r2:Recommendation:USPSTF {id: 'rec:statin-selective-grade-c'})
 ON CREATE SET
   r2.title = 'Selectively offer statin based on shared decision-making (Grade C)',
   r2.evidence_grade = 'C',
@@ -91,7 +98,7 @@ ON CREATE SET
   r2.provenance_publication_date = date('2022-08-23');
 
 // R3 — Grade I: insufficient evidence at age ≥76
-MERGE (r3:Recommendation {id: 'rec:statin-insufficient-evidence-grade-i'})
+MERGE (r3:Recommendation:USPSTF {id: 'rec:statin-insufficient-evidence-grade-i'})
 ON CREATE SET
   r3.title = 'Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)',
   r3.evidence_grade = 'I',
@@ -109,7 +116,7 @@ ON CREATE SET
 // Strategies
 // ---------------------------------------------------------------------------
 
-MERGE (sMod:Strategy {id: 'strategy:statin-moderate-intensity'})
+MERGE (sMod:Strategy:USPSTF {id: 'strategy:statin-moderate-intensity'})
 ON CREATE SET
   sMod.name = 'Moderate-intensity statin therapy',
   sMod.evidence_note = 'Any active moderate-intensity statin satisfies. v0 does not model intensity by dose; agent-level substitution is acceptable. See guidelines/statins.md.',
@@ -119,7 +126,7 @@ ON CREATE SET
   sMod.provenance_source_section = 'Recommendation Summary, Grade B',
   sMod.provenance_publication_date = date('2022-08-23');
 
-MERGE (sSdm:Strategy {id: 'strategy:statin-shared-decision-discussion'})
+MERGE (sSdm:Strategy:USPSTF {id: 'strategy:statin-shared-decision-discussion'})
 ON CREATE SET
   sSdm.name = 'Shared decision-making discussion about statin therapy',
   sSdm.evidence_note = 'Satisfied by a documented SDM encounter within the last year, regardless of decision outcome. Patients who elect to initiate are also evaluated against strategy:statin-moderate-intensity.',
@@ -128,185 +135,6 @@ ON CREATE SET
   sSdm.provenance_version = '2022-08-23',
   sSdm.provenance_source_section = 'Recommendation Summary, Grade C',
   sSdm.provenance_publication_date = date('2022-08-23');
-
-// ---------------------------------------------------------------------------
-// Clinical entity layer — Conditions
-// ---------------------------------------------------------------------------
-
-MERGE (cAscvd:Condition {id: 'cond:ascvd-established'})
-ON CREATE SET
-  cAscvd.display_name = 'Established atherosclerotic cardiovascular disease',
-  cAscvd.snomed_codes = ['394659003', '429559004', '230690007', '22298006', '52404001'],
-  cAscvd.icd10_codes = ['I20', 'I21', 'I22', 'I23', 'I24', 'I25', 'I63', 'I73.9', 'I70.2'],
-  cAscvd.provenance_guideline = 'guideline:uspstf-statin-2022',
-  cAscvd.provenance_version = '2022-08-23',
-  cAscvd.provenance_source_section = 'Clinical entity layer',
-  cAscvd.provenance_publication_date = date('2022-08-23');
-
-MERGE (cDm:Condition {id: 'cond:diabetes'})
-ON CREATE SET
-  cDm.display_name = 'Diabetes mellitus (Type 1 or Type 2)',
-  cDm.snomed_codes = ['73211009'],
-  cDm.icd10_codes = ['E10', 'E11'],
-  cDm.provenance_guideline = 'guideline:uspstf-statin-2022',
-  cDm.provenance_version = '2022-08-23',
-  cDm.provenance_source_section = 'Clinical entity layer',
-  cDm.provenance_publication_date = date('2022-08-23');
-
-MERGE (cHtn:Condition {id: 'cond:hypertension'})
-ON CREATE SET
-  cHtn.display_name = 'Essential hypertension',
-  cHtn.snomed_codes = ['38341003'],
-  cHtn.icd10_codes = ['I10'],
-  cHtn.provenance_guideline = 'guideline:uspstf-statin-2022',
-  cHtn.provenance_version = '2022-08-23',
-  cHtn.provenance_source_section = 'Clinical entity layer',
-  cHtn.provenance_publication_date = date('2022-08-23');
-
-MERGE (cDys:Condition {id: 'cond:dyslipidemia'})
-ON CREATE SET
-  cDys.display_name = 'Dyslipidemia / mixed hyperlipidemia',
-  cDys.snomed_codes = ['370992007'],
-  cDys.icd10_codes = ['E78.5', 'E78.2', 'E78.0'],
-  cDys.provenance_guideline = 'guideline:uspstf-statin-2022',
-  cDys.provenance_version = '2022-08-23',
-  cDys.provenance_source_section = 'Clinical entity layer',
-  cDys.provenance_publication_date = date('2022-08-23');
-
-MERGE (cFh:Condition {id: 'cond:familial-hypercholesterolemia'})
-ON CREATE SET
-  cFh.display_name = 'Familial hypercholesterolemia',
-  cFh.snomed_codes = ['398036000'],
-  cFh.icd10_codes = ['E78.01'],
-  cFh.provenance_guideline = 'guideline:uspstf-statin-2022',
-  cFh.provenance_version = '2022-08-23',
-  cFh.provenance_source_section = 'Clinical entity layer',
-  cFh.provenance_publication_date = date('2022-08-23');
-
-// ---------------------------------------------------------------------------
-// Clinical entity layer — Observations
-// ---------------------------------------------------------------------------
-
-MERGE (oTc:Observation {id: 'obs:total-cholesterol'})
-ON CREATE SET
-  oTc.display_name = 'Total cholesterol',
-  oTc.loinc_codes = ['2093-3'],
-  oTc.unit = 'mg/dL',
-  oTc.provenance_guideline = 'guideline:uspstf-statin-2022',
-  oTc.provenance_version = '2022-08-23',
-  oTc.provenance_source_section = 'Clinical entity layer',
-  oTc.provenance_publication_date = date('2022-08-23');
-
-MERGE (oHdl:Observation {id: 'obs:hdl-cholesterol'})
-ON CREATE SET
-  oHdl.display_name = 'HDL cholesterol',
-  oHdl.loinc_codes = ['2085-9'],
-  oHdl.unit = 'mg/dL',
-  oHdl.provenance_guideline = 'guideline:uspstf-statin-2022',
-  oHdl.provenance_version = '2022-08-23',
-  oHdl.provenance_source_section = 'Clinical entity layer',
-  oHdl.provenance_publication_date = date('2022-08-23');
-
-MERGE (oLdl:Observation {id: 'obs:ldl-cholesterol'})
-ON CREATE SET
-  oLdl.display_name = 'LDL cholesterol (direct or calculated)',
-  oLdl.loinc_codes = ['2089-1', '13457-7'],
-  oLdl.unit = 'mg/dL',
-  oLdl.provenance_guideline = 'guideline:uspstf-statin-2022',
-  oLdl.provenance_version = '2022-08-23',
-  oLdl.provenance_source_section = 'Clinical entity layer',
-  oLdl.provenance_publication_date = date('2022-08-23');
-
-MERGE (oBp:Observation {id: 'obs:blood-pressure'})
-ON CREATE SET
-  oBp.display_name = 'Blood pressure panel',
-  oBp.loinc_codes = ['85354-9', '8480-6', '8462-4'],
-  oBp.unit = 'mm[Hg]',
-  oBp.provenance_guideline = 'guideline:uspstf-statin-2022',
-  oBp.provenance_version = '2022-08-23',
-  oBp.provenance_source_section = 'Clinical entity layer',
-  oBp.provenance_publication_date = date('2022-08-23');
-
-// ---------------------------------------------------------------------------
-// Clinical entity layer — Medications (moderate-intensity statin class members)
-// ---------------------------------------------------------------------------
-
-MERGE (mAtor:Medication {id: 'med:atorvastatin'})
-ON CREATE SET
-  mAtor.display_name = 'Atorvastatin',
-  mAtor.rxnorm_codes = ['83367'],
-  mAtor.provenance_guideline = 'guideline:uspstf-statin-2022',
-  mAtor.provenance_version = '2022-08-23',
-  mAtor.provenance_source_section = 'Strategies — moderate-intensity',
-  mAtor.provenance_publication_date = date('2022-08-23');
-
-MERGE (mRosu:Medication {id: 'med:rosuvastatin'})
-ON CREATE SET
-  mRosu.display_name = 'Rosuvastatin',
-  mRosu.rxnorm_codes = ['301542'],
-  mRosu.provenance_guideline = 'guideline:uspstf-statin-2022',
-  mRosu.provenance_version = '2022-08-23',
-  mRosu.provenance_source_section = 'Strategies — moderate-intensity',
-  mRosu.provenance_publication_date = date('2022-08-23');
-
-MERGE (mSim:Medication {id: 'med:simvastatin'})
-ON CREATE SET
-  mSim.display_name = 'Simvastatin',
-  mSim.rxnorm_codes = ['36567'],
-  mSim.provenance_guideline = 'guideline:uspstf-statin-2022',
-  mSim.provenance_version = '2022-08-23',
-  mSim.provenance_source_section = 'Strategies — moderate-intensity',
-  mSim.provenance_publication_date = date('2022-08-23');
-
-MERGE (mPra:Medication {id: 'med:pravastatin'})
-ON CREATE SET
-  mPra.display_name = 'Pravastatin',
-  mPra.rxnorm_codes = ['42463'],
-  mPra.provenance_guideline = 'guideline:uspstf-statin-2022',
-  mPra.provenance_version = '2022-08-23',
-  mPra.provenance_source_section = 'Strategies — moderate-intensity',
-  mPra.provenance_publication_date = date('2022-08-23');
-
-MERGE (mLov:Medication {id: 'med:lovastatin'})
-ON CREATE SET
-  mLov.display_name = 'Lovastatin',
-  mLov.rxnorm_codes = ['6472'],
-  mLov.provenance_guideline = 'guideline:uspstf-statin-2022',
-  mLov.provenance_version = '2022-08-23',
-  mLov.provenance_source_section = 'Strategies — moderate-intensity',
-  mLov.provenance_publication_date = date('2022-08-23');
-
-MERGE (mFlu:Medication {id: 'med:fluvastatin'})
-ON CREATE SET
-  mFlu.display_name = 'Fluvastatin',
-  mFlu.rxnorm_codes = ['41127'],
-  mFlu.provenance_guideline = 'guideline:uspstf-statin-2022',
-  mFlu.provenance_version = '2022-08-23',
-  mFlu.provenance_source_section = 'Strategies — moderate-intensity',
-  mFlu.provenance_publication_date = date('2022-08-23');
-
-MERGE (mPit:Medication {id: 'med:pitavastatin'})
-ON CREATE SET
-  mPit.display_name = 'Pitavastatin',
-  mPit.rxnorm_codes = ['861634'],
-  mPit.provenance_guideline = 'guideline:uspstf-statin-2022',
-  mPit.provenance_version = '2022-08-23',
-  mPit.provenance_source_section = 'Strategies — moderate-intensity',
-  mPit.provenance_publication_date = date('2022-08-23');
-
-// ---------------------------------------------------------------------------
-// Clinical entity layer — Procedure (shared decision-making)
-// ---------------------------------------------------------------------------
-
-MERGE (pSdm:Procedure {id: 'proc:sdm-statin-discussion'})
-ON CREATE SET
-  pSdm.display_name = 'Shared decision-making discussion about statin therapy',
-  pSdm.snomed_codes = ['710925007'],
-  pSdm.cpt_codes = ['99401', '99402', '99403', '99404'],
-  pSdm.provenance_guideline = 'guideline:uspstf-statin-2022',
-  pSdm.provenance_version = '2022-08-23',
-  pSdm.provenance_source_section = 'Strategies — shared decision',
-  pSdm.provenance_publication_date = date('2022-08-23');
 
 // ---------------------------------------------------------------------------
 // FROM_GUIDELINE edges (Recommendation -> Guideline)
@@ -376,8 +204,9 @@ ON CREATE SET
 
 // ---------------------------------------------------------------------------
 // INCLUDES_ACTION edges — moderate-intensity strategy -> 7 statins.
-// Per guidelines/statins.md: intent=primary_prevention, cadence=null, lookback=null,
-// priority=routine for every member.
+// Clinical entity nodes are created in clinical-entities.cypher; referenced
+// here via MATCH. Per guidelines/statins.md: intent=primary_prevention,
+// cadence=null, lookback=null, priority=routine for every member.
 // ---------------------------------------------------------------------------
 
 MATCH (sMod:Strategy {id: 'strategy:statin-moderate-intensity'}),

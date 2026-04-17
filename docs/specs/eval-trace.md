@@ -1,6 +1,6 @@
 # Eval Trace
 
-**Status: v0.** The ordered, structured record of every step the evaluator takes while producing a recommendation set for a patient. This spec is the **primary contract** between the evaluator, the API, and the Eval UI. Contract source of truth: `docs/contracts/eval-trace.schema.json`.
+**Status: v1 (F21).** The ordered, structured record of every step the evaluator takes while producing a recommendation set for a patient. This spec is the **primary contract** between the evaluator, the API, and the Eval UI. Contract source of truth: `docs/contracts/eval-trace.schema.json`.
 
 ## Why a trace is a first-class output
 
@@ -19,11 +19,14 @@ If a design choice would trade trace fidelity for brevity, default to fidelity. 
 {
   envelope: Envelope                // versions, evaluation_time, patient fingerprint
   events: Event[]                   // ordered, one step each
-  recommendations: Recommendation[] // derived view; convenience for consumers
+  recommendations: Recommendation[] // derived view; convenience for consumers (flat list)
+  recommendations_by_guideline: {   // per-guideline breakdown; same data, keyed by guideline_id
+    [guideline_id]: Recommendation[]
+  }
 }
 ```
 
-The envelope is stamped once at the start and echoed in the API response. The `events` array is the trace proper. `recommendations` is a convenience derivation from `recommendation_emitted` events for consumers that don't want to walk the trace.
+The envelope is stamped once at the start and echoed in the API response. The `events` array is the trace proper. `recommendations` is a convenience derivation from `recommendation_emitted` events for consumers that don't want to walk the trace. `recommendations_by_guideline` groups the same data by guideline for the UI.
 
 ## Envelope
 
@@ -44,6 +47,7 @@ Wall-clock times are excluded from `patient_fingerprint` and excluded from regre
 Every event has:
 - `seq` — monotonically increasing integer, starting at 1.
 - `type` — one of the types below.
+- `guideline_id` — the guideline being evaluated when this event was emitted. **Required on every event** (F21). Null for envelope-level events (`evaluation_started`, `evaluation_completed`) that sit outside any guideline bracket. For all other events, set from the enclosing guideline context. Events referencing shared clinical entities (e.g., `action_checked` on a `Medication`) carry the `guideline_id` of the Rec being evaluated, not the entity.
 - `at` — optional wall-clock ISO 8601 date-time (informational, not part of determinism).
 - Type-specific payload fields.
 
@@ -53,7 +57,7 @@ Events are ordered by `seq`. `seq` is the only index the UI stepper uses. A trac
 
 **Traversal events** — describe graph walking.
 
-1. **`evaluation_started`** — always first.
+1. **`evaluation_started`** — always first. `guideline_id` is null.
    - `patient_age_years: int`
    - `patient_sex: string`
    - `guidelines_in_scope: string[]` (e.g., `["guideline:uspstf-statin-2022"]`)
@@ -62,17 +66,21 @@ Events are ordered by `seq`. `seq` is the only index the UI stepper uses. A trac
    - `guideline_id: string`
    - `guideline_title: string`
 
-3. **`recommendation_considered`** — evaluator begins evaluating a specific Rec.
+3. **`guideline_exited`** — evaluator finishes considering a specific guideline (F21).
+   - `guideline_id: string`
+   - `recommendations_emitted: int` (count of recs emitted for this guideline)
+
+4. **`recommendation_considered`** — evaluator begins evaluating a specific Rec.
    - `recommendation_id: string`
    - `recommendation_title: string`
    - `evidence_grade: string`
    - `intent: string`
    - `trigger: string`
 
-4. **`eligibility_evaluation_started`** — about to walk the `structured_eligibility` tree.
+5. **`eligibility_evaluation_started`** — about to walk the `structured_eligibility` tree.
    - `recommendation_id: string`
 
-5. **`predicate_evaluated`** — one leaf predicate has been resolved.
+6. **`predicate_evaluated`** — one leaf predicate has been resolved.
    - `recommendation_id: string`
    - `path: string[]` (location in the predicate tree, e.g., `["all_of", 0, "any_of", 2]`)
    - `predicate: string` (e.g., `age_between`)
@@ -82,44 +90,44 @@ Events are ordered by `seq`. `seq` is the only index the UI stepper uses. A trac
    - `missing_data_policy_applied: string | null` (e.g., `"fail_closed"`; null when no missing data)
    - `note: string | null` (optional human-readable detail, e.g., "no final LDL observation within P2Y")
 
-6. **`composite_resolved`** — an `all_of`/`any_of`/`none_of` has been short-circuited or fully evaluated.
+7. **`composite_resolved`** — an `all_of`/`any_of`/`none_of` has been short-circuited or fully evaluated.
    - `recommendation_id: string`
    - `path: string[]`
    - `operator: string`
    - `result: "true" | "false" | "unknown"`
    - `short_circuited: boolean`
 
-7. **`eligibility_evaluation_completed`** — top-level eligibility result is known.
+8. **`eligibility_evaluation_completed`** — top-level eligibility result is known.
    - `recommendation_id: string`
    - `result: "eligible" | "ineligible" | "unknown"`
    - `final_value: "true" | "false" | "unknown"`
 
 **Strategy events** — describe how the rec is satisfied (or not).
 
-8. **`strategy_considered`** — evaluator begins checking whether an offered Strategy is currently satisfied by patient state.
+9. **`strategy_considered`** — evaluator begins checking whether an offered Strategy is currently satisfied by patient state.
    - `recommendation_id: string`
    - `strategy_id: string`
    - `strategy_name: string`
 
-9. **`action_checked`** — one `INCLUDES_ACTION` edge has been resolved against patient state.
-   - `recommendation_id: string`
-   - `strategy_id: string`
-   - `action_node_id: string` (e.g., `med:atorvastatin`)
-   - `action_entity_type: "Medication" | "Procedure" | "Observation"`
-   - `cadence: string | null`
-   - `lookback: string | null`
-   - `inputs_read: InputRead[]`
-   - `satisfied: boolean`
-   - `note: string | null`
+10. **`action_checked`** — one `INCLUDES_ACTION` edge has been resolved against patient state.
+    - `recommendation_id: string`
+    - `strategy_id: string`
+    - `action_node_id: string` (e.g., `med:atorvastatin`)
+    - `action_entity_type: "Medication" | "Procedure" | "Observation"`
+    - `cadence: string | null`
+    - `lookback: string | null`
+    - `inputs_read: InputRead[]`
+    - `satisfied: boolean`
+    - `note: string | null`
 
-10. **`strategy_resolved`** — all actions of one Strategy checked.
+11. **`strategy_resolved`** — all actions of one Strategy checked.
     - `recommendation_id: string`
     - `strategy_id: string`
     - `satisfied: boolean`
 
 **Risk-score events** — unique to calculated scores.
 
-11. **`risk_score_lookup`** — evaluator is sourcing a score value.
+12. **`risk_score_lookup`** — evaluator is sourcing a score value.
     - `score_name: string` (e.g., `ascvd_10yr`)
     - `resolution: "supplied" | "computed" | "unavailable"`
     - `supplied_value: number | null` (when `resolution="supplied"`)
@@ -131,12 +139,12 @@ Events are ordered by `seq`. `seq` is the only index the UI stepper uses. A trac
 
 **Emission events** — what the evaluator concluded.
 
-12. **`exit_condition_triggered`** — a hard exit is taken (e.g., patient has pre-existing ASCVD).
+13. **`exit_condition_triggered`** — a hard exit is taken (e.g., patient has pre-existing ASCVD).
     - `recommendation_id: string`
     - `exit: string` (controlled token: `out_of_scope_secondary_prevention`, `out_of_scope_familial_hypercholesterolemia`, `out_of_scope_age_below_range`, etc.)
     - `rationale: string` (human-readable)
 
-13. **`recommendation_emitted`** — the evaluator is emitting a rec in the final output.
+14. **`recommendation_emitted`** — the evaluator is emitting a rec in the final output.
     - `recommendation_id: string`
     - `status: "due" | "up_to_date" | "not_applicable" | "insufficient_evidence"`
     - `evidence_grade: string`
@@ -144,9 +152,21 @@ Events are ordered by `seq`. `seq` is the only index the UI stepper uses. A trac
     - `satisfying_strategy: string | null` (strategy id, present when `status="up_to_date"`)
     - `reason: string` (human-readable summary)
 
-14. **`evaluation_completed`** — always last.
+15. **`evaluation_completed`** — always last. `guideline_id` is null.
     - `recommendations_emitted: int`
     - `duration_ms: int`
+
+**Cross-guideline events** — reserved for F25/F26. Schema defines the types; evaluator does not emit them in F21.
+
+16. **`cross_guideline_match`** — reserved for F25/F26. Indicates a cross-guideline relationship was found during traversal.
+    - `source_guideline_id: string`
+    - `target_guideline_id: string`
+    - `match_type: string`
+
+17. **`preemption_resolved`** — reserved for F25. Indicates a preemption edge was resolved.
+    - `preempted_recommendation_id: string`
+    - `preempting_recommendation_id: string`
+    - `preempted_by_edge_id: string`
 
 ### `InputRead` shape
 
@@ -163,9 +183,23 @@ Events are ordered by `seq`. `seq` is the only index the UI stepper uses. A trac
 
 `derived` as a source means the evaluator synthesized the value (e.g., `age_years` from `date_of_birth` + `evaluation_time`). `inputs_read` records every patient-context field the predicate or calculator actually consulted; this is what makes the trace auditable.
 
+## Forest traversal order
+
+**Deterministic traversal order (F21 contract):** guidelines are visited in ascending lexical order of `guideline_id`. This is a contract, not an implementation detail. If the database contains guidelines `guideline:acc-aha-cholesterol-2018`, `guideline:kdigo-ckd-2024`, and `guideline:uspstf-statin-2022`, they are visited in that order.
+
+Within each guideline, traversal follows the v0 ordering: recommendations by id (ascending), depth-first through eligibility trees, strategies by id.
+
+The trace event sequence for a multi-guideline evaluation is:
+1. `evaluation_started` (guideline_id: null)
+2. For each guideline (in lexical guideline_id order):
+   - `guideline_entered`
+   - [exit checks, recommendation evaluation, strategy checks — same as v0]
+   - `guideline_exited`
+3. `evaluation_completed` (guideline_id: null)
+
 ## Ordering guarantees
 
-- Traversal is depth-first over offered Recommendations.
+- Traversal is depth-first over offered Recommendations within each guideline.
 - Within a Recommendation: `recommendation_considered` → `eligibility_evaluation_started` → predicate tree events (in DFS order) → `eligibility_evaluation_completed`. If eligible, Strategy events follow: for each offered Strategy, `strategy_considered` → N `action_checked` → `strategy_resolved`. Finally, one `exit_condition_triggered` or `recommendation_emitted`.
 - Predicate tree events use `path` to locate within the tree; ordering is DFS, left-to-right, short-circuit when a composite can be resolved early.
 - The same `PatientContext` + same graph version must produce the same `seq`-ordered event stream. This is the determinism contract.

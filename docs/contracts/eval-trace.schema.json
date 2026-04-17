@@ -2,14 +2,22 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://clinical-knowledge-graph/contracts/eval-trace.schema.json",
   "title": "EvalTrace",
-  "description": "v0 (ADR 0013, 0014). Machine-readable pairing of docs/specs/eval-trace.md. The evaluator's primary output.",
+  "description": "v1 (F21). Machine-readable pairing of docs/specs/eval-trace.md. The evaluator's primary output. Every event carries a guideline_id field; envelope-level events (evaluation_started, evaluation_completed) use null.",
   "type": "object",
   "required": ["envelope", "events", "recommendations"],
   "additionalProperties": false,
   "properties": {
     "envelope": { "$ref": "#/$defs/Envelope" },
     "events": { "type": "array", "items": { "$ref": "#/$defs/Event" }, "minItems": 2 },
-    "recommendations": { "type": "array", "items": { "$ref": "#/$defs/Recommendation" }, "default": [] }
+    "recommendations": { "type": "array", "items": { "$ref": "#/$defs/Recommendation" }, "default": [] },
+    "recommendations_by_guideline": {
+      "type": "object",
+      "description": "Per-guideline breakdown of recommendations, keyed by guideline_id. Derived from the same trace as the flat recommendations list.",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "$ref": "#/$defs/Recommendation" }
+      }
+    }
   },
   "$defs": {
     "Envelope": {
@@ -42,6 +50,7 @@
       "oneOf": [
         { "$ref": "#/$defs/EvaluationStarted" },
         { "$ref": "#/$defs/GuidelineEntered" },
+        { "$ref": "#/$defs/GuidelineExited" },
         { "$ref": "#/$defs/RecommendationConsidered" },
         { "$ref": "#/$defs/EligibilityEvaluationStarted" },
         { "$ref": "#/$defs/PredicateEvaluated" },
@@ -53,23 +62,27 @@
         { "$ref": "#/$defs/RiskScoreLookup" },
         { "$ref": "#/$defs/ExitConditionTriggered" },
         { "$ref": "#/$defs/RecommendationEmitted" },
-        { "$ref": "#/$defs/EvaluationCompleted" }
+        { "$ref": "#/$defs/EvaluationCompleted" },
+        { "$ref": "#/$defs/CrossGuidelineMatch" },
+        { "$ref": "#/$defs/PreemptionResolved" }
       ]
     },
     "BaseEvent": {
       "type": "object",
-      "required": ["seq", "type"],
+      "required": ["seq", "type", "guideline_id"],
       "properties": {
         "seq": { "type": "integer", "minimum": 1 },
         "type": { "type": "string" },
+        "guideline_id": { "type": ["string", "null"], "description": "The guideline being evaluated when this event was emitted. Null for envelope-level events (evaluation_started, evaluation_completed)." },
         "at": { "type": "string", "format": "date-time" }
       }
     },
     "EvaluationStarted": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "patient_age_years", "patient_sex", "guidelines_in_scope"],
+      "required": ["seq", "type", "guideline_id", "patient_age_years", "patient_sex", "guidelines_in_scope"],
       "properties": {
         "type": { "const": "evaluation_started" },
+        "guideline_id": { "const": null },
         "patient_age_years": { "type": "integer" },
         "patient_sex": { "type": "string" },
         "guidelines_in_scope": { "type": "array", "items": { "type": "string" } }
@@ -84,11 +97,21 @@
         "guideline_title": { "type": "string" }
       }
     },
+    "GuidelineExited": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "required": ["seq", "type", "guideline_id", "recommendations_emitted"],
+      "properties": {
+        "type": { "const": "guideline_exited" },
+        "guideline_id": { "type": "string" },
+        "recommendations_emitted": { "type": "integer", "minimum": 0 }
+      }
+    },
     "RecommendationConsidered": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "recommendation_title", "evidence_grade", "intent", "trigger"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "recommendation_title", "evidence_grade", "intent", "trigger"],
       "properties": {
         "type": { "const": "recommendation_considered" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "recommendation_title": { "type": "string" },
         "evidence_grade": { "type": "string" },
@@ -98,17 +121,19 @@
     },
     "EligibilityEvaluationStarted": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id"],
       "properties": {
         "type": { "const": "eligibility_evaluation_started" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" }
       }
     },
     "PredicateEvaluated": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "path", "predicate", "args", "inputs_read", "result"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "path", "predicate", "args", "inputs_read", "result"],
       "properties": {
         "type": { "const": "predicate_evaluated" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "path": { "type": "array", "items": { "type": ["string", "integer"] } },
         "predicate": { "type": "string" },
@@ -121,9 +146,10 @@
     },
     "CompositeResolved": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "path", "operator", "result", "short_circuited"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "path", "operator", "result", "short_circuited"],
       "properties": {
         "type": { "const": "composite_resolved" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "path": { "type": "array", "items": { "type": ["string", "integer"] } },
         "operator": { "type": "string", "enum": ["all_of", "any_of", "none_of"] },
@@ -133,9 +159,10 @@
     },
     "EligibilityEvaluationCompleted": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "result", "final_value"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "result", "final_value"],
       "properties": {
         "type": { "const": "eligibility_evaluation_completed" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "result": { "type": "string", "enum": ["eligible", "ineligible", "unknown"] },
         "final_value": { "$ref": "#/$defs/TriState" }
@@ -143,9 +170,10 @@
     },
     "StrategyConsidered": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "strategy_id", "strategy_name"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "strategy_id", "strategy_name"],
       "properties": {
         "type": { "const": "strategy_considered" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "strategy_id": { "type": "string" },
         "strategy_name": { "type": "string" }
@@ -153,9 +181,10 @@
     },
     "ActionChecked": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "strategy_id", "action_node_id", "action_entity_type", "inputs_read", "satisfied"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "strategy_id", "action_node_id", "action_entity_type", "inputs_read", "satisfied"],
       "properties": {
         "type": { "const": "action_checked" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "strategy_id": { "type": "string" },
         "action_node_id": { "type": "string" },
@@ -169,9 +198,10 @@
     },
     "StrategyResolved": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "strategy_id", "satisfied"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "strategy_id", "satisfied"],
       "properties": {
         "type": { "const": "strategy_resolved" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "strategy_id": { "type": "string" },
         "satisfied": { "type": "boolean" }
@@ -179,9 +209,10 @@
     },
     "RiskScoreLookup": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "score_name", "resolution"],
+      "required": ["seq", "type", "guideline_id", "score_name", "resolution"],
       "properties": {
         "type": { "const": "risk_score_lookup" },
+        "guideline_id": { "type": "string" },
         "score_name": { "type": "string" },
         "resolution": { "type": "string", "enum": ["supplied", "computed", "unavailable"] },
         "supplied_value": { "type": ["number", "null"] },
@@ -194,9 +225,10 @@
     },
     "ExitConditionTriggered": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "exit", "rationale"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "exit", "rationale"],
       "properties": {
         "type": { "const": "exit_condition_triggered" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "exit": { "type": "string" },
         "rationale": { "type": "string" }
@@ -204,9 +236,10 @@
     },
     "RecommendationEmitted": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendation_id", "status", "evidence_grade", "reason"],
+      "required": ["seq", "type", "guideline_id", "recommendation_id", "status", "evidence_grade", "reason"],
       "properties": {
         "type": { "const": "recommendation_emitted" },
+        "guideline_id": { "type": "string" },
         "recommendation_id": { "type": "string" },
         "status": { "type": "string", "enum": ["due", "up_to_date", "not_applicable", "insufficient_evidence"] },
         "evidence_grade": { "type": "string" },
@@ -217,18 +250,44 @@
     },
     "EvaluationCompleted": {
       "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
-      "required": ["seq", "type", "recommendations_emitted", "duration_ms"],
+      "required": ["seq", "type", "guideline_id", "recommendations_emitted", "duration_ms"],
       "properties": {
         "type": { "const": "evaluation_completed" },
+        "guideline_id": { "const": null },
         "recommendations_emitted": { "type": "integer", "minimum": 0 },
         "duration_ms": { "type": "integer", "minimum": 0 }
       }
     },
+    "CrossGuidelineMatch": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "description": "Reserved for F25/F26. Not emitted by the evaluator in F21.",
+      "required": ["seq", "type", "guideline_id", "source_guideline_id", "target_guideline_id", "match_type"],
+      "properties": {
+        "type": { "const": "cross_guideline_match" },
+        "guideline_id": { "type": "string" },
+        "source_guideline_id": { "type": "string" },
+        "target_guideline_id": { "type": "string" },
+        "match_type": { "type": "string" }
+      }
+    },
+    "PreemptionResolved": {
+      "allOf": [{ "$ref": "#/$defs/BaseEvent" }],
+      "description": "Reserved for F25. Not emitted by the evaluator in F21.",
+      "required": ["seq", "type", "guideline_id", "preempted_recommendation_id", "preempting_recommendation_id", "preempted_by_edge_id"],
+      "properties": {
+        "type": { "const": "preemption_resolved" },
+        "guideline_id": { "type": "string" },
+        "preempted_recommendation_id": { "type": "string" },
+        "preempting_recommendation_id": { "type": "string" },
+        "preempted_by_edge_id": { "type": "string" }
+      }
+    },
     "Recommendation": {
       "type": "object",
-      "required": ["recommendation_id", "status", "evidence_grade", "reason"],
+      "required": ["recommendation_id", "guideline_id", "status", "evidence_grade", "reason"],
       "properties": {
         "recommendation_id": { "type": "string" },
+        "guideline_id": { "type": "string" },
         "status": { "type": "string", "enum": ["due", "up_to_date", "not_applicable", "insufficient_evidence"] },
         "evidence_grade": { "type": "string" },
         "offered_strategies": { "type": "array", "items": { "type": "string" } },

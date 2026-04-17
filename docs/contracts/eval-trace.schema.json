@@ -4,7 +4,7 @@
   "title": "EvalTrace",
   "description": "v1 (F21). Machine-readable pairing of docs/specs/eval-trace.md. The evaluator's primary output. Every event carries a guideline_id field; envelope-level events (evaluation_started, evaluation_completed) use null.",
   "type": "object",
-  "required": ["envelope", "events", "recommendations"],
+  "required": ["envelope", "events", "recommendations", "recommendations_by_guideline"],
   "additionalProperties": false,
   "properties": {
     "envelope": { "$ref": "#/$defs/Envelope" },

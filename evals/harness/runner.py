@@ -34,9 +34,25 @@ def discover_fixtures(fixture_filter: str | None = None) -> list[Path]:
     """Discover fixture directories under evals/fixtures/.
 
     If fixture_filter is set (e.g., "statins/01-high-risk-55m-smoker"),
-    return only that fixture. Otherwise return all fixtures that have
-    both patient.json and expected-actions.json.
+    return only that fixture. If it starts with "_guideline:", return all
+    fixtures for that guideline directory. Otherwise return all fixtures
+    that have both patient.json and expected-actions.json.
     """
+    # Handle --guideline filter: return all fixtures for a guideline directory
+    if fixture_filter and fixture_filter.startswith("_guideline:"):
+        guideline_name = fixture_filter.split(":", 1)[1]
+        guideline_dir = FIXTURES_ROOT / guideline_name
+        if not guideline_dir.exists() or not guideline_dir.is_dir():
+            print(f"Guideline fixture directory not found: {guideline_name}", file=sys.stderr)
+            sys.exit(1)
+        fixtures: list[Path] = []
+        for case_dir in sorted(guideline_dir.iterdir()):
+            if not case_dir.is_dir():
+                continue
+            if (case_dir / "patient.json").exists() and (case_dir / "expected-actions.json").exists():
+                fixtures.append(case_dir)
+        return fixtures
+
     if fixture_filter:
         fixture_dir = FIXTURES_ROOT / fixture_filter
         if not fixture_dir.exists():
@@ -56,7 +72,7 @@ def discover_fixtures(fixture_filter: str | None = None) -> list[Path]:
         return [fixture_dir]
 
     # Discover all fixtures
-    fixtures: list[Path] = []
+    fixtures = []
     if not FIXTURES_ROOT.exists():
         return fixtures
     for guideline_dir in sorted(FIXTURES_ROOT.iterdir()):
@@ -310,6 +326,12 @@ def main() -> None:
         help="Run a specific arm only",
     )
     parser.add_argument(
+        "--guideline",
+        type=str,
+        default=None,
+        help="Run all fixtures for a specific guideline (e.g., cholesterol, statins)",
+    )
+    parser.add_argument(
         "--all",
         action="store_true",
         help="Run all fixtures with all arms",
@@ -328,10 +350,15 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if not args.all and not args.fixture:
-        parser.error("Specify --fixture <path> or --all")
+    if not args.all and not args.fixture and not args.guideline:
+        parser.error("Specify --fixture <path>, --guideline <name>, or --all")
 
-    fixture_filter = None if args.all else args.fixture
+    if args.guideline:
+        fixture_filter = f"_guideline:{args.guideline}"
+    elif args.all:
+        fixture_filter = None
+    else:
+        fixture_filter = args.fixture
 
     run_harness(
         fixture_filter=fixture_filter,

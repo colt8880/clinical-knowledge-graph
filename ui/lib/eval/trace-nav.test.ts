@@ -18,7 +18,7 @@ describe("highlightedNodeIds", () => {
       patient_age_years: 55,
       patient_sex: "male",
       guidelines_in_scope: ["guideline:uspstf-statin-2022"],
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(highlightedNodeIds(event)).toEqual([]);
   });
 
@@ -28,7 +28,7 @@ describe("highlightedNodeIds", () => {
       type: "guideline_entered" as const,
       guideline_id: "guideline:uspstf-statin-2022",
       guideline_title: "USPSTF Statin 2022",
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(highlightedNodeIds(event)).toEqual(["guideline:uspstf-statin-2022"]);
   });
 
@@ -41,7 +41,7 @@ describe("highlightedNodeIds", () => {
       evidence_grade: "B",
       intent: "initiate",
       trigger: "primary_prevention",
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(highlightedNodeIds(event)).toEqual(["rec:statin-initiate-grade-b"]);
   });
 
@@ -55,7 +55,7 @@ describe("highlightedNodeIds", () => {
       action_entity_type: "Medication" as const,
       inputs_read: [],
       satisfied: false,
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(highlightedNodeIds(event)).toEqual(["med:atorvastatin"]);
   });
 
@@ -66,7 +66,7 @@ describe("highlightedNodeIds", () => {
       recommendation_id: "rec:statin-initiate-grade-b",
       strategy_id: "strategy:statin-moderate-intensity",
       strategy_name: "Moderate Intensity Statin",
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(highlightedNodeIds(event)).toEqual([
       "strategy:statin-moderate-intensity",
     ]);
@@ -79,7 +79,7 @@ describe("highlightedNodeIds", () => {
       recommendation_id: "rec:statin-initiate-grade-b",
       exit: "out_of_scope_age_below_range",
       rationale: "Patient is 35, below minimum age 40",
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(highlightedNodeIds(event)).toEqual(["rec:statin-initiate-grade-b"]);
   });
 
@@ -89,8 +89,42 @@ describe("highlightedNodeIds", () => {
       type: "evaluation_completed" as const,
       recommendations_emitted: 1,
       duration_ms: 42,
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(highlightedNodeIds(event)).toEqual([]);
+  });
+
+  it("returns both rec IDs for preemption_resolved", () => {
+    const event = {
+      seq: 30,
+      type: "preemption_resolved" as const,
+      guideline_id: null,
+      preempted_recommendation_id: "rec:statin-selective-grade-c",
+      preempting_recommendation_id: "rec:accaha-statin-primary-prevention",
+      edge_priority: 200,
+      reason: "ACC/AHA takes precedence",
+    } as unknown as TraceEvent;
+    expect(highlightedNodeIds(event)).toEqual([
+      "rec:statin-selective-grade-c",
+      "rec:accaha-statin-primary-prevention",
+    ]);
+  });
+
+  it("returns both rec IDs for cross_guideline_match", () => {
+    const event = {
+      seq: 31,
+      type: "cross_guideline_match" as const,
+      guideline_id: null,
+      source_rec_id: "rec:kdigo-statin-for-ckd",
+      target_rec_id: "rec:accaha-statin-secondary-prevention",
+      nature: "intensity_reduction" as const,
+      note: "KDIGO modifies intensity",
+      source_guideline_id: "guideline:kdigo-ckd-2024",
+      target_guideline_id: "guideline:acc-aha-cholesterol-2018",
+    } as unknown as TraceEvent;
+    expect(highlightedNodeIds(event)).toEqual([
+      "rec:kdigo-statin-for-ckd",
+      "rec:accaha-statin-secondary-prevention",
+    ]);
   });
 });
 
@@ -102,7 +136,7 @@ describe("eventSummary", () => {
       patient_age_years: 55,
       patient_sex: "male",
       guidelines_in_scope: [],
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(eventSummary(event)).toBe("55M");
   });
 
@@ -113,7 +147,7 @@ describe("eventSummary", () => {
       patient_age_years: 78,
       patient_sex: "female",
       guidelines_in_scope: [],
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(eventSummary(event)).toBe("78F");
   });
 
@@ -127,7 +161,7 @@ describe("eventSummary", () => {
       args: { min: 40, max: 75 },
       inputs_read: [],
       result: "true" as const,
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(eventSummary(event)).toBe("age_between → true");
   });
 
@@ -138,8 +172,38 @@ describe("eventSummary", () => {
       score_name: "ascvd_10yr",
       resolution: "supplied" as const,
       supplied_value: 18.2,
-    } as TraceEvent;
+    } as unknown as TraceEvent;
     expect(eventSummary(event)).toBe("ascvd_10yr: supplied (18.2)");
+  });
+
+  it("formats preemption_resolved", () => {
+    const event = {
+      seq: 30,
+      type: "preemption_resolved" as const,
+      guideline_id: null,
+      preempted_recommendation_id: "rec:grade-c",
+      preempting_recommendation_id: "rec:accaha-primary",
+      edge_priority: 200,
+      reason: "ACC/AHA wins",
+    } as unknown as TraceEvent;
+    expect(eventSummary(event)).toBe("rec:grade-c preempted by rec:accaha-primary");
+  });
+
+  it("formats cross_guideline_match", () => {
+    const event = {
+      seq: 31,
+      type: "cross_guideline_match" as const,
+      guideline_id: null,
+      source_rec_id: "rec:kdigo-statin",
+      target_rec_id: "rec:accaha-secondary",
+      nature: "intensity_reduction" as const,
+      note: "KDIGO modifies",
+      source_guideline_id: "guideline:kdigo-ckd-2024",
+      target_guideline_id: "guideline:acc-aha-cholesterol-2018",
+    } as unknown as TraceEvent;
+    expect(eventSummary(event)).toBe(
+      "rec:kdigo-statin modifies rec:accaha-secondary (intensity_reduction)",
+    );
   });
 });
 
@@ -149,6 +213,12 @@ describe("eventTypeLabel", () => {
     expect(eventTypeLabel("recommendation_emitted")).toBe(
       "Recommendation Emitted",
     );
+  });
+
+  it("returns labels for cross-guideline event types", () => {
+    expect(eventTypeLabel("preemption_resolved")).toBe("Preemption Resolved");
+    expect(eventTypeLabel("cross_guideline_match")).toBe("Cross-Guideline Match");
+    expect(eventTypeLabel("guideline_exited")).toBe("Guideline Exited");
   });
 
   it("returns raw type for unknown types", () => {
@@ -217,57 +287,64 @@ describe("deriveRecommendations", () => {
 
 // ── Dynamic subgraph expansion ──────────────────────────────────────
 
-const sampleEvents: TraceEvent[] = [
+const G = "guideline:uspstf-statin-2022";
+
+const sampleEvents = [
   {
     seq: 1,
     type: "evaluation_started",
+    guideline_id: null,
     patient_age_years: 55,
     patient_sex: "male",
-    guidelines_in_scope: ["guideline:uspstf-statin-2022"],
-  } as TraceEvent,
+    guidelines_in_scope: [G],
+  },
   {
     seq: 2,
     type: "guideline_entered",
-    guideline_id: "guideline:uspstf-statin-2022",
+    guideline_id: G,
     guideline_title: "USPSTF Statin 2022",
-  } as TraceEvent,
+  },
   {
     seq: 3,
     type: "recommendation_considered",
+    guideline_id: G,
     recommendation_id: "rec:statin-initiate-grade-b",
     recommendation_title: "Grade B",
     evidence_grade: "B",
     intent: "initiate",
     trigger: "primary_prevention",
-  } as TraceEvent,
+  },
   {
     seq: 8,
     type: "strategy_considered",
+    guideline_id: G,
     recommendation_id: "rec:statin-initiate-grade-b",
     strategy_id: "strategy:statin-moderate-intensity",
     strategy_name: "Moderate Intensity Statin",
-  } as TraceEvent,
+  },
   {
     seq: 9,
     type: "action_checked",
+    guideline_id: G,
     recommendation_id: "rec:statin-initiate-grade-b",
     strategy_id: "strategy:statin-moderate-intensity",
     action_node_id: "med:atorvastatin",
     action_entity_type: "Medication" as const,
     inputs_read: [],
     satisfied: false,
-  } as TraceEvent,
+  },
   {
     seq: 10,
     type: "action_checked",
+    guideline_id: G,
     recommendation_id: "rec:statin-initiate-grade-b",
     strategy_id: "strategy:statin-moderate-intensity",
     action_node_id: "med:rosuvastatin",
     action_entity_type: "Medication" as const,
     inputs_read: [],
     satisfied: false,
-  } as TraceEvent,
-];
+  },
+] as unknown as TraceEvent[];
 
 describe("subgraphFetchIds", () => {
   it("extracts unique rec and strategy IDs from full trace", () => {

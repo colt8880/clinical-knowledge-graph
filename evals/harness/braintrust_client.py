@@ -37,11 +37,11 @@ class BraintrustLogger:
         logger.finish_experiment()
     """
 
-    def __init__(self) -> None:
+    def __init__(self, timestamp: str | None = None) -> None:
         self._enabled = _is_enabled()
         self._experiment = None
         self._experiment_name: str | None = None
-        self._timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        self._timestamp = timestamp or datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
         self._local_entries: list[dict[str, Any]] = []
 
         if self._enabled:

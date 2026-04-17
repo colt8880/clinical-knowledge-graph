@@ -217,7 +217,6 @@ def run_harness(
     fixture_filter: str | None = None,
     arm_filter: str | None = None,
     force: bool = False,
-    score_only: bool = False,
     api_base: str = "http://localhost:8000",
 ) -> dict[str, Any]:
     """Run the full harness: arms + judge across fixtures.

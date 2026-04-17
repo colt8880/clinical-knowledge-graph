@@ -65,6 +65,15 @@ class PreemptionEdge:
     rationale: str
 
 
+@dataclass(frozen=True)
+class ModifierEdge:
+    """A MODIFIES edge from a source Rec to a target Rec or Strategy (ADR 0019)."""
+    source_rec_id: str
+    target_rec_id: str
+    nature: str  # intensity_reduction | dose_adjustment | monitoring | contraindication_warning
+    note: str
+
+
 @dataclass
 class GraphSnapshot:
     guideline_id: str
@@ -279,5 +288,37 @@ async def load_preemption_edges() -> list[PreemptionEdge]:
             winning_rec_id=record["winner_id"],
             priority=record["priority"],
             rationale=record["rationale"] or "",
+        ))
+    return edges
+
+
+async def load_modifier_edges() -> list[ModifierEdge]:
+    """Load all MODIFIES edges from Neo4j.
+
+    These are cross-guideline edges that annotate (but do not gate) target
+    Recs. Lives in dedicated seed files (e.g., cross-edges-kdigo.cypher).
+    Returns an empty list if no modifier edges exist in the graph.
+    """
+    driver = get_driver()
+    async with driver.session() as session:
+        result = await session.run(
+            """
+            MATCH (source:Recommendation)-[r:MODIFIES]->(target:Recommendation)
+            RETURN source.id AS source_id,
+                   target.id AS target_id,
+                   r.nature AS nature,
+                   r.note AS note
+            ORDER BY source.id, target.id
+            """
+        )
+        records = [record async for record in result]
+
+    edges: list[ModifierEdge] = []
+    for record in records:
+        edges.append(ModifierEdge(
+            source_rec_id=record["source_id"],
+            target_rec_id=record["target_id"],
+            nature=record["nature"] or "",
+            note=record["note"] or "",
         ))
     return edges

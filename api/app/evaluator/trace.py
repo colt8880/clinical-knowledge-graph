@@ -276,6 +276,30 @@ class TraceBuilder:
             fields["satisfying_strategy"] = satisfying_strategy
         self.emit("recommendation_emitted", **fields)
 
+    def cross_guideline_match(
+        self,
+        source_rec_id: str,
+        target_rec_id: str,
+        nature: str,
+        note: str,
+        source_guideline_id: str,
+        target_guideline_id: str,
+    ) -> None:
+        """Append a cross_guideline_match event for a MODIFIES edge (F26).
+
+        Emitted after preemption resolution but before evaluation_completed.
+        Does not mutate prior events (append-only).
+        """
+        self.emit(
+            "cross_guideline_match",
+            source_rec_id=source_rec_id,
+            target_rec_id=target_rec_id,
+            nature=nature,
+            note=note,
+            source_guideline_id=source_guideline_id,
+            target_guideline_id=target_guideline_id,
+        )
+
     def preemption_resolved(
         self,
         preempted_rec_id: str,

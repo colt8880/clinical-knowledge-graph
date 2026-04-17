@@ -5,8 +5,8 @@ All inputs are PatientContext + a list of loaded GraphSnapshots.
 
 Multi-guideline forest traversal (F21): the evaluator walks every
 guideline in ascending lexical order of guideline_id. Each guideline
-is evaluated independently; preemption (F25) and modifier handling
-(F26) are not yet implemented.
+is evaluated independently. Post-traversal steps: preemption (F25)
+then modifier resolution (F26).
 
 For the statin model, three out-of-scope exits are checked before
 iterating recommendations. See docs/reference/guidelines/statins.md §
@@ -18,9 +18,10 @@ from __future__ import annotations
 from typing import Any
 
 from app.config import settings
-from app.evaluator.graph import GraphSnapshot, CodeRef, PreemptionEdge, RecommendationNode
+from app.evaluator.graph import GraphSnapshot, CodeRef, ModifierEdge, PreemptionEdge, RecommendationNode
 from app.evaluator.predicates.registry import get_predicate
 from app.evaluator.predicates.composites import eval_all_of, eval_any_of, eval_none_of
+from app.evaluator.modifiers import resolve_modifiers
 from app.evaluator.preemption import resolve_preemptions
 from app.evaluator.trace import TraceBuilder, compute_age, patient_fingerprint
 
@@ -756,24 +757,28 @@ def evaluate(
     patient_context: dict[str, Any],
     graphs: list[GraphSnapshot],
     preemption_edges: list[PreemptionEdge] | None = None,
+    modifier_edges: list[ModifierEdge] | None = None,
 ) -> dict[str, Any]:
     """Run the trace-first evaluator across all guidelines (forest traversal).
 
-    Pure function: same (patient_context, graphs, preemption_edges) -> same trace.
-    Guidelines are visited in ascending lexical order of guideline_id
-    (deterministic traversal order per F21 spec).
+    Pure function: same (patient_context, graphs, preemption_edges,
+    modifier_edges) -> same trace. Guidelines are visited in ascending
+    lexical order of guideline_id (deterministic traversal order per F21).
 
     Wall-clock fields (envelope.started_at, envelope.completed_at,
     evaluation_completed.duration_ms) are NOT set here — the caller
     (route handler) stamps them after evaluate() returns. This keeps
     evaluate() free of datetime.now() calls.
 
-    After the guideline loop, preemption resolution runs as a post-traversal
-    step (F25). For each PREEMPTED_BY edge where both the preempted and
-    winning Recs were emitted, a preemption_resolved event is appended.
+    Post-traversal steps (in order):
+    1. Preemption resolution (F25).
+    2. Modifier resolution (F26).
+    3. evaluation_completed.
     """
     if preemption_edges is None:
         preemption_edges = []
+    if modifier_edges is None:
+        modifier_edges = []
 
     # Sort graphs by guideline_id for deterministic traversal
     sorted_graphs = sorted(graphs, key=lambda g: g.guideline_id)
@@ -812,6 +817,7 @@ def evaluate(
         g.guideline_id: g.effective_date for g in sorted_graphs
     }
 
+    preempted_rec_ids: set[str] = set()
     if preemption_edges and emitted_rec_ids:
         trace.set_guideline_context(None)
         preemption_results = resolve_preemptions(
@@ -827,8 +833,29 @@ def evaluate(
                 edge_priority=pr.edge_priority,
                 reason=pr.reason,
             )
+            preempted_rec_ids.add(pr.preempted_rec_id)
 
-    # 4. evaluation_completed (envelope-level, guideline_id=None)
+    # 4. Modifier resolution (post-traversal, F26)
+    # Runs after preemption; preempted targets do not receive modifiers.
+    if modifier_edges and emitted_rec_ids:
+        trace.set_guideline_context(None)
+        modifier_results = resolve_modifiers(
+            emitted_rec_ids=emitted_rec_ids,
+            preempted_rec_ids=preempted_rec_ids,
+            modifier_edges=modifier_edges,
+            rec_to_guideline=rec_to_guideline,
+        )
+        for mr in modifier_results:
+            trace.cross_guideline_match(
+                source_rec_id=mr.source_rec_id,
+                target_rec_id=mr.target_rec_id,
+                nature=mr.nature,
+                note=mr.note,
+                source_guideline_id=mr.source_guideline_id,
+                target_guideline_id=mr.target_guideline_id,
+            )
+
+    # 5. evaluation_completed (envelope-level, guideline_id=None)
     trace.set_guideline_context(None)
     trace.evaluation_completed(total_recommendations_emitted, duration_ms=0)
 
@@ -847,6 +874,18 @@ def evaluate(
         if e["type"] == "preemption_resolved":
             preempted_by_map[e["preempted_recommendation_id"]] = e["preempting_recommendation_id"]
 
+    # Build modifiers lookup from cross_guideline_match events
+    modifiers_by_target: dict[str, list[dict[str, str]]] = {}
+    for e in trace.events:
+        if e["type"] == "cross_guideline_match":
+            target = e["target_rec_id"]
+            modifiers_by_target.setdefault(target, []).append({
+                "source_rec_id": e["source_rec_id"],
+                "source_guideline_id": e["source_guideline_id"],
+                "nature": e["nature"],
+                "note": e["note"],
+            })
+
     # Derive flat recommendation list from trace events
     flat_recommendations = [
         {
@@ -856,6 +895,7 @@ def evaluate(
             "evidence_grade": e["evidence_grade"],
             "reason": e["reason"],
             "preempted_by": preempted_by_map.get(e["recommendation_id"]),
+            "modifiers": modifiers_by_target.get(e["recommendation_id"], []),
             **({"offered_strategies": e["offered_strategies"]} if "offered_strategies" in e else {}),
             **({"satisfying_strategy": e["satisfying_strategy"]} if "satisfying_strategy" in e else {}),
         }

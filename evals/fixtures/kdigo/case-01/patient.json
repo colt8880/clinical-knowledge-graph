@@ -1,0 +1,65 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1962-11-03",
+    "administrative_sex": "male",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [],
+  "observations": [
+    {
+      "id": "obs-egfr-2026-02",
+      "codes": [{ "system": "loinc", "code": "48642-3", "display": "Glomerular filtration rate/1.73 sq M.predicted" }],
+      "status": "final",
+      "effective_date": "2026-02-10T09:00:00Z",
+      "value": { "value_quantity": { "value": 52, "unit": "mL/min/1.73m2" } }
+    },
+    {
+      "id": "obs-acr-2026-02",
+      "codes": [{ "system": "loinc", "code": "9318-7", "display": "Albumin/Creatinine [Mass Ratio] in Urine" }],
+      "status": "final",
+      "effective_date": "2026-02-10T09:00:00Z",
+      "value": { "value_quantity": { "value": 22, "unit": "mg/g" } }
+    },
+    {
+      "id": "obs-tc-2026-02",
+      "codes": [{ "system": "loinc", "code": "2093-3" }],
+      "status": "final",
+      "effective_date": "2026-02-10T09:00:00Z",
+      "value": { "value_quantity": { "value": 215, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-hdl-2026-02",
+      "codes": [{ "system": "loinc", "code": "2085-9" }],
+      "status": "final",
+      "effective_date": "2026-02-10T09:00:00Z",
+      "value": { "value_quantity": { "value": 48, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-ldl-2026-02",
+      "codes": [{ "system": "loinc", "code": "13457-7" }],
+      "status": "final",
+      "effective_date": "2026-02-10T09:00:00Z",
+      "value": { "value_quantity": { "value": 138, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-bp-2026-03",
+      "codes": [{ "system": "loinc", "code": "85354-9" }],
+      "status": "final",
+      "effective_date": "2026-03-05T08:30:00Z",
+      "value": null,
+      "components": [
+        { "codes": [{ "system": "loinc", "code": "8480-6" }], "value": { "value_quantity": { "value": 132, "unit": "mm[Hg]" } } },
+        { "codes": [{ "system": "loinc", "code": "8462-4" }], "value": { "value_quantity": { "value": 78, "unit": "mm[Hg]" } } }
+      ]
+    }
+  ],
+  "medications": [],
+  "social_history": {
+    "tobacco": { "status": "never", "as_of": "2026-03-05" }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

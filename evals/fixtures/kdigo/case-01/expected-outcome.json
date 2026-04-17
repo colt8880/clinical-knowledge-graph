@@ -1,0 +1,43 @@
+{
+  "description": "63M with CKD 3a (eGFR 52), albuminuria A1 (ACR 22), no diabetes. Exercises monitoring (R1) and statin-for-CKD (R3). SGLT2 (R2) does not fire: no diabetes and ACR < 200. ACEi/ARB (R4) does not fire: ACR < 30.",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "status": "due",
+      "evidence_grade": "1B",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "status": "due",
+      "evidence_grade": "1A",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "guideline_entered",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "status": "due"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "status": "due"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd"
+    }
+  ]
+}

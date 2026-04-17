@@ -38,6 +38,22 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 - Adults >75 with ASCVD (moderate-intensity consideration).
 - Statin-intolerant patient with LDL ≥190.
 
+## KDIGO CKD (v1 — KDIGO 2024)
+
+### Landed
+
+| ID | Directory | Coverage |
+|---|---|---|
+| 01 | `fixtures/kdigo/case-01/` | 63M, CKD 3a (eGFR 52), albuminuria A1 (ACR 22), no diabetes. Monitoring (R1) + statin-for-CKD (R3) only. |
+| 02 | `fixtures/kdigo/case-02/` | 68M, CKD 3b (eGFR 38), albuminuria A3 (ACR 520), T2DM + HTN. All four Recs fire. |
+| 03 | `fixtures/kdigo/case-03/` | 71M, CKD 4 (eGFR 22), albuminuria A2 (ACR 85), T2DM + HTN. All four Recs fire. Near SGLT2/dialysis eGFR boundaries. |
+
+### Deferred
+
+- Cross-domain fixtures (CKD modifies statin intensity) land in F26.
+- Dialysis patients (eGFR < 15 / G5D).
+- CKD + diabetes deep integration.
+
 ## Archived
 
 - `archive/` — CRC-era fixtures and inventory retained for reference. Not loaded by the evaluator.

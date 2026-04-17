@@ -1,0 +1,56 @@
+{
+  "description": "71M, CKD 4 (eGFR 22), albuminuria A2 (ACR 85 mg/g), T2DM (16-year duration), HTN. Advanced CKD near the eGFR 20 SGLT2 threshold and eGFR 15 statin/dialysis boundary.",
+  "actions": [
+    {
+      "id": "initiate-sglt2-inhibitor",
+      "label": "Initiate SGLT2 inhibitor (empagliflozin or dapagliflozin)",
+      "rationale": "KDIGO 1A: CKD + T2DM with eGFR 22 (≥20 threshold met, just above the contraindication cutoff). SGLT2i slows CKD progression; critical at G4 where trajectory toward dialysis is a near-term concern. Note: once initiated, can continue even if eGFR drops below 20.",
+      "source_rec_id": "rec:kdigo-sglt2-for-ckd",
+      "priority": 1
+    },
+    {
+      "id": "initiate-acei-or-arb",
+      "label": "Initiate ACE inhibitor or ARB",
+      "rationale": "KDIGO 1B: ACR 85 mg/g (A2) with diabetes and hypertension. RAS blockade reduces proteinuria and slows CKD progression. BP 142/86 is uncontrolled; ACEi/ARB provides dual benefit of nephroprotection and BP reduction. Monitor potassium closely at eGFR 22 — hyperkalemia risk is elevated.",
+      "source_rec_id": "rec:kdigo-acei-arb-for-ckd",
+      "priority": 2
+    },
+    {
+      "id": "initiate-moderate-statin",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "KDIGO 1A: age 71, eGFR 22 (G4, ≥15 not-on-dialysis proxy met). Moderate-intensity only — high-intensity contraindicated in advanced CKD. Statin clearance is significantly reduced at G4; start low and monitor for myopathy.",
+      "source_rec_id": "rec:kdigo-statin-for-ckd",
+      "priority": 3
+    },
+    {
+      "id": "frequent-monitoring",
+      "label": "Monitor eGFR and ACR every 1-3 months",
+      "rationale": "KDIGO 1B: G4-A2 is 'very high risk' on the KDIGO heatmap. eGFR trajectory monitoring is critical at G4 for dialysis planning. Also monitor for medication-related eGFR dips after SGLT2i and ACEi/ARB initiation.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 4
+    },
+    {
+      "id": "nephrology-referral",
+      "label": "Nephrology referral for advanced CKD management",
+      "rationale": "eGFR 22 (G4) warrants nephrology co-management per KDIGO. Pre-dialysis education, vascular access planning, and transplant evaluation should begin. Multiple new medications being initiated require coordinated management.",
+      "priority": 5
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "high-intensity-statin",
+      "label": "High-intensity statin therapy",
+      "rationale": "eGFR 22 (G4) significantly alters statin pharmacokinetics. High-intensity carries unacceptable myopathy risk at this level of renal impairment."
+    },
+    {
+      "id": "dual-ras-blockade",
+      "label": "Combined ACEi + ARB",
+      "rationale": "Dual RAS blockade increases hyperkalemia risk, which is already elevated at eGFR 22. Use one agent only."
+    },
+    {
+      "id": "defer-all-treatment",
+      "label": "Conservative management without pharmacotherapy",
+      "rationale": "At G4 with T2DM and albuminuria, the trajectory toward kidney failure is measurable. Evidence-based interventions (SGLT2i, RAS blockade, statin) have clear benefit in slowing progression. Deferral risks accelerated decline."
+    }
+  ]
+}

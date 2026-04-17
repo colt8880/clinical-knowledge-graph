@@ -1,0 +1,86 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1954-12-28",
+    "administrative_sex": "male",
+    "ancestry": ["hispanic_or_latino"]
+  },
+  "conditions": [
+    {
+      "id": "cond-t2dm",
+      "codes": [
+        { "system": "snomed", "code": "73211009", "display": "Diabetes mellitus" },
+        { "system": "icd10", "code": "E11", "display": "Type 2 diabetes mellitus" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2010-04-20"
+    },
+    {
+      "id": "cond-htn",
+      "codes": [
+        { "system": "snomed", "code": "38341003", "display": "Essential hypertension" },
+        { "system": "icd10", "code": "I10" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2008-09-10"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-egfr-2026-03",
+      "codes": [{ "system": "loinc", "code": "48642-3", "display": "Glomerular filtration rate/1.73 sq M.predicted" }],
+      "status": "final",
+      "effective_date": "2026-03-01T09:00:00Z",
+      "value": { "value_quantity": { "value": 22, "unit": "mL/min/1.73m2" } }
+    },
+    {
+      "id": "obs-acr-2026-03",
+      "codes": [{ "system": "loinc", "code": "9318-7", "display": "Albumin/Creatinine [Mass Ratio] in Urine" }],
+      "status": "final",
+      "effective_date": "2026-03-01T09:00:00Z",
+      "value": { "value_quantity": { "value": 85, "unit": "mg/g" } }
+    },
+    {
+      "id": "obs-tc-2026-03",
+      "codes": [{ "system": "loinc", "code": "2093-3" }],
+      "status": "final",
+      "effective_date": "2026-03-01T09:00:00Z",
+      "value": { "value_quantity": { "value": 178, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-hdl-2026-03",
+      "codes": [{ "system": "loinc", "code": "2085-9" }],
+      "status": "final",
+      "effective_date": "2026-03-01T09:00:00Z",
+      "value": { "value_quantity": { "value": 42, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-ldl-2026-03",
+      "codes": [{ "system": "loinc", "code": "13457-7" }],
+      "status": "final",
+      "effective_date": "2026-03-01T09:00:00Z",
+      "value": { "value_quantity": { "value": 108, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-bp-2026-03",
+      "codes": [{ "system": "loinc", "code": "85354-9" }],
+      "status": "final",
+      "effective_date": "2026-03-15T08:30:00Z",
+      "value": null,
+      "components": [
+        { "codes": [{ "system": "loinc", "code": "8480-6" }], "value": { "value_quantity": { "value": 142, "unit": "mm[Hg]" } } },
+        { "codes": [{ "system": "loinc", "code": "8462-4" }], "value": { "value_quantity": { "value": 86, "unit": "mm[Hg]" } } }
+      ]
+    }
+  ],
+  "medications": [],
+  "social_history": {
+    "tobacco": { "status": "never", "as_of": "2026-03-15" }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "description": "63M, CKD 3a (eGFR 52), albuminuria A1 (ACR 22 mg/g), no diabetes. Moderate CKD without albuminuria or diabetes narrows scope to monitoring + statin.",
+  "actions": [
+    {
+      "id": "initiate-moderate-statin",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "KDIGO 1A: adults aged ≥50 with CKD G3a-G5 not on dialysis should receive moderate-intensity statin regardless of LDL-C. Patient is 63 with eGFR 52 (G3a) and no current statin. KDIGO specifically recommends moderate-intensity over high-intensity in CKD due to altered pharmacokinetics.",
+      "source_rec_id": "rec:kdigo-statin-for-ckd",
+      "priority": 1
+    },
+    {
+      "id": "annual-egfr-acr-monitoring",
+      "label": "Ensure annual eGFR and urine ACR monitoring",
+      "rationale": "KDIGO 1B: all patients with CKD should have at least annual eGFR and albuminuria monitoring. G3a-A1 is low risk on the KDIGO heatmap; annual monitoring is the minimum frequency.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 2
+    },
+    {
+      "id": "address-cv-risk",
+      "label": "Comprehensive cardiovascular risk assessment",
+      "rationale": "CKD is an independent cardiovascular risk factor. Beyond statin, assess BP control, smoking status, and metabolic parameters. Patient's BP 132/78 may warrant treatment per KDIGO BP targets (<120 systolic when tolerated).",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "high-intensity-statin",
+      "label": "High-intensity statin therapy",
+      "rationale": "KDIGO specifically recommends moderate-intensity in CKD G3-G5 due to altered pharmacokinetics and increased myopathy risk. High-intensity would be inappropriate."
+    },
+    {
+      "id": "sglt2-without-indication",
+      "label": "SGLT2 inhibitor initiation",
+      "rationale": "Patient has no diabetes and ACR 22 mg/g (below 200 mg/g threshold). KDIGO SGLT2 recommendation does not apply without T2DM or significant albuminuria."
+    }
+  ]
+}

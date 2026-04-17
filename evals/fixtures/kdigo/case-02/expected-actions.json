@@ -1,0 +1,56 @@
+{
+  "description": "68M, CKD 3b (eGFR 38), albuminuria A3 (ACR 520 mg/g), T2DM, HTN. High-risk CKD patient with multiple comorbidities — all four KDIGO Recs fire.",
+  "actions": [
+    {
+      "id": "initiate-sglt2-inhibitor",
+      "label": "Initiate SGLT2 inhibitor (empagliflozin or dapagliflozin)",
+      "rationale": "KDIGO 1A: patient has CKD with T2DM (eGFR 38, ≥20 threshold met) AND severely increased albuminuria (ACR 520 ≥200 threshold). Both eligibility paths met. SGLT2i shown to slow CKD progression and reduce cardiovascular events (CREDENCE, DAPA-CKD, EMPA-KIDNEY). Highest clinical priority given dual indication.",
+      "source_rec_id": "rec:kdigo-sglt2-for-ckd",
+      "priority": 1
+    },
+    {
+      "id": "initiate-acei-or-arb",
+      "label": "Initiate ACE inhibitor or ARB at maximally tolerated dose",
+      "rationale": "KDIGO 1B: ACR 520 mg/g (A3) with diabetes and hypertension represents the strongest indication for RAS blockade. RENAAL and IDNT trials demonstrated kidney protection in diabetic nephropathy. Use ACEi or ARB (not both). Monitor potassium and creatinine at 2-4 weeks.",
+      "source_rec_id": "rec:kdigo-acei-arb-for-ckd",
+      "priority": 2
+    },
+    {
+      "id": "initiate-moderate-statin",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "KDIGO 1A: age 68, eGFR 38 (G3b), not on dialysis. Statin recommended regardless of LDL-C. Moderate-intensity specifically (not high-intensity) due to CKD G3b pharmacokinetics. SHARP trial evidence.",
+      "source_rec_id": "rec:kdigo-statin-for-ckd",
+      "priority": 3
+    },
+    {
+      "id": "increase-monitoring-frequency",
+      "label": "Increase eGFR and ACR monitoring to every 3-4 months",
+      "rationale": "KDIGO 1B: G3b-A3 is 'very high risk' on the KDIGO heatmap. Monitoring frequency should be every 3-4 months, not just annually. Track eGFR trajectory for progression and ACR for treatment response.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 4
+    },
+    {
+      "id": "bp-optimization",
+      "label": "Optimize blood pressure to target <120/80 mmHg",
+      "rationale": "BP 148/92 is uncontrolled. KDIGO 2021 BP guideline recommends <120 systolic in CKD patients who tolerate it. ACEi/ARB will contribute to BP control; additional agents may be needed.",
+      "priority": 5
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "high-intensity-statin",
+      "label": "High-intensity statin therapy",
+      "rationale": "KDIGO recommends moderate-intensity in CKD G3-G5. High-intensity carries increased myopathy risk in advanced CKD."
+    },
+    {
+      "id": "dual-ras-blockade",
+      "label": "Combined ACEi + ARB (dual RAS blockade)",
+      "rationale": "ONTARGET and VA NEPHRON-D trials showed dual RAS blockade increases hyperkalemia and AKI without additional benefit. Use one agent."
+    },
+    {
+      "id": "defer-sglt2-for-risk-assessment",
+      "label": "Defer SGLT2 inhibitor pending further evaluation",
+      "rationale": "Both eligibility paths are met (diabetes + CKD, and ACR ≥200). Evidence from multiple large RCTs supports prompt initiation. Deferral is not clinically appropriate."
+    }
+  ]
+}

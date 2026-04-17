@@ -88,7 +88,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons
@@ -268,7 +268,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons
@@ -290,11 +290,11 @@ jobs:
 
           driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
 
-          # Expected counts from all seeds (statins + cholesterol):
-          # Nodes: 2 Guideline + 7 Recommendation + 4 Strategy + 5 Condition + 4 Observation + 7 Medication + 1 Procedure = 30
-          # Edges: 7 FROM_GUIDELINE + 9 OFFERS_STRATEGY + 17 INCLUDES_ACTION = 33
-          EXPECTED_NODES = 30
-          EXPECTED_EDGES = 33
+          # Expected counts from all seeds (statins + cholesterol + KDIGO CKD):
+          # Nodes: 3 Guideline + 11 Recommendation + 8 Strategy + 6 Condition + 6 Observation + 15 Medication + 1 Procedure = 50
+          # Edges: 11 FROM_GUIDELINE + 13 OFFERS_STRATEGY + 26 INCLUDES_ACTION + 4 FOR_CONDITION + 8 EXCLUDED_BY = 62
+          EXPECTED_NODES = 50
+          EXPECTED_EDGES = 62
 
           with driver.session() as session:
               actual_nodes = session.run("MATCH (n) RETURN count(n) AS c").single()["c"]

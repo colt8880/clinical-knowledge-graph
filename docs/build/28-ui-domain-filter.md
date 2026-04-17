@@ -28,16 +28,15 @@ This feature is larger than it looks. Read the Required reading and Constraints 
 
 ### UI
 
-- `ui/app/explore/page.tsx` — rewrite. Replace column layout with Cytoscape canvas and sidebar controls. Keep the node detail panel (reused from v0) triggered by canvas clicks.
-- `ui/components/Explore/GraphCanvas.tsx` — new; Cytoscape wrapper. Props: `nodes`, `edges`, `visibleDomains`, `focusedNodeId`, `onNodeClick`. Handles layout, rendering, visibility toggling.
-- `ui/components/Explore/DomainFilter.tsx` — new; multi-select chip control for USPSTF / ACC-AHA / KDIGO. Emits `visibleDomains: string[]`.
-- `ui/components/Explore/NodeDetailPanel.tsx` — refactor existing v0 detail panel into a standalone component if not already. Triggered by canvas click, not column click.
-- `ui/lib/api/client.ts` — add `fetchSubgraph({ domains: string[] })` calling the new API endpoint. Keep existing `fetchNeighbors` (still used by Eval tab).
-- `ui/lib/explore/urlState.ts` — new; centralizes URL state logic for Explore. New params: `?domains=uspstf,acc-aha,kdigo&focus=<node_id>`. Deprecates v0's `?g=&r=&s=` column-navigation params.
-- `ui/lib/explore/layout.ts` — new; Cytoscape layout configuration. Per-guideline `dagre` clustering, with shared entities positioned centrally between clusters. Document the choice.
-- `ui/styles/explore.css` (or Tailwind config additions) — domain color palette: USPSTF blue, ACC/AHA purple, KDIGO green, shared entities neutral gray. Defined as CSS variables so F29 can reuse.
+- `ui/app/explore/page.tsx` — rewrite. Remove `ColumnBrowser` usage; replace with whole-forest canvas plus `DomainFilter` sidebar. Keep detail panel (`NodeDetail`) triggered by canvas clicks.
+- `ui/components/GraphCanvas.tsx` — **refactor existing component** (already Cytoscape-based, column-layout today). Replace the column-based layout engine with a whole-forest layout. Extend the existing `TYPE_COLORS` / `EDGE_COLORS` palettes with domain-specific styling for Rec/Strategy nodes keyed off the new `domain` property (USPSTF blue, ACC/AHA purple, KDIGO green; shared entities keep their current TYPE_COLORS). New props: `visibleDomains: string[]`, `focusedNodeId: string | null`. Drop or deprecate the `columns` prop in favor of `nodes` + `edges`. Keep `onNodeClick`, `highlightedNodeIds` (used by Eval stepper). F29 later extends this same file with preemption/modifier styles.
+- `ui/components/DomainFilter.tsx` — new; multi-select chip control for USPSTF / ACC-AHA / KDIGO. Emits `visibleDomains: string[]`.
+- `ui/components/NodeDetail.tsx` — already exists. Extend to render domain badge and full codes list for shared entities (RxNorm / SNOMED / ICD-10-CM / LOINC / CPT). No structural refactor; additive.
+- `ui/lib/api/client.ts` — add `fetchSubgraph({ domains: string[] })` calling the new API endpoint. Keep existing `fetchNeighbors` (still used by Eval tab's on-demand expansion).
+- `ui/lib/explore/urlState.ts` — new; centralizes URL state logic for Explore. New params: `?domains=uspstf,acc-aha,kdigo&focus=<node_id>`. Deprecates v0's `?g=&r=&s=` column-navigation params; legacy params log a console warning and load the default forest view.
+- `ui/lib/explore/layout.ts` — new; Cytoscape layout configuration for whole-forest mode. Per-guideline clustering with shared entities positioned centrally. Author picks between `fcose` (with compound nodes per guideline) and `dagre`-per-cluster; choice documented in `docs/specs/ui.md`.
 - `ui/tests/components/DomainFilter.test.tsx` — unit test.
-- `ui/tests/components/GraphCanvas.test.tsx` — unit test (nodes/edges render, click handlers fire, visibility respects `visibleDomains`).
+- `ui/tests/components/GraphCanvas.test.tsx` — refactor existing tests if present; assert whole-forest rendering, visibility toggling via `visibleDomains`, focused-node state, domain-colored nodes.
 - `ui/tests/e2e/explore.spec.ts` — Playwright: load /explore, verify all three guidelines render, toggle a domain off, verify hidden, click a node, verify detail panel opens, verify URL reflects state.
 
 ### API

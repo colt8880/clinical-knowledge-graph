@@ -145,6 +145,7 @@ Only edge types with attributes beyond the global set are listed.
 | `priority` | enum | Urgency tier for the agent / trust framework: `routine` / `urgent` / `stat`. |
 | `intent` | enum | `screening` / `diagnostic` / `treatment` / `surveillance` / `counseling` / `shared_decision`. |
 | `expects` | string \| null | Optional result label (e.g., `"negative"`) the matched patient record must carry for this action to count as satisfied. Null = any result satisfies (default; preserves behavior for procedures without a meaningful result dimension). Labels resolve to coded value-sets via the external registry keyed by `(clinical_entity_id, label)`. Shares vocabulary with `TRIGGERED_BY.criteria.value`. See `schema.md` → Result-conditional satisfaction. v0: set on stool observations only. |
+| `intensity` | enum \| null | Statin intensity tier: `"high"` / `"moderate"`. Used by ACC/AHA cholesterol strategies. Null on USPSTF v0 actions. v1 models at class level; dose verification deferred. |
 
 #### `TRIGGERED_BY` (Recommendation → clinical entity)
 

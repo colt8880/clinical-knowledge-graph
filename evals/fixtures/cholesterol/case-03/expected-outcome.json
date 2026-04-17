@@ -22,7 +22,8 @@
   ],
   "must_not_contain": [
     {
-      "type": "exit_condition_triggered"
+      "type": "exit_condition_triggered",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
     }
   ]
 }

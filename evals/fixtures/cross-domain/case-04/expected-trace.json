@@ -1,0 +1,96 @@
+{
+  "description": "55M, HTN, CKD 3a (eGFR 52), ACR 18 (A1), LDL 145, ASCVD risk 8.5%, no diabetes. USPSTF Grade C and ACC/AHA R4 both fire; ACC/AHA preempts USPSTF. KDIGO statin-for-CKD fires and MODIFIES ACC/AHA R4 intensity to moderate. KDIGO modifier does NOT fire on USPSTF Grade C (preempted). KDIGO monitoring fires; SGLT2 and ACEi/ARB do not (no diabetes, ACR < 30).",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "status": "due",
+      "evidence_grade": "C",
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "preempted_by": "rec:accaha-statin-primary-prevention",
+      "modifiers": []
+    },
+    {
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "status": "due",
+      "evidence_grade": "COR I, LOE A",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018",
+      "preempted_by": null,
+      "modifiers": [
+        {
+          "source_rec_id": "rec:kdigo-statin-for-ckd",
+          "source_guideline_id": "guideline:kdigo-ckd-2024",
+          "nature": "intensity_reduction",
+          "note": "KDIGO 2024 recommends moderate-intensity statin in CKD G3-G5. ACC/AHA primary prevention may recommend moderate-to-high intensity based on ASCVD risk. In patients with CKD G3-G5, cap intensity at moderate per KDIGO guidance."
+        }
+      ]
+    },
+    {
+      "recommendation_id": "rec:kdigo-ckd-monitoring",
+      "status": "due",
+      "evidence_grade": "1B",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "preempted_by": null,
+      "modifiers": []
+    },
+    {
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "status": "due",
+      "evidence_grade": "1A",
+      "guideline_id": "guideline:kdigo-ckd-2024",
+      "preempted_by": null,
+      "modifiers": []
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "evaluation_started",
+      "guideline_id": null
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:statin-selective-grade-c",
+      "status": "due",
+      "guideline_id": "guideline:uspstf-statin-2022"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:accaha-statin-primary-prevention",
+      "status": "due",
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-statin-for-ckd",
+      "status": "due",
+      "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "type": "preemption_resolved",
+      "preempted_recommendation_id": "rec:statin-selective-grade-c",
+      "preempting_recommendation_id": "rec:accaha-statin-primary-prevention",
+      "edge_priority": 200
+    },
+    {
+      "type": "cross_guideline_match",
+      "source_rec_id": "rec:kdigo-statin-for-ckd",
+      "target_rec_id": "rec:accaha-statin-primary-prevention",
+      "nature": "intensity_reduction",
+      "source_guideline_id": "guideline:kdigo-ckd-2024",
+      "target_guideline_id": "guideline:acc-aha-cholesterol-2018"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "cross_guideline_match",
+      "target_rec_id": "rec:statin-selective-grade-c"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-sglt2-for-ckd"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:kdigo-acei-arb-for-ckd"
+    }
+  ]
+}

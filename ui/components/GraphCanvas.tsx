@@ -637,10 +637,23 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     }
   }, [selectedEdgeId]);
 
+  // Track which nodes had their labels modified so we can restore them.
+  const modifiedLabelsRef = useRef<Map<string, string>>(new Map());
+
   // Apply preemption/modifier classes from recState.
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
+
+    // Restore any previously modified labels before reapplying.
+    modifiedLabelsRef.current.forEach((originalLabel, nodeId) => {
+      const node = cy.getElementById(nodeId);
+      if (node.length > 0) {
+        node.data("label", originalLabel);
+      }
+    });
+    modifiedLabelsRef.current.clear();
+
     cy.nodes().removeClass("preempted has-modifiers");
     if (!recState) return;
 
@@ -648,9 +661,9 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       const node = cy.getElementById(recId);
       if (node.length > 0) {
         node.addClass("preempted");
-        // Append "(preempted)" to the label if not already present.
         const label = node.data("label") as string;
-        if (label && !label.includes("(preempted)")) {
+        if (label) {
+          modifiedLabelsRef.current.set(recId, label);
           node.data("label", `${label}\n(preempted by ${winnerId.split(":").pop()})`);
         }
       }
@@ -661,10 +674,13 @@ export default function GraphCanvas(props: GraphCanvasProps) {
         const node = cy.getElementById(recId);
         if (node.length > 0) {
           node.addClass("has-modifiers");
-          // Append modifier badge to label.
           const label = node.data("label") as string;
-          if (label && !label.includes("[mod")) {
-            node.data("label", `${label}\n[mod: ${count}]`);
+          if (label) {
+            // Only store original if not already stored by preemption above.
+            if (!modifiedLabelsRef.current.has(recId)) {
+              modifiedLabelsRef.current.set(recId, label);
+            }
+            node.data("label", `${node.data("label")}\n[mod: ${count}]`);
           }
         }
       }

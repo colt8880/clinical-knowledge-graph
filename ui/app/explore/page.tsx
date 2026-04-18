@@ -4,7 +4,7 @@ import { Suspense, useCallback, useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSubgraph } from "@/lib/api/client";
 import type { ForestNode, GraphEdge, GraphNode } from "@/lib/api/client";
-import GraphCanvas, { type CanvasColumn } from "@/components/GraphCanvas";
+import GraphCanvas, { type CanvasColumn, nodeType } from "@/components/GraphCanvas";
 import DomainFilter from "@/components/DomainFilter";
 import NodeDetail from "@/components/NodeDetail";
 import {
@@ -91,7 +91,7 @@ function ExploreContent() {
 
     // Col 0 + Col 1: all visible Guidelines and Recommendations.
     for (const n of visibleNodes) {
-      const type = n.labels[0] ?? "Unknown";
+      const type = nodeType(n);
       if (type === "Guideline") {
         cols[0].push(n);
         visibleIds.add(n.id);
@@ -174,7 +174,7 @@ function ExploreContent() {
       // Drill-down: clicking a Rec expands its Strategies; clicking a Strategy expands its Actions.
       const node = allNodes.find((n) => n.id === nodeId);
       if (!node) return;
-      const type = node.labels[0] ?? "Unknown";
+      const type = nodeType(node);
 
       if (type === "Recommendation") {
         // Toggle: clicking the same Rec again collapses it.

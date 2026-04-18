@@ -104,8 +104,18 @@ function nodeLabel(node: GraphNode): string {
   );
 }
 
+/** Known semantic node types. Domain labels (ACC_AHA, KDIGO, USPSTF) are not types. */
+const NODE_TYPES = new Set([
+  "Guideline", "Recommendation", "Strategy",
+  "Condition", "Procedure", "Observation", "Medication",
+]);
+
+export function nodeType(node: GraphNode): string {
+  return node.labels.find((l) => NODE_TYPES.has(l)) ?? node.labels[0] ?? "Unknown";
+}
+
 function primaryLabel(node: GraphNode): string {
-  return node.labels[0] ?? "Unknown";
+  return nodeType(node);
 }
 
 function computeFontSize(label: string, nodeWidth: number): number {
@@ -534,20 +544,47 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       layoutConfig = { name: "preset" };
     }
 
+    const isColumnMode = !isForestMode;
+
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       style: CY_STYLE,
       layout: layoutConfig,
-      wheelSensitivity: 0.2,
-      minZoom: 0.3,
-      maxZoom: 2.5,
-      userPanningEnabled: true,
-      userZoomingEnabled: true,
+      wheelSensitivity: isColumnMode ? 0 : 0.2,
+      minZoom: isColumnMode ? 1 : 0.3,
+      maxZoom: isColumnMode ? 1 : 2.5,
+      userPanningEnabled: !isColumnMode,
+      userZoomingEnabled: !isColumnMode,
       boxSelectionEnabled: false,
+      autoungrabify: false,
     });
 
-    if (!isForestMode) {
+    if (isColumnMode) {
+      cy.fit(undefined, 40);
+
+      // Lock header nodes so they can't be dragged.
+      cy.nodes("[nodeType = '__header']").lock();
+
+      // Constrain node dragging to vertical only (within their column).
+      cy.on("drag", "node", (evt) => {
+        const node = evt.target;
+        if (node.locked()) return;
+        const origX = node.data("_colX") as number | undefined;
+        if (origX != null) {
+          node.position("x", origX);
+        }
+      });
+
+      // Store each node's column X on init for drag constraint.
+      cy.nodes().forEach((node) => {
+        if (!node.locked()) {
+          node.data("_colX", node.position("x"));
+        }
+      });
+    }
+
+    if (!isColumnMode) {
       cy.fit(undefined, 40);
     }
 

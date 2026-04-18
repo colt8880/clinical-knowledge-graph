@@ -29,7 +29,7 @@ const mockCyInstance = {
   off: vi.fn(),
   destroy: vi.fn(),
   fit: vi.fn(),
-  nodes: vi.fn(() => ({ forEach: vi.fn(), removeClass: vi.fn() })),
+  nodes: vi.fn(() => ({ forEach: vi.fn(), removeClass: vi.fn(), lock: vi.fn() })),
   edges: vi.fn(() => ({ forEach: vi.fn() })),
   elements: vi.fn(() => ({ removeClass: vi.fn() })),
   getElementById: vi.fn(() => mockNode),

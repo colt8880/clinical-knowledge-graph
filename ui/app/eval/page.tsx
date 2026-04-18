@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { evaluate, fetchNeighbors } from "@/lib/api/client";
 import type { PatientContext, GraphNode, GraphEdge } from "@/lib/api/client";
 import {
@@ -13,7 +13,7 @@ import {
   visibleNodeIds,
 } from "@/lib/eval/trace-nav";
 import type { EvalTrace, TraceEvent } from "@/lib/eval/trace-nav";
-import GraphCanvas, { type CanvasColumn } from "@/components/GraphCanvas";
+import GraphCanvas, { type CanvasColumn, type RecState } from "@/components/GraphCanvas";
 import FixturePicker from "@/components/FixturePicker";
 import TraceStepper from "@/components/TraceStepper";
 import TraceEventList from "@/components/TraceEventList";
@@ -42,9 +42,25 @@ const FIXTURE_MODULES: Record<string, () => Promise<PatientContext>> = {
     import("../../../evals/fixtures/statins/05-prior-mi-62m/patient.json").then(
       (m) => m.default as unknown as PatientContext,
     ),
+  "cross-01-ascvd-62m": () =>
+    import("../../../evals/fixtures/cross-domain/case-01/patient-context.json").then(
+      (m) => m.default as unknown as PatientContext,
+    ),
+  "cross-02-primary-55m": () =>
+    import("../../../evals/fixtures/cross-domain/case-02/patient-context.json").then(
+      (m) => m.default as unknown as PatientContext,
+    ),
+  "cross-03-ckd3b-65m": () =>
+    import("../../../evals/fixtures/cross-domain/case-03/patient-context.json").then(
+      (m) => m.default as unknown as PatientContext,
+    ),
+  "cross-04-ckd3a-55m": () =>
+    import("../../../evals/fixtures/cross-domain/case-04/patient-context.json").then(
+      (m) => m.default as unknown as PatientContext,
+    ),
 };
 
-const GUIDELINE_ID = "guideline:uspstf-statin-2022";
+const DEFAULT_GUIDELINE_ID = "guideline:uspstf-statin-2022";
 
 export default function EvalPage() {
   return (
@@ -76,17 +92,31 @@ function EvalContent() {
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ── Data fetching ──────────────────────────────────────────────
+  // ── Data fetching ───────────────────────────────���──────────────
 
-  // Always fetch the guideline subgraph (guideline + recs).
-  const guidelineQuery = useQuery({
-    queryKey: ["neighbors", GUIDELINE_ID],
-    queryFn: () => fetchNeighbors(GUIDELINE_ID),
+  // Determine guidelines from trace; fall back to default.
+  const events = useMemo(() => trace?.events ?? [], [trace]);
+  const guidelineIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const e of events) {
+      if (e.type === "guideline_entered") ids.add(e.guideline_id);
+    }
+    return ids.size > 0 ? Array.from(ids) : [DEFAULT_GUIDELINE_ID];
+  }, [events]);
+
+  // Fetch the subgraph for each guideline (guideline + recs).
+  const guidelineQueries = useQueries({
+    queries: guidelineIds.map((id) => ({
+      queryKey: ["neighbors", id],
+      queryFn: () => fetchNeighbors(id),
+      staleTime: Infinity,
+    })),
   });
+  const guidelineDataReady = guidelineQueries.some((q) => q.data != null);
+  const guidelineDataLoading = guidelineQueries.some((q) => q.isLoading);
 
   // From the full trace, determine which recs and strategies we need
   // neighbor data for. Fetches happen once when the trace loads.
-  const events = useMemo(() => trace?.events ?? [], [trace]);
   const fetchIds = useMemo(() => subgraphFetchIds(events), [events]);
 
   // Fetch neighbors for each recommendation (gives us Strategy nodes).
@@ -183,6 +213,23 @@ function EvalContent() {
     [trace],
   );
 
+  // Derive preemption/modifier state from recommendations for canvas styling.
+  const recState: RecState | undefined = useMemo(() => {
+    if (recommendations.length === 0) return undefined;
+    const preemptedBy = new Map<string, string>();
+    const modifierCounts = new Map<string, number>();
+    for (const rec of recommendations) {
+      if (rec.preempted_by) {
+        preemptedBy.set(rec.recommendation_id, rec.preempted_by);
+      }
+      if (rec.modifiers && rec.modifiers.length > 0) {
+        modifierCounts.set(rec.recommendation_id, rec.modifiers.length);
+      }
+    }
+    if (preemptedBy.size === 0 && modifierCounts.size === 0) return undefined;
+    return { preemptedBy, modifierCounts };
+  }, [recommendations]);
+
   // ── Build a complete node/edge pool from all fetched subgraphs ─
 
   const { nodePool, edgePool } = useMemo(() => {
@@ -199,7 +246,7 @@ function EvalContent() {
       }
     };
 
-    addSubgraph(guidelineQuery.data);
+    for (const q of guidelineQueries) addSubgraph(q.data);
     for (const q of recQueries) addSubgraph(q.data);
     for (const q of strategyQueries) addSubgraph(q.data);
 
@@ -207,7 +254,7 @@ function EvalContent() {
       nodePool: nodeMap,
       edgePool: Array.from(edgeMap.values()),
     };
-  }, [guidelineQuery.data, recQueries, strategyQueries]);
+  }, [guidelineQueries, recQueries, strategyQueries]);
 
   // ── Build canvas columns based on which nodes the trace has visited ─
 
@@ -216,42 +263,34 @@ function EvalContent() {
     [events, currentIndex],
   );
 
+  // Always 4 fixed columns: Guideline → Recommendation → Strategy → Action.
+  // Empty columns still occupy space so nodes never shift horizontally.
   const canvasColumns: CanvasColumn[] = useMemo(() => {
-    if (!guidelineQuery.data) return [];
+    if (!guidelineDataReady) return [];
 
-    const guidelineNode = nodePool.get(GUIDELINE_ID);
-    if (!guidelineNode) return [];
+    const guidelineNodes = guidelineIds
+      .map((id) => nodePool.get(id))
+      .filter((n): n is GraphNode => n != null);
 
-    const cols: CanvasColumn[] = [
-      { nodes: [guidelineNode], selectedId: null },
-    ];
-
-    // Col 1: Recommendations that have been considered up to currentIndex.
     const recNodes = Array.from(visible.recIds)
       .map((id) => nodePool.get(id))
       .filter((n): n is GraphNode => n != null);
-    if (recNodes.length > 0) {
-      cols.push({ nodes: recNodes, selectedId: null });
-    }
 
-    // Col 2: Strategies that have been considered.
     const strategyNodes = Array.from(visible.strategyIds)
       .map((id) => nodePool.get(id))
       .filter((n): n is GraphNode => n != null);
-    if (strategyNodes.length > 0) {
-      cols.push({ nodes: strategyNodes, selectedId: null });
-    }
 
-    // Col 3: Actions that have been checked.
     const actionNodes = Array.from(visible.actionIds)
       .map((id) => nodePool.get(id))
       .filter((n): n is GraphNode => n != null);
-    if (actionNodes.length > 0) {
-      cols.push({ nodes: actionNodes, selectedId: null });
-    }
 
-    return cols;
-  }, [guidelineQuery.data, nodePool, visible]);
+    return [
+      { nodes: guidelineNodes, selectedId: null },
+      { nodes: recNodes, selectedId: null },
+      { nodes: strategyNodes, selectedId: null },
+      { nodes: actionNodes, selectedId: null },
+    ];
+  }, [guidelineDataReady, guidelineIds, nodePool, visible]);
 
   // Only include edges between currently visible nodes.
   const visibleEdges = useMemo(() => {
@@ -297,6 +336,7 @@ function EvalContent() {
               <TraceStepper
                 currentIndex={currentIndex}
                 totalEvents={events.length}
+                currentEventType={currentEvent?.type ?? null}
                 onPrev={handlePrev}
                 onNext={handleNext}
                 onJump={handleSetIndex}
@@ -317,7 +357,7 @@ function EvalContent() {
 
         {/* Center: graph canvas */}
         <div className="flex-1 min-w-0">
-          {guidelineQuery.isLoading ? (
+          {guidelineDataLoading ? (
             <div className="flex items-center justify-center h-full text-slate-400">
               Loading graph...
             </div>
@@ -326,6 +366,7 @@ function EvalContent() {
               columns={canvasColumns}
               edges={visibleEdges}
               highlightedNodeIds={highlighted}
+              recState={recState}
             />
           )}
         </div>

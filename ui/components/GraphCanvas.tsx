@@ -5,6 +5,7 @@ import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
 import type { GraphNode, GraphEdge, ForestNode } from "@/lib/api/client";
 import { DOMAIN_PARENTS, FOREST_LAYOUT_OPTIONS } from "@/lib/explore/layout";
+import GraphTooltips from "./GraphTooltips";
 
 // Register cose-bilkent layout once.
 if (typeof window !== "undefined") {
@@ -42,12 +43,22 @@ interface ForestModeProps {
   focusedNodeId?: string | null;
 }
 
+/** Preemption and modifier state derived from the trace's recommendations. */
+export interface RecState {
+  /** Map from rec ID to the winning rec ID, for preempted recs. */
+  preemptedBy: Map<string, string>;
+  /** Map from rec ID to modifier count, for recs with active modifiers. */
+  modifierCounts: Map<string, number>;
+}
+
 type GraphCanvasProps = (ColumnModeProps | ForestModeProps) & {
   onNodeClick?: (nodeId: string) => void;
   onEdgeClick?: (edgeId: string) => void;
   selectedNodeId?: string | null;
   selectedEdgeId?: string | null;
   highlightedNodeIds?: string[];
+  /** Preemption/modifier state from trace recommendations. */
+  recState?: RecState;
 };
 
 /** Color palette keyed by Neo4j label. */
@@ -93,8 +104,18 @@ function nodeLabel(node: GraphNode): string {
   );
 }
 
+/** Known semantic node types. Domain labels (ACC_AHA, KDIGO, USPSTF) are not types. */
+const NODE_TYPES = new Set([
+  "Guideline", "Recommendation", "Strategy",
+  "Condition", "Procedure", "Observation", "Medication",
+]);
+
+export function nodeType(node: GraphNode): string {
+  return node.labels.find((l) => NODE_TYPES.has(l)) ?? node.labels[0] ?? "Unknown";
+}
+
 function primaryLabel(node: GraphNode): string {
-  return node.labels[0] ?? "Unknown";
+  return nodeType(node);
 }
 
 function computeFontSize(label: string, nodeWidth: number): number {
@@ -110,12 +131,25 @@ function computeFontSize(label: string, nodeWidth: number): number {
   return Math.max(7, Math.min(maxForWord, maxForHeight, 11));
 }
 
-// ── Column-mode layout (legacy, Eval tab) ─────────────────────────────
+// ── Column-mode layout ───────────────────────────────────────────────
+// Fixed 4-column layout: Guideline → Recommendation → Strategy → Action.
+// Zoom is locked at 1 and pan.x is fixed so model coordinates map
+// directly to screen pixels. This lets us align HTML column headers
+// with Cytoscape node positions without coordinate transforms.
 
-const COL_SPACING = 260;
-const ROW_SPACING = 90;
-const LEFT_PAD = 120;
-const TOP_PAD = 80;
+const COL_SPACING = 280;
+const ROW_SPACING = 80;
+const LEFT_PAD = 140;
+const TOP_PAD = 20;
+
+const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
+
+/** Domain / condition context shown beneath guideline node labels. */
+const GUIDELINE_CONTEXT: Record<string, string> = {
+  "guideline:uspstf-statin-2022": "Cardiovascular — Primary Prevention",
+  "guideline:acc-aha-cholesterol-2018": "Cardiovascular — Lipid Management",
+  "guideline:kdigo-ckd-2024": "Renal — Chronic Kidney Disease",
+};
 
 function buildColumnElements(
   columns: CanvasColumn[],
@@ -126,19 +160,27 @@ function buildColumnElements(
 
   for (let col = 0; col < columns.length; col++) {
     const { nodes, selectedId } = columns[col];
+    if (nodes.length === 0) continue;
+
     const colX = LEFT_PAD + col * COL_SPACING;
-    const totalHeight = (nodes.length - 1) * ROW_SPACING;
-    const startY = TOP_PAD + Math.max(0, (300 - totalHeight) / 2);
 
     for (let row = 0; row < nodes.length; row++) {
       const n = nodes[row];
       nodeIds.add(n.id);
       const type = primaryLabel(n);
       const colors = TYPE_COLORS[type] ?? { bg: "#e2e8f0", border: "#64748b" };
-      const display = nodeLabel(n);
-      const nodeWidth = type === "Guideline" ? 180 : type === "Recommendation" ? 160 : 130;
-      const nodeHeight = type === "Guideline" ? 60 : 55;
+      let display = nodeLabel(n);
+      const nodeWidth = type === "Guideline" ? 200 : type === "Recommendation" ? 180 : 150;
+      const nodeHeight = type === "Guideline" ? 70 : 55;
       const isSelected = n.id === selectedId;
+
+      // Add condition context beneath guideline names.
+      if (type === "Guideline") {
+        const context = GUIDELINE_CONTEXT[n.id];
+        if (context) {
+          display = `${display}\n${context}`;
+        }
+      }
 
       els.push({
         data: {
@@ -152,12 +194,17 @@ function buildColumnElements(
           fontSize: computeFontSize(display, nodeWidth),
           isSelected: isSelected ? "true" : "false",
         },
-        position: { x: colX, y: startY + row * ROW_SPACING },
+        position: { x: colX, y: TOP_PAD + row * ROW_SPACING },
       });
     }
   }
 
   for (const e of edges) {
+    // Skip PREEMPTED_BY edges — preemption is rendered as an inline
+    // annotation on the dimmed node, not as a drawn edge. This avoids
+    // awkward same-column curves between two Recommendation nodes.
+    if (e.type === "PREEMPTED_BY") continue;
+
     if (nodeIds.has(e.start) && nodeIds.has(e.end)) {
       els.push({
         data: {
@@ -394,6 +441,49 @@ const CY_STYLE: any[] = [
       "overlay-padding": 6,
     },
   },
+  // Preempted node: dimmed, dashed red outline. The "superseded by" annotation
+  // is part of the label — no PREEMPTED_BY edge is drawn.
+  {
+    selector: ".preempted",
+    style: {
+      opacity: 0.45,
+      "border-style": "dashed",
+      "border-width": 2,
+      "border-color": "#dc2626",
+      "background-color": "#fef2f2",
+      height: 80,
+      "font-size": 8,
+    },
+  },
+  // MODIFIES edge: dotted amber line, gentle curve for cross-column routing.
+  {
+    selector: "edge[edgeType = 'MODIFIES']",
+    style: {
+      width: 2,
+      "line-color": "#d97706",
+      "target-arrow-color": "#d97706",
+      "line-style": "dotted",
+      "arrow-scale": 0.9,
+      "curve-style": "bezier",
+      "z-index": 10,
+    },
+  },
+  // Modifier badge on target Rec (has modifiers).
+  {
+    selector: ".has-modifiers",
+    style: {
+      "border-width": 3,
+      "border-color": "#d97706",
+    },
+  },
+  // "Hidden by filter" indicator: node whose cross-guideline source is filtered out.
+  {
+    selector: ".cross-edge-filtered",
+    style: {
+      "border-style": "dotted",
+      "border-color": "#94a3b8",
+    },
+  },
 ];
 
 export default function GraphCanvas(props: GraphCanvasProps) {
@@ -403,6 +493,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     selectedNodeId,
     selectedEdgeId,
     highlightedNodeIds: highlightedIds,
+    recState,
   } = props;
 
   const isForestMode = props.nodes !== undefined;
@@ -431,27 +522,57 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       layoutConfig = { name: "preset" };
     }
 
+    const isColumnMode = !isForestMode;
+
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       style: CY_STYLE,
       layout: layoutConfig,
       wheelSensitivity: 0.2,
-      minZoom: 0.3,
-      maxZoom: 2.5,
+      minZoom: 1,
+      maxZoom: isColumnMode ? 1 : 2.5,
       userPanningEnabled: true,
-      userZoomingEnabled: true,
+      userZoomingEnabled: !isColumnMode,
       boxSelectionEnabled: false,
+      autoungrabify: false,
     });
 
-    if (!isForestMode) {
+    if (isColumnMode) {
+      // No cy.fit() — zoom stays at 1 so model coords = screen pixels.
+      // This keeps HTML column headers aligned with Cytoscape nodes.
+      cy.zoom(1);
+      cy.pan({ x: 0, y: 0 });
+
+      // Allow vertical panning only — lock horizontal pan position.
+      cy.on("pan", () => {
+        const pan = cy.pan();
+        if (pan.x !== 0) {
+          cy.pan({ x: 0, y: pan.y });
+        }
+      });
+
+      // Constrain node dragging to vertical only (within their column).
+      cy.on("drag", "node", (evt) => {
+        const node = evt.target;
+        const origX = node.data("_colX") as number | undefined;
+        if (origX != null) {
+          node.position("x", origX);
+        }
+      });
+
+      // Store each node's column X for drag constraint.
+      cy.nodes().forEach((node) => {
+        node.data("_colX", node.position("x"));
+      });
+    } else {
       cy.fit(undefined, 40);
     }
 
     cy.on("tap", "node", (evt) => {
       const id = evt.target.id();
-      // Don't fire for compound parent nodes.
-      if (id.startsWith("__cluster_")) return;
+      // Don't fire for compound parent nodes or column headers.
+      if (id.startsWith("__cluster_") || id.startsWith("__header_")) return;
       onNodeClickRef.current?.(id);
     });
 
@@ -513,13 +634,22 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       }
     });
 
-    // Edges auto-hide when either endpoint is hidden, but we handle explicitly
-    // for cross-guideline edges.
+    // Edges: hide when either endpoint is hidden; mark target Recs whose
+    // cross-guideline source is filtered out with "cross-edge-filtered".
+    cy.nodes().removeClass("cross-edge-filtered");
     cy.edges().forEach((edge) => {
       const src = cy.getElementById(edge.data("source"));
       const tgt = cy.getElementById(edge.data("target"));
-      if (src.style("display") === "none" || tgt.style("display") === "none") {
+      const srcHidden = src.style("display") === "none";
+      const tgtHidden = tgt.style("display") === "none";
+      if (srcHidden || tgtHidden) {
         edge.style("display", "none");
+        // If this is a cross-guideline edge (PREEMPTED_BY or MODIFIES) and
+        // only the source is hidden, mark the target with a filter indicator.
+        const edgeType = edge.data("edgeType") as string;
+        if (srcHidden && !tgtHidden && (edgeType === "PREEMPTED_BY" || edgeType === "MODIFIES")) {
+          tgt.addClass("cross-edge-filtered");
+        }
       } else {
         edge.style("display", "element");
       }
@@ -567,6 +697,58 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     }
   }, [selectedEdgeId]);
 
+  // Track which nodes had their labels modified so we can restore them.
+  const modifiedLabelsRef = useRef<Map<string, string>>(new Map());
+
+  // Apply preemption/modifier classes from recState.
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy) return;
+
+    // Restore any previously modified labels before reapplying.
+    modifiedLabelsRef.current.forEach((originalLabel, nodeId) => {
+      const node = cy.getElementById(nodeId);
+      if (node.length > 0) {
+        node.data("label", originalLabel);
+      }
+    });
+    modifiedLabelsRef.current.clear();
+
+    cy.nodes().removeClass("preempted has-modifiers");
+    if (!recState) return;
+
+    recState.preemptedBy.forEach((winnerId, recId) => {
+      const node = cy.getElementById(recId);
+      if (node.length > 0) {
+        node.addClass("preempted");
+        const label = node.data("label") as string;
+        if (label) {
+          modifiedLabelsRef.current.set(recId, label);
+          // Show the winner's readable ID as a "superseded by" annotation.
+          const winnerShort = winnerId.replace(/^rec:/, "").replace(/-/g, " ");
+          node.data("label", `${label}\n⊘ Superseded by:\n${winnerShort}`);
+        }
+      }
+    });
+
+    recState.modifierCounts.forEach((count, recId) => {
+      if (count > 0) {
+        const node = cy.getElementById(recId);
+        if (node.length > 0) {
+          node.addClass("has-modifiers");
+          const label = node.data("label") as string;
+          if (label) {
+            // Only store original if not already stored by preemption above.
+            if (!modifiedLabelsRef.current.has(recId)) {
+              modifiedLabelsRef.current.set(recId, label);
+            }
+            node.data("label", `${node.data("label")}\n[mod: ${count}]`);
+          }
+        }
+      }
+    });
+  }, [recState, cyVersion]);
+
   // Eval tab: highlight node(s) for the current trace step.
   useEffect(() => {
     const cy = cyRef.current;
@@ -579,11 +761,34 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     }
   }, [highlightedIds, cyVersion]);
 
+  const columnCount = !isForestMode ? (props.columns?.length ?? 0) : 0;
+
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full bg-white"
-      data-testid="graph-canvas"
-    />
+    <div className="relative w-full h-full">
+      {/* Fixed column headers — positioned to match Cytoscape node X coords (zoom=1, pan.x=0). */}
+      {!isForestMode && columnCount > 0 && (
+        <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none bg-white/90 backdrop-blur-sm border-b border-slate-200 h-8 flex items-center">
+          {COLUMN_HEADERS.slice(0, columnCount).map((header, i) => (
+            <div
+              key={i}
+              className="absolute text-[11px] font-semibold uppercase tracking-wide text-slate-400 text-center"
+              style={{
+                left: LEFT_PAD + i * COL_SPACING,
+                transform: "translateX(-50%)",
+                width: COL_SPACING - 20,
+              }}
+            >
+              {header}
+            </div>
+          ))}
+        </div>
+      )}
+      <div
+        ref={containerRef}
+        className={`w-full bg-white ${!isForestMode ? "h-[calc(100%-32px)] mt-8" : "h-full"}`}
+        data-testid="graph-canvas"
+      />
+      <GraphTooltips cyRef={cyRef} cyVersion={cyVersion} />
+    </div>
   );
 }

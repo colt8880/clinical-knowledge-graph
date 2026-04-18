@@ -52,6 +52,18 @@ export function highlightedNodeIds(event: TraceEvent): string[] {
     case "recommendation_emitted":
       return [event.recommendation_id];
 
+    case "guideline_exited":
+      return [event.guideline_id];
+
+    case "preemption_resolved":
+      return [
+        event.preempted_recommendation_id,
+        event.preempting_recommendation_id,
+      ];
+
+    case "cross_guideline_match":
+      return [event.source_rec_id, event.target_rec_id];
+
     default:
       return [];
   }
@@ -79,6 +91,9 @@ export function eventTypeLabel(type: string): string {
     exit_condition_triggered: "Exit Condition Triggered",
     recommendation_emitted: "Recommendation Emitted",
     evaluation_completed: "Evaluation Completed",
+    guideline_exited: "Guideline Exited",
+    preemption_resolved: "Preemption Resolved",
+    cross_guideline_match: "Cross-Guideline Match",
   };
   return labels[type] ?? type;
 }
@@ -127,6 +142,15 @@ export function eventSummary(event: TraceEvent): string {
 
     case "evaluation_completed":
       return `${event.recommendations_emitted} recs in ${event.duration_ms}ms`;
+
+    case "guideline_exited":
+      return `${event.guideline_id} (${event.recommendations_emitted} recs)`;
+
+    case "preemption_resolved":
+      return `${event.preempted_recommendation_id} preempted by ${event.preempting_recommendation_id}`;
+
+    case "cross_guideline_match":
+      return `${event.source_rec_id} modifies ${event.target_rec_id} (${event.nature})`;
 
     default:
       return "";

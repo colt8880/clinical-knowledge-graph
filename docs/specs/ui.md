@@ -144,6 +144,47 @@ Given a `PatientContext`, produce a recommendation set by running the evaluator,
 - Animated transitions between steps.
 - Side-by-side trace diff (for comparing two runs).
 
+## Visual language: preemption and modifiers (F29)
+
+Cross-guideline semantics are rendered via Cytoscape style rules keyed off node/edge data, not eval-mode flags. Both Explore and Eval tabs share these styles.
+
+### Preempted Rec nodes
+
+- **Opacity:** 0.4 (dimmed, not hidden — dimming communicates "evaluated and consciously suppressed").
+- **Outline:** dashed border.
+- **Label suffix:** `(preempted by <winner_short_id>)` appended to the node label.
+- **Class:** `.preempted` applied via `recState.preemptedBy`.
+
+### PREEMPTED_BY edges
+
+- **Stroke:** 3px width (thicker than normal edges), solid line.
+- **Color:** desaturated red (`#991b1b`).
+- **Arrow:** from preempted → winner, scale 1.2.
+- **Hover tooltip:** shows `edge_priority` and `reason`.
+
+### MODIFIES edges
+
+- **Stroke:** 2px width, dotted line.
+- **Color:** amber (`#d97706`).
+- **Hover tooltip:** shows `nature`, `note`, and source guideline.
+
+### Modifier badge on target Recs
+
+- **Visual:** amber border highlight (`.has-modifiers` class) + `[mod: N]` label suffix.
+- **Hover tooltip:** shows count of active modifiers.
+- **Multiple modifiers:** stack in the tooltip, not on the badge.
+
+### Domain filter interaction
+
+When a domain filter hides the source of a `PREEMPTED_BY` or `MODIFIES` edge:
+- The edge is hidden.
+- The target Rec shows a `.cross-edge-filtered` indicator (dotted gray border) so users understand why preemption/modification is not visible when one exists in the graph.
+
+### Trace stepper event icons
+
+- `preemption_resolved`: strikethrough `Rec` + "Preempted" label (red background). Clicking navigates the canvas to highlight both preempted and winner nodes.
+- `cross_guideline_match`: bidirectional arrow + "Modifier" label (orange background). Clicking highlights the target Rec.
+
 ## Styling and copy
 
 - Grade badges: B → filled green, C → outlined amber, I → outlined gray, `not_applicable` / exit → muted neutral. Colors are accessible (WCAG AA); never encode meaning in color alone — always pair with text.

@@ -121,12 +121,18 @@ function computeFontSize(label: string, nodeWidth: number): number {
   return Math.max(7, Math.min(maxForWord, maxForHeight, 11));
 }
 
-// ── Column-mode layout (legacy, Eval tab) ─────────────────────────────
+// ── Column-mode layout (Eval tab) ────────────────────────────────────
+// Fixed 4-column layout: Guideline → Recommendation → Strategy → Action.
+// Columns always occupy their position even when empty, so nodes never
+// shift horizontally as the trace progresses.
 
-const COL_SPACING = 260;
-const ROW_SPACING = 90;
-const LEFT_PAD = 120;
-const TOP_PAD = 80;
+const COL_SPACING = 280;
+const ROW_SPACING = 80;
+const LEFT_PAD = 100;
+const TOP_PAD = 50;
+const HEADER_Y = 20;
+
+const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
 
 function buildColumnElements(
   columns: CanvasColumn[],
@@ -135,11 +141,33 @@ function buildColumnElements(
   const els: ElementDefinition[] = [];
   const nodeIds = new Set<string>();
 
+  // Add column header labels as non-interactive nodes.
+  for (let col = 0; col < columns.length; col++) {
+    const colX = LEFT_PAD + col * COL_SPACING;
+    const header = COLUMN_HEADERS[col] ?? `Column ${col}`;
+    els.push({
+      data: {
+        id: `__header_${col}`,
+        label: header,
+        nodeType: "__header",
+        bgColor: "transparent",
+        borderColor: "transparent",
+        nodeWidth: 200,
+        nodeHeight: 24,
+        fontSize: 11,
+        isSelected: "false",
+      },
+      position: { x: colX, y: HEADER_Y },
+    });
+  }
+
   for (let col = 0; col < columns.length; col++) {
     const { nodes, selectedId } = columns[col];
+    if (nodes.length === 0) continue;
+
     const colX = LEFT_PAD + col * COL_SPACING;
     const totalHeight = (nodes.length - 1) * ROW_SPACING;
-    const startY = TOP_PAD + Math.max(0, (300 - totalHeight) / 2);
+    const startY = TOP_PAD + Math.max(0, (200 - totalHeight) / 2);
 
     for (let row = 0; row < nodes.length; row++) {
       const n = nodes[row];
@@ -147,7 +175,7 @@ function buildColumnElements(
       const type = primaryLabel(n);
       const colors = TYPE_COLORS[type] ?? { bg: "#e2e8f0", border: "#64748b" };
       const display = nodeLabel(n);
-      const nodeWidth = type === "Guideline" ? 180 : type === "Recommendation" ? 160 : 130;
+      const nodeWidth = type === "Guideline" ? 180 : type === "Recommendation" ? 170 : 140;
       const nodeHeight = type === "Guideline" ? 60 : 55;
       const isSelected = n.id === selectedId;
 
@@ -324,6 +352,20 @@ const CY_STYLE: any[] = [
   {
     selector: "node[nodeType = 'Guideline']",
     style: { "font-weight": 600 },
+  },
+  {
+    selector: "node[nodeType = '__header']",
+    style: {
+      "background-opacity": 0,
+      "border-width": 0,
+      "font-size": 11,
+      "font-weight": 600,
+      "text-transform": "uppercase",
+      color: "#94a3b8",
+      "text-valign": "center",
+      "text-halign": "center",
+      "events": "no",
+    },
   },
   {
     selector: "node[nodeType = '__cluster']",
@@ -511,8 +553,8 @@ export default function GraphCanvas(props: GraphCanvasProps) {
 
     cy.on("tap", "node", (evt) => {
       const id = evt.target.id();
-      // Don't fire for compound parent nodes.
-      if (id.startsWith("__cluster_")) return;
+      // Don't fire for compound parent nodes or column headers.
+      if (id.startsWith("__cluster_") || id.startsWith("__header_")) return;
       onNodeClickRef.current?.(id);
     });
 

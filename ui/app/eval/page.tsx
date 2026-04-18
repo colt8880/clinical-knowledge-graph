@@ -263,44 +263,33 @@ function EvalContent() {
     [events, currentIndex],
   );
 
+  // Always 4 fixed columns: Guideline → Recommendation → Strategy → Action.
+  // Empty columns still occupy space so nodes never shift horizontally.
   const canvasColumns: CanvasColumn[] = useMemo(() => {
     if (!guidelineDataReady) return [];
 
-    // Guideline column: one node per guideline in the trace.
     const guidelineNodes = guidelineIds
       .map((id) => nodePool.get(id))
       .filter((n): n is GraphNode => n != null);
-    if (guidelineNodes.length === 0) return [];
 
-    const cols: CanvasColumn[] = [
-      { nodes: guidelineNodes, selectedId: null },
-    ];
-
-    // Col 1: Recommendations that have been considered up to currentIndex.
     const recNodes = Array.from(visible.recIds)
       .map((id) => nodePool.get(id))
       .filter((n): n is GraphNode => n != null);
-    if (recNodes.length > 0) {
-      cols.push({ nodes: recNodes, selectedId: null });
-    }
 
-    // Col 2: Strategies that have been considered.
     const strategyNodes = Array.from(visible.strategyIds)
       .map((id) => nodePool.get(id))
       .filter((n): n is GraphNode => n != null);
-    if (strategyNodes.length > 0) {
-      cols.push({ nodes: strategyNodes, selectedId: null });
-    }
 
-    // Col 3: Actions that have been checked.
     const actionNodes = Array.from(visible.actionIds)
       .map((id) => nodePool.get(id))
       .filter((n): n is GraphNode => n != null);
-    if (actionNodes.length > 0) {
-      cols.push({ nodes: actionNodes, selectedId: null });
-    }
 
-    return cols;
+    return [
+      { nodes: guidelineNodes, selectedId: null },
+      { nodes: recNodes, selectedId: null },
+      { nodes: strategyNodes, selectedId: null },
+      { nodes: actionNodes, selectedId: null },
+    ];
   }, [guidelineDataReady, guidelineIds, nodePool, visible]);
 
   // Only include edges between currently visible nodes.

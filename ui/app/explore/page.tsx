@@ -13,14 +13,6 @@ import {
   type DomainKey,
 } from "@/lib/explore/urlState";
 
-/** Node types that belong in each column. */
-const COLUMN_TYPE_MAP: Record<string, number> = {
-  Guideline: 0,
-  Recommendation: 1,
-  Strategy: 2,
-  // Everything else (Medication, Condition, Observation, Procedure) → col 3
-};
-
 
 export default function ExplorePage() {
   return (
@@ -40,6 +32,9 @@ function ExploreContent() {
   const { domains, focus, setDomains, setFocus } = useExploreUrlState();
   const [detailNodeId, setDetailNodeId] = useState<string | null>(null);
   const [detailEdgeId, setDetailEdgeId] = useState<string | null>(null);
+  // Progressive drill-down: click a Rec → show its Strategies; click a Strategy → show its Actions.
+  const [expandedRecId, setExpandedRecId] = useState<string | null>(null);
+  const [expandedStrategyId, setExpandedStrategyId] = useState<string | null>(null);
 
   // Fetch the full forest (all domains) once. Filter client-side.
   const forestQuery = useQuery({
@@ -72,16 +67,68 @@ function ExploreContent() {
     });
   }, [allNodes, visibleApiDomains]);
 
-  // Organize visible nodes into 4 columns by type.
+  // Build an edge lookup: source → [target] by edge type, for drill-down.
+  const edgeIndex = useMemo(() => {
+    const bySource = new Map<string, { type: string; target: string }[]>();
+    for (const e of allEdges) {
+      const list = bySource.get(e.start) ?? [];
+      list.push({ type: e.type, target: e.end });
+      bySource.set(e.start, list);
+    }
+    return bySource;
+  }, [allEdges]);
+
+  // Organize into 4 columns with progressive drill-down:
+  //   Col 0: Guidelines (always)
+  //   Col 1: Recommendations (always)
+  //   Col 2: Strategies for the expanded Rec (only when a Rec is clicked)
+  //   Col 3: Actions for the expanded Strategy (only when a Strategy is clicked)
   const { exploreColumns, visibleEdges } = useMemo(() => {
     const cols: GraphNode[][] = [[], [], [], []];
     const visibleIds = new Set<string>();
+    const nodeById = new Map<string, ForestNode>();
+    for (const n of visibleNodes) nodeById.set(n.id, n);
 
+    // Col 0 + Col 1: all visible Guidelines and Recommendations.
     for (const n of visibleNodes) {
       const type = n.labels[0] ?? "Unknown";
-      const colIdx = COLUMN_TYPE_MAP[type] ?? 3;
-      cols[colIdx].push(n);
-      visibleIds.add(n.id);
+      if (type === "Guideline") {
+        cols[0].push(n);
+        visibleIds.add(n.id);
+      } else if (type === "Recommendation") {
+        cols[1].push(n);
+        visibleIds.add(n.id);
+      }
+    }
+
+    // Col 2: Strategies connected to the expanded Rec via OFFERS_STRATEGY.
+    if (expandedRecId) {
+      const targets = edgeIndex.get(expandedRecId) ?? [];
+      for (const { type, target } of targets) {
+        if (type === "OFFERS_STRATEGY") {
+          const node = nodeById.get(target);
+          if (node) {
+            cols[2].push(node);
+            visibleIds.add(node.id);
+          }
+        }
+      }
+      visibleIds.add(expandedRecId); // ensure the rec itself is visible
+    }
+
+    // Col 3: Actions connected to the expanded Strategy via INCLUDES_ACTION.
+    if (expandedStrategyId) {
+      const targets = edgeIndex.get(expandedStrategyId) ?? [];
+      for (const { type, target } of targets) {
+        if (type === "INCLUDES_ACTION") {
+          const node = nodeById.get(target);
+          if (node) {
+            cols[3].push(node);
+            visibleIds.add(node.id);
+          }
+        }
+      }
+      visibleIds.add(expandedStrategyId);
     }
 
     const columns: CanvasColumn[] = cols.map((nodes) => ({
@@ -94,7 +141,7 @@ function ExploreContent() {
     );
 
     return { exploreColumns: columns, visibleEdges: edges };
-  }, [visibleNodes, allEdges, detailNodeId]);
+  }, [visibleNodes, allEdges, detailNodeId, expandedRecId, expandedStrategyId, edgeIndex]);
 
   // Find the focused/detail node.
   const detailNode = useMemo(() => {
@@ -123,8 +170,21 @@ function ExploreContent() {
       setDetailNodeId(nodeId);
       setDetailEdgeId(null);
       setFocus(nodeId);
+
+      // Drill-down: clicking a Rec expands its Strategies; clicking a Strategy expands its Actions.
+      const node = allNodes.find((n) => n.id === nodeId);
+      if (!node) return;
+      const type = node.labels[0] ?? "Unknown";
+
+      if (type === "Recommendation") {
+        // Toggle: clicking the same Rec again collapses it.
+        setExpandedRecId((prev) => (prev === nodeId ? null : nodeId));
+        setExpandedStrategyId(null); // collapse actions when switching Rec
+      } else if (type === "Strategy") {
+        setExpandedStrategyId((prev) => (prev === nodeId ? null : nodeId));
+      }
     },
-    [setFocus],
+    [setFocus, allNodes],
   );
 
   const handleEdgeClick = useCallback((edgeId: string) => {
@@ -135,6 +195,8 @@ function ExploreContent() {
   const handleBackgroundClick = useCallback(() => {
     setDetailNodeId(null);
     setDetailEdgeId(null);
+    setExpandedRecId(null);
+    setExpandedStrategyId(null);
     setFocus(null);
   }, [setFocus]);
 
@@ -151,6 +213,8 @@ function ExploreContent() {
       if (e.key === "Escape") {
         setDetailNodeId(null);
         setDetailEdgeId(null);
+        setExpandedRecId(null);
+        setExpandedStrategyId(null);
         setFocus(null);
       }
     };

@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { evaluate, fetchNeighbors } from "@/lib/api/client";
 import type { PatientContext, GraphNode, GraphEdge } from "@/lib/api/client";
 import {

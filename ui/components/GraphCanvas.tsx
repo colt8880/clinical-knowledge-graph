@@ -140,7 +140,6 @@ const COL_SPACING = 280;
 const ROW_SPACING = 80;
 const LEFT_PAD = 100;
 const TOP_PAD = 50;
-const HEADER_Y = 20;
 
 const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
 
@@ -150,26 +149,6 @@ function buildColumnElements(
 ): ElementDefinition[] {
   const els: ElementDefinition[] = [];
   const nodeIds = new Set<string>();
-
-  // Add column header labels as non-interactive nodes.
-  for (let col = 0; col < columns.length; col++) {
-    const colX = LEFT_PAD + col * COL_SPACING;
-    const header = COLUMN_HEADERS[col] ?? `Column ${col}`;
-    els.push({
-      data: {
-        id: `__header_${col}`,
-        label: header,
-        nodeType: "__header",
-        bgColor: "transparent",
-        borderColor: "transparent",
-        nodeWidth: 200,
-        nodeHeight: 24,
-        fontSize: 11,
-        isSelected: "false",
-      },
-      position: { x: colX, y: HEADER_Y },
-    });
-  }
 
   for (let col = 0; col < columns.length; col++) {
     const { nodes, selectedId } = columns[col];
@@ -364,20 +343,6 @@ const CY_STYLE: any[] = [
     style: { "font-weight": 600 },
   },
   {
-    selector: "node[nodeType = '__header']",
-    style: {
-      "background-opacity": 0,
-      "border-width": 0,
-      "font-size": 11,
-      "font-weight": 600,
-      "text-transform": "uppercase",
-      color: "#94a3b8",
-      "text-valign": "center",
-      "text-halign": "center",
-      "events": "no",
-    },
-  },
-  {
     selector: "node[nodeType = '__cluster']",
     style: {
       "background-opacity": 0.08,
@@ -466,7 +431,8 @@ const CY_STYLE: any[] = [
       "border-width": 2,
     },
   },
-  // PREEMPTED_BY edge: thicker stroke, desaturated red, prominent arrow.
+  // PREEMPTED_BY edge: thicker stroke, desaturated red, arcs outward so it's
+  // visible when both endpoints are in the same column (Recommendations).
   {
     selector: "edge[edgeType = 'PREEMPTED_BY']",
     style: {
@@ -477,9 +443,13 @@ const CY_STYLE: any[] = [
       "arrow-scale": 1.2,
       "font-size": 9,
       "font-weight": 600,
+      "curve-style": "unbundled-bezier",
+      "control-point-distances": [-80],
+      "control-point-weights": [0.5],
+      "z-index": 10,
     },
   },
-  // MODIFIES edge: dotted line, amber color.
+  // MODIFIES edge: dotted line, amber color, arcs outward like PREEMPTED_BY.
   {
     selector: "edge[edgeType = 'MODIFIES']",
     style: {
@@ -488,6 +458,10 @@ const CY_STYLE: any[] = [
       "target-arrow-color": "#d97706",
       "line-style": "dotted",
       "arrow-scale": 0.9,
+      "curve-style": "unbundled-bezier",
+      "control-point-distances": [80],
+      "control-point-weights": [0.5],
+      "z-index": 10,
     },
   },
   // Modifier badge on target Rec (has modifiers).
@@ -551,10 +525,10 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       elements,
       style: CY_STYLE,
       layout: layoutConfig,
-      wheelSensitivity: isColumnMode ? 0 : 0.2,
-      minZoom: isColumnMode ? 1 : 0.3,
+      wheelSensitivity: 0.2,
+      minZoom: 1,
       maxZoom: isColumnMode ? 1 : 2.5,
-      userPanningEnabled: !isColumnMode,
+      userPanningEnabled: true,
       userZoomingEnabled: !isColumnMode,
       boxSelectionEnabled: false,
       autoungrabify: false,
@@ -565,6 +539,17 @@ export default function GraphCanvas(props: GraphCanvasProps) {
 
       // Lock header nodes so they can't be dragged.
       cy.nodes("[nodeType = '__header']").lock();
+
+      // Allow vertical panning only — lock horizontal pan position.
+      let lockedPanX = cy.pan().x;
+      cy.on("pan", () => {
+        const pan = cy.pan();
+        if (pan.x !== lockedPanX) {
+          cy.pan({ x: lockedPanX, y: pan.y });
+        }
+      });
+      // Update locked X when the canvas resizes / re-fits.
+      cy.on("resize", () => { lockedPanX = cy.pan().x; });
 
       // Constrain node dragging to vertical only (within their column).
       cy.on("drag", "node", (evt) => {
@@ -778,11 +763,27 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     }
   }, [highlightedIds, cyVersion]);
 
+  const columnCount = !isForestMode ? (props.columns?.length ?? 0) : 0;
+
   return (
     <div className="relative w-full h-full">
+      {/* Fixed column headers — rendered as HTML so they don't scroll with the graph. */}
+      {!isForestMode && columnCount > 0 && (
+        <div className="absolute top-0 left-0 right-0 z-10 flex pointer-events-none bg-white border-b border-slate-100 py-2">
+          {COLUMN_HEADERS.slice(0, columnCount).map((header, i) => (
+            <div
+              key={i}
+              className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 text-center"
+              style={{ width: COL_SPACING, marginLeft: i === 0 ? LEFT_PAD - COL_SPACING / 2 : 0 }}
+            >
+              {header}
+            </div>
+          ))}
+        </div>
+      )}
       <div
         ref={containerRef}
-        className="w-full h-full bg-white"
+        className={`w-full bg-white ${!isForestMode ? "h-[calc(100%-32px)] mt-8" : "h-full"}`}
         data-testid="graph-canvas"
       />
       <GraphTooltips cyRef={cyRef} cyVersion={cyVersion} />

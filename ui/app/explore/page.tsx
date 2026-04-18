@@ -3,8 +3,8 @@
 import { Suspense, useCallback, useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSubgraph } from "@/lib/api/client";
-import type { ForestNode, GraphEdge } from "@/lib/api/client";
-import GraphCanvas from "@/components/GraphCanvas";
+import type { ForestNode, GraphEdge, GraphNode } from "@/lib/api/client";
+import GraphCanvas, { type CanvasColumn } from "@/components/GraphCanvas";
 import DomainFilter from "@/components/DomainFilter";
 import NodeDetail from "@/components/NodeDetail";
 import {
@@ -12,6 +12,15 @@ import {
   domainKeysToApiLabels,
   type DomainKey,
 } from "@/lib/explore/urlState";
+
+/** Node types that belong in each column. */
+const COLUMN_TYPE_MAP: Record<string, number> = {
+  Guideline: 0,
+  Recommendation: 1,
+  Strategy: 2,
+  // Everything else (Medication, Condition, Observation, Procedure) → col 3
+};
+
 
 export default function ExplorePage() {
   return (
@@ -50,9 +59,42 @@ function ExploreContent() {
 
   // Convert domain keys to API labels for visibility filtering.
   const visibleApiDomains = useMemo(
-    () => domainKeysToApiLabels(domains),
+    () => new Set(domainKeysToApiLabels(domains).map((d) => d.toUpperCase().replace("-", "_"))),
     [domains],
   );
+
+  // Filter nodes by visible domains: shared entities always visible,
+  // guideline-scoped nodes only when their domain is toggled on.
+  const visibleNodes: ForestNode[] = useMemo(() => {
+    return allNodes.filter((n) => {
+      if (!n.domain) return true; // shared entity
+      return visibleApiDomains.has(n.domain);
+    });
+  }, [allNodes, visibleApiDomains]);
+
+  // Organize visible nodes into 4 columns by type.
+  const { exploreColumns, visibleEdges } = useMemo(() => {
+    const cols: GraphNode[][] = [[], [], [], []];
+    const visibleIds = new Set<string>();
+
+    for (const n of visibleNodes) {
+      const type = n.labels[0] ?? "Unknown";
+      const colIdx = COLUMN_TYPE_MAP[type] ?? 3;
+      cols[colIdx].push(n);
+      visibleIds.add(n.id);
+    }
+
+    const columns: CanvasColumn[] = cols.map((nodes) => ({
+      nodes,
+      selectedId: detailNodeId,
+    }));
+
+    const edges = allEdges.filter(
+      (e) => visibleIds.has(e.start) && visibleIds.has(e.end),
+    );
+
+    return { exploreColumns: columns, visibleEdges: edges };
+  }, [visibleNodes, allEdges, detailNodeId]);
 
   // Find the focused/detail node.
   const detailNode = useMemo(() => {
@@ -146,10 +188,8 @@ function ExploreContent() {
           </div>
         ) : (
           <GraphCanvas
-            nodes={allNodes}
-            edges={allEdges}
-            visibleDomains={visibleApiDomains}
-            focusedNodeId={focus}
+            columns={exploreColumns}
+            edges={visibleEdges}
             onNodeClick={handleNodeClick}
             onEdgeClick={handleEdgeClick}
             selectedNodeId={detailNodeId}

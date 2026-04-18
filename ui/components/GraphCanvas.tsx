@@ -131,17 +131,25 @@ function computeFontSize(label: string, nodeWidth: number): number {
   return Math.max(7, Math.min(maxForWord, maxForHeight, 11));
 }
 
-// ── Column-mode layout (Eval tab) ────────────────────────────────────
+// ── Column-mode layout ───────────────────────────────────────────────
 // Fixed 4-column layout: Guideline → Recommendation → Strategy → Action.
-// Columns always occupy their position even when empty, so nodes never
-// shift horizontally as the trace progresses.
+// Zoom is locked at 1 and pan.x is fixed so model coordinates map
+// directly to screen pixels. This lets us align HTML column headers
+// with Cytoscape node positions without coordinate transforms.
 
 const COL_SPACING = 280;
 const ROW_SPACING = 80;
-const LEFT_PAD = 100;
-const TOP_PAD = 50;
+const LEFT_PAD = 140;
+const TOP_PAD = 20;
 
 const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
+
+/** Domain / condition context shown beneath guideline node labels. */
+const GUIDELINE_CONTEXT: Record<string, string> = {
+  "guideline:uspstf-statin-2022": "Cardiovascular — Primary Prevention",
+  "guideline:acc-aha-cholesterol-2018": "Cardiovascular — Lipid Management",
+  "guideline:kdigo-ckd-2024": "Renal — Chronic Kidney Disease",
+};
 
 function buildColumnElements(
   columns: CanvasColumn[],
@@ -155,18 +163,24 @@ function buildColumnElements(
     if (nodes.length === 0) continue;
 
     const colX = LEFT_PAD + col * COL_SPACING;
-    const totalHeight = (nodes.length - 1) * ROW_SPACING;
-    const startY = TOP_PAD + Math.max(0, (200 - totalHeight) / 2);
 
     for (let row = 0; row < nodes.length; row++) {
       const n = nodes[row];
       nodeIds.add(n.id);
       const type = primaryLabel(n);
       const colors = TYPE_COLORS[type] ?? { bg: "#e2e8f0", border: "#64748b" };
-      const display = nodeLabel(n);
-      const nodeWidth = type === "Guideline" ? 180 : type === "Recommendation" ? 170 : 140;
-      const nodeHeight = type === "Guideline" ? 60 : 55;
+      let display = nodeLabel(n);
+      const nodeWidth = type === "Guideline" ? 200 : type === "Recommendation" ? 180 : 150;
+      const nodeHeight = type === "Guideline" ? 70 : 55;
       const isSelected = n.id === selectedId;
+
+      // Add condition context beneath guideline names.
+      if (type === "Guideline") {
+        const context = GUIDELINE_CONTEXT[n.id];
+        if (context) {
+          display = `${display}\n${context}`;
+        }
+      }
 
       els.push({
         data: {
@@ -180,12 +194,17 @@ function buildColumnElements(
           fontSize: computeFontSize(display, nodeWidth),
           isSelected: isSelected ? "true" : "false",
         },
-        position: { x: colX, y: startY + row * ROW_SPACING },
+        position: { x: colX, y: TOP_PAD + row * ROW_SPACING },
       });
     }
   }
 
   for (const e of edges) {
+    // Skip PREEMPTED_BY edges — preemption is rendered as an inline
+    // annotation on the dimmed node, not as a drawn edge. This avoids
+    // awkward same-column curves between two Recommendation nodes.
+    if (e.type === "PREEMPTED_BY") continue;
+
     if (nodeIds.has(e.start) && nodeIds.has(e.end)) {
       els.push({
         data: {
@@ -422,34 +441,21 @@ const CY_STYLE: any[] = [
       "overlay-padding": 6,
     },
   },
-  // Preempted node: dimmed opacity, dashed outline, label suffix handled in data.
+  // Preempted node: dimmed, dashed red outline. The "superseded by" annotation
+  // is part of the label — no PREEMPTED_BY edge is drawn.
   {
     selector: ".preempted",
     style: {
-      opacity: 0.4,
+      opacity: 0.45,
       "border-style": "dashed",
       "border-width": 2,
+      "border-color": "#dc2626",
+      "background-color": "#fef2f2",
+      height: 80,
+      "font-size": 8,
     },
   },
-  // PREEMPTED_BY edge: thicker stroke, desaturated red, arcs outward so it's
-  // visible when both endpoints are in the same column (Recommendations).
-  {
-    selector: "edge[edgeType = 'PREEMPTED_BY']",
-    style: {
-      width: 3,
-      "line-color": "#991b1b",
-      "target-arrow-color": "#991b1b",
-      "line-style": "solid",
-      "arrow-scale": 1.2,
-      "font-size": 9,
-      "font-weight": 600,
-      "curve-style": "unbundled-bezier",
-      "control-point-distances": [-80],
-      "control-point-weights": [0.5],
-      "z-index": 10,
-    },
-  },
-  // MODIFIES edge: dotted line, amber color, arcs outward like PREEMPTED_BY.
+  // MODIFIES edge: dotted amber line, gentle curve for cross-column routing.
   {
     selector: "edge[edgeType = 'MODIFIES']",
     style: {
@@ -458,9 +464,7 @@ const CY_STYLE: any[] = [
       "target-arrow-color": "#d97706",
       "line-style": "dotted",
       "arrow-scale": 0.9,
-      "curve-style": "unbundled-bezier",
-      "control-point-distances": [80],
-      "control-point-weights": [0.5],
+      "curve-style": "bezier",
       "z-index": 10,
     },
   },
@@ -535,41 +539,33 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     });
 
     if (isColumnMode) {
-      cy.fit(undefined, 40);
-
-      // Lock header nodes so they can't be dragged.
-      cy.nodes("[nodeType = '__header']").lock();
+      // No cy.fit() — zoom stays at 1 so model coords = screen pixels.
+      // This keeps HTML column headers aligned with Cytoscape nodes.
+      cy.zoom(1);
+      cy.pan({ x: 0, y: 0 });
 
       // Allow vertical panning only — lock horizontal pan position.
-      let lockedPanX = cy.pan().x;
       cy.on("pan", () => {
         const pan = cy.pan();
-        if (pan.x !== lockedPanX) {
-          cy.pan({ x: lockedPanX, y: pan.y });
+        if (pan.x !== 0) {
+          cy.pan({ x: 0, y: pan.y });
         }
       });
-      // Update locked X when the canvas resizes / re-fits.
-      cy.on("resize", () => { lockedPanX = cy.pan().x; });
 
       // Constrain node dragging to vertical only (within their column).
       cy.on("drag", "node", (evt) => {
         const node = evt.target;
-        if (node.locked()) return;
         const origX = node.data("_colX") as number | undefined;
         if (origX != null) {
           node.position("x", origX);
         }
       });
 
-      // Store each node's column X on init for drag constraint.
+      // Store each node's column X for drag constraint.
       cy.nodes().forEach((node) => {
-        if (!node.locked()) {
-          node.data("_colX", node.position("x"));
-        }
+        node.data("_colX", node.position("x"));
       });
-    }
-
-    if (!isColumnMode) {
+    } else {
       cy.fit(undefined, 40);
     }
 
@@ -728,7 +724,9 @@ export default function GraphCanvas(props: GraphCanvasProps) {
         const label = node.data("label") as string;
         if (label) {
           modifiedLabelsRef.current.set(recId, label);
-          node.data("label", `${label}\n(preempted by ${winnerId.split(":").pop()})`);
+          // Show the winner's readable ID as a "superseded by" annotation.
+          const winnerShort = winnerId.replace(/^rec:/, "").replace(/-/g, " ");
+          node.data("label", `${label}\n⊘ Superseded by:\n${winnerShort}`);
         }
       }
     });
@@ -767,14 +765,18 @@ export default function GraphCanvas(props: GraphCanvasProps) {
 
   return (
     <div className="relative w-full h-full">
-      {/* Fixed column headers — rendered as HTML so they don't scroll with the graph. */}
+      {/* Fixed column headers — positioned to match Cytoscape node X coords (zoom=1, pan.x=0). */}
       {!isForestMode && columnCount > 0 && (
-        <div className="absolute top-0 left-0 right-0 z-10 flex pointer-events-none bg-white border-b border-slate-100 py-2">
+        <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none bg-white/90 backdrop-blur-sm border-b border-slate-200 h-8 flex items-center">
           {COLUMN_HEADERS.slice(0, columnCount).map((header, i) => (
             <div
               key={i}
-              className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 text-center"
-              style={{ width: COL_SPACING, marginLeft: i === 0 ? LEFT_PAD - COL_SPACING / 2 : 0 }}
+              className="absolute text-[11px] font-semibold uppercase tracking-wide text-slate-400 text-center"
+              style={{
+                left: LEFT_PAD + i * COL_SPACING,
+                transform: "translateX(-50%)",
+                width: COL_SPACING - 20,
+              }}
             >
               {header}
             </div>

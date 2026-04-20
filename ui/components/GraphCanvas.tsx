@@ -121,14 +121,14 @@ function primaryLabel(node: GraphNode): string {
 function computeFontSize(label: string, nodeWidth: number): number {
   const words = label.split(/\s+/);
   const longestWord = words.reduce((a, b) => (a.length > b.length ? a : b), "");
-  const charWidth = 6;
+  const charWidth = 7;
   const maxForWord = Math.floor(
-    (nodeWidth - 20) / (longestWord.length * (charWidth / 10)),
+    (nodeWidth - 24) / (longestWord.length * (charWidth / 12)),
   );
-  const charsPerLine = Math.floor((nodeWidth - 20) / charWidth);
+  const charsPerLine = Math.floor((nodeWidth - 24) / charWidth);
   const lines = Math.ceil(label.length / charsPerLine);
-  const maxForHeight = lines > 4 ? 8 : lines > 3 ? 9 : 10;
-  return Math.max(7, Math.min(maxForWord, maxForHeight, 11));
+  const maxForHeight = lines > 4 ? 10 : lines > 3 ? 11 : 12;
+  return Math.max(9, Math.min(maxForWord, maxForHeight, 13));
 }
 
 // ── Column-mode layout ───────────────────────────────────────────────
@@ -137,9 +137,9 @@ function computeFontSize(label: string, nodeWidth: number): number {
 // directly to screen pixels. This lets us align HTML column headers
 // with Cytoscape node positions without coordinate transforms.
 
-const COL_SPACING = 280;
-const ROW_SPACING = 80;
-const LEFT_PAD = 140;
+const COL_SPACING = 320;
+const ROW_SPACING = 90;
+const LEFT_PAD = 160;
 const TOP_PAD = 80;
 
 const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
@@ -163,8 +163,8 @@ function buildColumnElements(
       const type = primaryLabel(n);
       const colors = TYPE_COLORS[type] ?? { bg: "#e2e8f0", border: "#64748b" };
       const display = nodeLabel(n);
-      const nodeWidth = type === "Guideline" ? 200 : type === "Recommendation" ? 180 : 150;
-      const nodeHeight = type === "Guideline" ? 70 : 55;
+      const nodeWidth = type === "Guideline" ? 240 : type === "Recommendation" ? 220 : 180;
+      const nodeHeight = type === "Guideline" ? 80 : 65;
       const isSelected = n.id === selectedId;
 
       els.push({
@@ -245,8 +245,8 @@ function buildForestElements(
     }
 
     const display = nodeLabel(n);
-    const nodeWidth = type === "Guideline" ? 180 : type === "Recommendation" ? 160 : 130;
-    const nodeHeight = type === "Guideline" ? 60 : 55;
+    const nodeWidth = type === "Guideline" ? 220 : type === "Recommendation" ? 190 : 155;
+    const nodeHeight = type === "Guideline" ? 72 : 65;
 
     const data: Record<string, unknown> = {
       id: n.id,

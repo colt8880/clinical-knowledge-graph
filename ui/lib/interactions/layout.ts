@@ -27,10 +27,3 @@ export const INTERACTIONS_LAYOUT_OPTIONS: { name: string; [key: string]: unknown
   // Seed for determinism.
   randomize: false,
 };
-
-/** Fixed cluster positions (triangle layout). Applied after layout runs. */
-export const CLUSTER_POSITIONS: Record<string, { x: number; y: number }> = {
-  __interactions_cluster_uspstf: { x: 400, y: 100 },
-  __interactions_cluster_acc_aha: { x: 650, y: 400 },
-  __interactions_cluster_kdigo: { x: 150, y: 400 },
-};

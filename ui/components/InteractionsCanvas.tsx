@@ -138,7 +138,6 @@ const CY_STYLE: any[] = [
 interface InteractionsCanvasProps {
   data: InteractionsResponse;
   edgeTypeFilter: EdgeTypeFilter;
-  visibleGuidelines?: Set<string>;
   focusNodeId?: string | null;
   selectedNodeId?: string | null;
   selectedEdgeId?: string | null;
@@ -150,7 +149,6 @@ interface InteractionsCanvasProps {
 export default function InteractionsCanvas({
   data,
   edgeTypeFilter,
-  visibleGuidelines,
   focusNodeId,
   selectedNodeId,
   selectedEdgeId,
@@ -169,7 +167,7 @@ export default function InteractionsCanvas({
   const onBackgroundClickRef = useRef(onBackgroundClick);
   onBackgroundClickRef.current = onBackgroundClick;
 
-  const { elements } = collapseInteractions(data, edgeTypeFilter, visibleGuidelines);
+  const { elements } = collapseInteractions(data, edgeTypeFilter);
 
   const initCy = useCallback(() => {
     if (!containerRef.current) return;

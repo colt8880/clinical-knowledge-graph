@@ -44,15 +44,6 @@ function InteractionsContent() {
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [excludedPairs, setExcludedPairs] = useState<Set<string>>(new Set());
 
-  // Build visible guidelines set from excluded pairs.
-  const visibleGuidelines = useMemo(() => {
-    if (excludedPairs.size === 0) return undefined; // All visible.
-    // We don't actually hide full guidelines via pair filter — we filter edges
-    // at the collapse level using the pair filter indirectly. For now, pass undefined
-    // (all visible) and let the collapse function handle edge filtering.
-    return undefined;
-  }, [excludedPairs]);
-
   // Fetch data on mount.
   useEffect(() => {
     let cancelled = false;
@@ -186,7 +177,6 @@ function InteractionsContent() {
         <InteractionsCanvas
           data={filteredData}
           edgeTypeFilter={edgeTypeFilter}
-          visibleGuidelines={visibleGuidelines}
           focusNodeId={focusNodeId}
           selectedNodeId={selectedNodeId}
           selectedEdgeId={selectedEdgeId}

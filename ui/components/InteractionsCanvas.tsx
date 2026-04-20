@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import cytoscape, { type Core } from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
 import type { InteractionsResponse } from "@/lib/api/client";
@@ -71,17 +71,24 @@ const CY_STYLE: any[] = [
       "border-color": "#d97706",
     },
   },
-  // Edges.
+  // Edges — base style with label and wide click target.
   {
     selector: "edge",
     style: {
+      label: "data(edgeType)",
+      "font-size": 8,
+      color: "#64748b",
+      "text-background-color": "#ffffff",
+      "text-background-opacity": 0.9,
+      "text-background-padding": "2px",
       width: 2,
       "line-color": "data(lineColor)",
       "target-arrow-color": "data(lineColor)",
       "target-arrow-shape": "triangle",
       "curve-style": "bezier",
       "arrow-scale": 1,
-      "overlay-padding": 8,
+      // Wide overlay for easier click targeting.
+      "overlay-padding": 12,
     },
   },
   // PREEMPTED_BY edges: solid red, thicker.
@@ -116,10 +123,11 @@ const CY_STYLE: any[] = [
   {
     selector: ".selected-edge",
     style: {
-      width: 4,
+      width: 5,
       "overlay-color": "#0ea5e9",
-      "overlay-opacity": 0.15,
-      "overlay-padding": 5,
+      "overlay-opacity": 0.2,
+      "overlay-padding": 8,
+      "font-weight": 700,
     },
   },
   // Selected/focused node.
@@ -167,10 +175,25 @@ export default function InteractionsCanvas({
   const onBackgroundClickRef = useRef(onBackgroundClick);
   onBackgroundClickRef.current = onBackgroundClick;
 
-  const { elements } = collapseInteractions(data, edgeTypeFilter);
+  // Memoize elements so cy only rebuilds when data or filter actually change.
+  const elements = useMemo(
+    () => collapseInteractions(data, edgeTypeFilter).elements,
+    [data, edgeTypeFilter],
+  );
+
+  // Stable JSON key for initCy dependency — avoids new-reference-every-render.
+  const elementsKey = useMemo(
+    () => JSON.stringify(elements.map((e) => e.data.id)),
+    [elements],
+  );
 
   const initCy = useCallback(() => {
     if (!containerRef.current) return;
+
+    if (cyRef.current) {
+      cyRef.current.destroy();
+      cyRef.current = null;
+    }
 
     const cy = cytoscape({
       container: containerRef.current,
@@ -205,7 +228,7 @@ export default function InteractionsCanvas({
     cyRef.current = cy;
     setCyVersion((v) => v + 1);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [elements]);
+  }, [elementsKey]);
 
   useEffect(() => {
     initCy();
@@ -249,7 +272,6 @@ export default function InteractionsCanvas({
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
-    // Don't remove focus-ring here — that's handled by focusNodeId effect.
     if (selectedNodeId && selectedNodeId !== focusNodeId) {
       cy.getElementById(selectedNodeId).addClass("focus-ring");
     }

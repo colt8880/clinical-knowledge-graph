@@ -35,14 +35,33 @@ function InteractionsContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // URL-synced state.
-  const edgeTypeFilter = parseEdgeType(searchParams.get("type"));
-  const focusNodeId = searchParams.get("focus");
+  // Local state — initialised from URL, then owned by React.
+  const [edgeTypeFilter, setEdgeTypeFilter] = useState<EdgeTypeFilter>(
+    parseEdgeType(searchParams.get("type")),
+  );
+  const [focusId, setFocusId] = useState<string | null>(searchParams.get("focus"));
   const guidelinesParam = searchParams.get("guidelines");
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(focusNodeId);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(focusId);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [excludedPairs, setExcludedPairs] = useState<Set<string>>(new Set());
+
+  // Sync local state changes back to URL (fire-and-forget, no re-render dependency).
+  const syncUrl = useCallback(
+    (params: Record<string, string | null>) => {
+      const sp = new URLSearchParams(searchParams.toString());
+      for (const [key, val] of Object.entries(params)) {
+        if (val === null || val === "") {
+          sp.delete(key);
+        } else {
+          sp.set(key, val);
+        }
+      }
+      const qs = sp.toString();
+      router.replace(`/interactions${qs ? `?${qs}` : ""}`, { scroll: false });
+    },
+    [searchParams, router],
+  );
 
   // Fetch data on mount.
   useEffect(() => {
@@ -71,53 +90,39 @@ function InteractionsContent() {
     return () => { cancelled = true; };
   }, [guidelinesParam]);
 
-  // Sync URL state.
-  const updateUrl = useCallback(
-    (params: Record<string, string | null>) => {
-      const sp = new URLSearchParams(searchParams.toString());
-      for (const [key, val] of Object.entries(params)) {
-        if (val === null || val === "" || val === "both") {
-          sp.delete(key);
-        } else {
-          sp.set(key, val);
-        }
-      }
-      const qs = sp.toString();
-      router.replace(`/interactions${qs ? `?${qs}` : ""}`, { scroll: false });
-    },
-    [searchParams, router],
-  );
-
   const handleEdgeTypeChange = useCallback(
     (filter: EdgeTypeFilter) => {
-      updateUrl({ type: filter === "both" ? null : filter });
+      setEdgeTypeFilter(filter);
+      syncUrl({ type: filter === "both" ? null : filter });
     },
-    [updateUrl],
+    [syncUrl],
   );
 
   const handleNodeClick = useCallback(
     (nodeId: string) => {
       setSelectedEdgeId(null);
       setSelectedNodeId(nodeId);
-      updateUrl({ focus: nodeId });
+      setFocusId(nodeId);
+      syncUrl({ focus: nodeId });
     },
-    [updateUrl],
+    [syncUrl],
   );
 
   const handleEdgeClick = useCallback(
     (edgeId: string) => {
       setSelectedNodeId(null);
       setSelectedEdgeId(edgeId);
-      updateUrl({ focus: edgeId });
+      syncUrl({ focus: edgeId });
     },
-    [updateUrl],
+    [syncUrl],
   );
 
   const handleBackgroundClick = useCallback(() => {
     setSelectedNodeId(null);
     setSelectedEdgeId(null);
-    updateUrl({ focus: null });
-  }, [updateUrl]);
+    setFocusId(null);
+    syncUrl({ focus: null });
+  }, [syncUrl]);
 
   const handleTogglePair = useCallback((pairKey: string) => {
     setExcludedPairs((prev) => {
@@ -177,7 +182,7 @@ function InteractionsContent() {
         <InteractionsCanvas
           data={filteredData}
           edgeTypeFilter={edgeTypeFilter}
-          focusNodeId={focusNodeId}
+          focusNodeId={focusId}
           selectedNodeId={selectedNodeId}
           selectedEdgeId={selectedEdgeId}
           onNodeClick={handleNodeClick}

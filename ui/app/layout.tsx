@@ -48,6 +48,12 @@ export default function RootLayout({
             >
               Eval
             </Link>
+            <Link
+              href="/interactions"
+              className="px-3 py-1.5 rounded hover:bg-slate-700 transition-colors"
+            >
+              Interactions
+            </Link>
           </nav>
           <span className="ml-auto text-xs text-slate-500">
             USPSTF 2022 Statin v0

@@ -766,7 +766,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
   const columnCount = !isForestMode ? (props.columns?.length ?? 0) : 0;
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full bg-white">
       {/* Fixed column headers — positioned to match Cytoscape node X coords (zoom=1, pan.x=0). */}
       {!isForestMode && columnCount > 0 && (
         <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none h-8 flex items-center">

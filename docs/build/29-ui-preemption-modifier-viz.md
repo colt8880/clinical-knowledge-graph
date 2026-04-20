@@ -1,6 +1,6 @@
 # 29: UI preemption and modifier visualization on Eval tab
 
-**Status**: pending
+**Status**: shipped
 **Depends on**: 25, 26, 28
 **Components touched**: ui / api
 **Branch**: `feat/ui-preemption-modifier-viz`

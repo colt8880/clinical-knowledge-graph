@@ -31,7 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen flex flex-col`}
       >
-        <header className="bg-slate-900 text-slate-100 px-5 py-3 flex items-center gap-6 shrink-0">
+        <header className="bg-slate-900 text-slate-100 px-5 py-3 flex items-center gap-6 shrink-0 sticky top-0 z-50">
           <h1 className="text-sm font-semibold tracking-tight">
             Clinical Knowledge Graph
           </h1>

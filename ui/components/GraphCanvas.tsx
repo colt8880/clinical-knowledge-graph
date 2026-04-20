@@ -140,16 +140,9 @@ function computeFontSize(label: string, nodeWidth: number): number {
 const COL_SPACING = 280;
 const ROW_SPACING = 80;
 const LEFT_PAD = 140;
-const TOP_PAD = 20;
+const TOP_PAD = 60;
 
 const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
-
-/** Domain / condition context shown beneath guideline node labels. */
-const GUIDELINE_CONTEXT: Record<string, string> = {
-  "guideline:uspstf-statin-2022": "Cardiovascular — Primary Prevention",
-  "guideline:acc-aha-cholesterol-2018": "Cardiovascular — Lipid Management",
-  "guideline:kdigo-ckd-2024": "Renal — Chronic Kidney Disease",
-};
 
 function buildColumnElements(
   columns: CanvasColumn[],
@@ -169,18 +162,10 @@ function buildColumnElements(
       nodeIds.add(n.id);
       const type = primaryLabel(n);
       const colors = TYPE_COLORS[type] ?? { bg: "#e2e8f0", border: "#64748b" };
-      let display = nodeLabel(n);
+      const display = nodeLabel(n);
       const nodeWidth = type === "Guideline" ? 200 : type === "Recommendation" ? 180 : 150;
       const nodeHeight = type === "Guideline" ? 70 : 55;
       const isSelected = n.id === selectedId;
-
-      // Add condition context beneath guideline names.
-      if (type === "Guideline") {
-        const context = GUIDELINE_CONTEXT[n.id];
-        if (context) {
-          display = `${display}\n${context}`;
-        }
-      }
 
       els.push({
         data: {
@@ -200,11 +185,6 @@ function buildColumnElements(
   }
 
   for (const e of edges) {
-    // Skip PREEMPTED_BY edges — preemption is rendered as an inline
-    // annotation on the dimmed node, not as a drawn edge. This avoids
-    // awkward same-column curves between two Recommendation nodes.
-    if (e.type === "PREEMPTED_BY") continue;
-
     if (nodeIds.has(e.start) && nodeIds.has(e.end)) {
       els.push({
         data: {
@@ -268,14 +248,9 @@ function buildForestElements(
     const nodeWidth = type === "Guideline" ? 180 : type === "Recommendation" ? 160 : 130;
     const nodeHeight = type === "Guideline" ? 60 : 55;
 
-    // Domain badge text for Rec/Strategy nodes.
-    const domainBadge = isGuidelineScoped && domain
-      ? domain.replace("_", "/")
-      : "";
-
     const data: Record<string, unknown> = {
       id: n.id,
-      label: domainBadge ? `${domainBadge}\n${display}` : display,
+      label: display,
       nodeType: type,
       bgColor: colors.bg,
       borderColor: colors.border,
@@ -401,6 +376,8 @@ const CY_STYLE: any[] = [
       "target-arrow-shape": "triangle",
       "curve-style": "bezier",
       "arrow-scale": 0.8,
+      // Wider overlay for easier click targeting.
+      "overlay-padding": 8,
     },
   },
   {
@@ -441,8 +418,7 @@ const CY_STYLE: any[] = [
       "overlay-padding": 6,
     },
   },
-  // Preempted node: dimmed, dashed red outline. The "superseded by" annotation
-  // is part of the label — no PREEMPTED_BY edge is drawn.
+  // Preempted node: dimmed, dashed red outline.
   {
     selector: ".preempted",
     style: {
@@ -455,7 +431,22 @@ const CY_STYLE: any[] = [
       "font-size": 8,
     },
   },
-  // MODIFIES edge: dotted amber line, gentle curve for cross-column routing.
+  // PREEMPTED_BY edge: red dashed, taxi-routed rightward to avoid overlapping tree edges.
+  {
+    selector: "edge[edgeType = 'PREEMPTED_BY']",
+    style: {
+      width: 2,
+      "line-color": "#dc2626",
+      "target-arrow-color": "#dc2626",
+      "line-style": "dashed",
+      "arrow-scale": 0.9,
+      "curve-style": "taxi",
+      "taxi-direction": "rightward",
+      "taxi-turn-min-distance": 30,
+      "z-index": 10,
+    },
+  },
+  // MODIFIES edge: amber dotted, taxi-routed rightward.
   {
     selector: "edge[edgeType = 'MODIFIES']",
     style: {
@@ -464,7 +455,9 @@ const CY_STYLE: any[] = [
       "target-arrow-color": "#d97706",
       "line-style": "dotted",
       "arrow-scale": 0.9,
-      "curve-style": "bezier",
+      "curve-style": "taxi",
+      "taxi-direction": "rightward",
+      "taxi-turn-min-distance": 40,
       "z-index": 10,
     },
   },
@@ -501,6 +494,8 @@ export default function GraphCanvas(props: GraphCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
   const [cyVersion, setCyVersion] = useState(0);
+  // Preserve vertical pan across re-inits so clicking a node doesn't reset scroll.
+  const savedPanYRef = useRef<number | null>(null);
 
   const onNodeClickRef = useRef(onNodeClick);
   onNodeClickRef.current = onNodeClick;
@@ -510,6 +505,11 @@ export default function GraphCanvas(props: GraphCanvasProps) {
   // Build and mount Cytoscape instance.
   const initCy = useCallback(() => {
     if (!containerRef.current) return;
+
+    // Save current pan before destroying so we can restore it.
+    if (cyRef.current) {
+      savedPanYRef.current = cyRef.current.pan().y;
+    }
 
     let elements: ElementDefinition[];
     let layoutConfig: { name: string; [key: string]: unknown };
@@ -542,7 +542,9 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       // No cy.fit() — zoom stays at 1 so model coords = screen pixels.
       // This keeps HTML column headers aligned with Cytoscape nodes.
       cy.zoom(1);
-      cy.pan({ x: 0, y: 0 });
+      // Restore saved pan position if available, otherwise start at origin.
+      const restoredY = savedPanYRef.current ?? 0;
+      cy.pan({ x: 0, y: restoredY });
 
       // Allow vertical panning only — lock horizontal pan position.
       cy.on("pan", () => {

@@ -45,15 +45,44 @@ const MOCK_DATA: InteractionsResponse = {
 };
 
 describe("InteractionsLegend", () => {
-  it("renders edge type filter buttons", () => {
-    const onEdgeTypeChange = vi.fn();
+  it("renders guideline selection chips", () => {
     render(
       <InteractionsLegend
         data={MOCK_DATA}
         edgeTypeFilter="both"
-        onEdgeTypeChange={onEdgeTypeChange}
-        excludedPairs={new Set()}
-        onTogglePair={vi.fn()}
+        onEdgeTypeChange={vi.fn()}
+        selectedGuidelines={new Set()}
+        onToggleGuideline={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId("guideline-chip-USPSTF")).toBeDefined();
+    expect(screen.getByTestId("guideline-chip-ACC/AHA")).toBeDefined();
+    expect(screen.getByTestId("guideline-chip-KDIGO")).toBeDefined();
+  });
+
+  it("hides edge type filter until 2+ guidelines selected", () => {
+    render(
+      <InteractionsLegend
+        data={MOCK_DATA}
+        edgeTypeFilter="both"
+        onEdgeTypeChange={vi.fn()}
+        selectedGuidelines={new Set(["USPSTF"])}
+        onToggleGuideline={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId("edge-type-both")).toBeNull();
+  });
+
+  it("shows edge type filter when 2+ guidelines selected", () => {
+    render(
+      <InteractionsLegend
+        data={MOCK_DATA}
+        edgeTypeFilter="both"
+        onEdgeTypeChange={vi.fn()}
+        selectedGuidelines={new Set(["USPSTF", "ACC/AHA"])}
+        onToggleGuideline={vi.fn()}
       />,
     );
 
@@ -62,36 +91,20 @@ describe("InteractionsLegend", () => {
     expect(screen.getByTestId("edge-type-modifier")).toBeDefined();
   });
 
-  it("calls onEdgeTypeChange when filter is clicked", () => {
-    const onEdgeTypeChange = vi.fn();
-    render(
-      <InteractionsLegend
-        data={MOCK_DATA}
-        edgeTypeFilter="both"
-        onEdgeTypeChange={onEdgeTypeChange}
-        excludedPairs={new Set()}
-        onTogglePair={vi.fn()}
-      />,
-    );
-
-    fireEvent.click(screen.getByTestId("edge-type-preemption"));
-    expect(onEdgeTypeChange).toHaveBeenCalledWith("preemption");
-  });
-
-  it("renders summary counts", () => {
+  it("calls onToggleGuideline when a chip is clicked", () => {
+    const onToggle = vi.fn();
     render(
       <InteractionsLegend
         data={MOCK_DATA}
         edgeTypeFilter="both"
         onEdgeTypeChange={vi.fn()}
-        excludedPairs={new Set()}
-        onTogglePair={vi.fn()}
+        selectedGuidelines={new Set()}
+        onToggleGuideline={onToggle}
       />,
     );
 
-    const summary = screen.getByTestId("interactions-summary");
-    expect(summary.textContent).toContain("1 preemption");
-    expect(summary.textContent).toContain("0 modifiers");
+    fireEvent.click(screen.getByTestId("guideline-chip-USPSTF"));
+    expect(onToggle).toHaveBeenCalledWith("USPSTF");
   });
 
   it("has proper accessibility roles", () => {
@@ -100,11 +113,12 @@ describe("InteractionsLegend", () => {
         data={MOCK_DATA}
         edgeTypeFilter="both"
         onEdgeTypeChange={vi.fn()}
-        excludedPairs={new Set()}
-        onTogglePair={vi.fn()}
+        selectedGuidelines={new Set(["USPSTF", "ACC/AHA"])}
+        onToggleGuideline={vi.fn()}
       />,
     );
 
     expect(screen.getByRole("radiogroup")).toBeDefined();
+    expect(screen.getByRole("group")).toBeDefined();
   });
 });

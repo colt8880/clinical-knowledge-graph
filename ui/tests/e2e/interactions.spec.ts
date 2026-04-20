@@ -1,69 +1,58 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Interactions view", () => {
-  test("loads /interactions with three guideline clusters", async ({ page }) => {
+  test("loads with empty canvas and guideline picker", async ({ page }) => {
     await page.goto("/interactions");
     await page.waitForSelector('[data-testid="interactions-page"]');
 
-    // Legend should be visible with summary counts.
+    // Legend should show guideline chips.
     const legend = page.locator('[data-testid="interactions-legend"]');
     await expect(legend).toBeVisible();
+    await expect(page.locator('[data-testid="guideline-chip-USPSTF"]')).toBeVisible();
+    await expect(page.locator('[data-testid="guideline-chip-ACC/AHA"]')).toBeVisible();
+    await expect(page.locator('[data-testid="guideline-chip-KDIGO"]')).toBeVisible();
 
-    // Summary should show preemptions and modifiers.
-    const summary = page.locator('[data-testid="interactions-summary"]');
-    await expect(summary).toContainText("preemption");
-    await expect(summary).toContainText("modifier");
+    // Canvas should show empty state prompt.
+    await expect(page.locator("text=Select two or more guidelines")).toBeVisible();
 
-    // Canvas should be rendered.
-    const canvas = page.locator('[data-testid="interactions-canvas"]');
-    await expect(canvas).toBeVisible();
+    // Edge type filter should NOT be visible yet.
+    await expect(page.locator('[data-testid="edge-type-both"]')).not.toBeVisible();
   });
 
-  test("edge-type filter toggles between preemption/modifier/both", async ({ page }) => {
-    // Navigate directly to preemption filter via URL to verify state restoration.
-    await page.goto("/interactions?type=preemption");
+  test("selecting two guidelines shows the canvas", async ({ page }) => {
+    await page.goto("/interactions");
+    await page.waitForSelector('[data-testid="interactions-page"]');
+
+    // Select USPSTF and ACC/AHA.
+    await page.click('[data-testid="guideline-chip-USPSTF"]');
+    await page.click('[data-testid="guideline-chip-ACC/AHA"]');
+
+    // Canvas should appear.
+    await expect(page.locator('[data-testid="interactions-canvas"]')).toBeVisible();
+
+    // Edge type filter should now be visible.
+    await expect(page.locator('[data-testid="edge-type-both"]')).toBeVisible();
+
+    // Summary should show counts.
+    await expect(page.locator('[data-testid="interactions-summary"]')).toBeVisible();
+  });
+
+  test("edge-type filter restores from URL", async ({ page }) => {
+    await page.goto("/interactions?type=preemption&guidelines=uspstf,acc-aha");
     await page.waitForSelector('[data-testid="interactions-page"]');
 
     await expect(page.locator('[data-testid="edge-type-preemption"]')).toHaveAttribute(
-      "aria-checked",
-      "true",
-    );
-
-    // Navigate to modifier filter.
-    await page.goto("/interactions?type=modifier");
-    await page.waitForSelector('[data-testid="interactions-page"]');
-
-    await expect(page.locator('[data-testid="edge-type-modifier"]')).toHaveAttribute(
-      "aria-checked",
-      "true",
-    );
-
-    // Navigate to both (default).
-    await page.goto("/interactions");
-    await page.waitForSelector('[data-testid="interactions-page"]');
-
-    await expect(page.locator('[data-testid="edge-type-both"]')).toHaveAttribute(
       "aria-checked",
       "true",
     );
   });
 
   test("detail panel shows placeholder when nothing selected", async ({ page }) => {
-    await page.goto("/interactions");
+    await page.goto("/interactions?guidelines=uspstf,acc-aha");
     await page.waitForSelector('[data-testid="interactions-page"]');
 
     const detail = page.locator('[data-testid="interaction-detail-panel"]');
     await expect(detail).toContainText("Click an edge or node to view details.");
-  });
-
-  test("URL state with ?type=preemption restores filter state", async ({ page }) => {
-    await page.goto("/interactions?type=preemption");
-    await page.waitForSelector('[data-testid="interactions-page"]');
-
-    await expect(page.locator('[data-testid="edge-type-preemption"]')).toHaveAttribute(
-      "aria-checked",
-      "true",
-    );
   });
 
   test("nav header shows Interactions link", async ({ page }) => {

@@ -13,6 +13,22 @@ function parseEdgeType(val: string | null): EdgeTypeFilter {
   return "both";
 }
 
+function parseGuidelines(val: string | null): Set<string> {
+  if (!val) return new Set();
+  const VALID = new Set(["USPSTF", "ACC/AHA", "KDIGO"]);
+  const slugToDisplay: Record<string, string> = {
+    uspstf: "USPSTF",
+    "acc-aha": "ACC/AHA",
+    kdigo: "KDIGO",
+  };
+  const result = new Set<string>();
+  for (const s of val.split(",")) {
+    const mapped = slugToDisplay[s.trim().toLowerCase()];
+    if (mapped && VALID.has(mapped)) result.add(mapped);
+  }
+  return result;
+}
+
 export default function InteractionsPage() {
   return (
     <Suspense
@@ -40,13 +56,16 @@ function InteractionsContent() {
     parseEdgeType(searchParams.get("type")),
   );
   const [focusId, setFocusId] = useState<string | null>(searchParams.get("focus"));
-  const guidelinesParam = searchParams.get("guidelines");
+  const [selectedGuidelines, setSelectedGuidelines] = useState<Set<string>>(
+    parseGuidelines(searchParams.get("guidelines")),
+  );
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(focusId);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
-  const [excludedPairs, setExcludedPairs] = useState<Set<string>>(new Set());
 
-  // Sync local state changes back to URL (fire-and-forget, no re-render dependency).
+  const hasSelection = selectedGuidelines.size >= 2;
+
+  // Sync local state changes back to URL.
   const syncUrl = useCallback(
     (params: Record<string, string | null>) => {
       const sp = new URLSearchParams(searchParams.toString());
@@ -63,17 +82,13 @@ function InteractionsContent() {
     [searchParams, router],
   );
 
-  // Fetch data on mount.
+  // Fetch all data on mount (we filter client-side by selected guidelines).
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    const guidelinesList = guidelinesParam
-      ? guidelinesParam.split(",").map((s) => s.trim()).filter(Boolean)
-      : undefined;
-
-    fetchInteractions("both", guidelinesList)
+    fetchInteractions("both")
       .then((result) => {
         if (!cancelled) {
           setData(result);
@@ -88,7 +103,31 @@ function InteractionsContent() {
       });
 
     return () => { cancelled = true; };
-  }, [guidelinesParam]);
+  }, []);
+
+  // Guideline slug mapping for URL sync.
+  const domainToSlug: Record<string, string> = {
+    USPSTF: "uspstf",
+    "ACC/AHA": "acc-aha",
+    KDIGO: "kdigo",
+  };
+
+  const handleToggleGuideline = useCallback(
+    (domain: string) => {
+      setSelectedGuidelines((prev) => {
+        const next = new Set(prev);
+        if (next.has(domain)) {
+          next.delete(domain);
+        } else {
+          next.add(domain);
+        }
+        const slugs = Array.from(next).map((d) => domainToSlug[d] ?? d.toLowerCase()).join(",");
+        syncUrl({ guidelines: slugs || null });
+        return next;
+      });
+    },
+    [syncUrl, domainToSlug],
+  );
 
   const handleEdgeTypeChange = useCallback(
     (filter: EdgeTypeFilter) => {
@@ -124,32 +163,23 @@ function InteractionsContent() {
     syncUrl({ focus: null });
   }, [syncUrl]);
 
-  const handleTogglePair = useCallback((pairKey: string) => {
-    setExcludedPairs((prev) => {
-      const next = new Set(prev);
-      if (next.has(pairKey)) {
-        next.delete(pairKey);
-      } else {
-        next.add(pairKey);
-      }
-      return next;
-    });
-  }, []);
-
-  // Filter data edges based on excluded pairs before passing to canvas.
+  // Filter data to only include edges between selected guidelines.
   const filteredData = useMemo(() => {
-    if (!data || excludedPairs.size === 0) return data;
+    if (!data || !hasSelection) return null;
     return {
       ...data,
       edges: data.edges.filter((edge) => {
         const sourceRec = data.recommendations.find((r) => r.id === edge.source);
         const targetRec = data.recommendations.find((r) => r.id === edge.target);
-        if (!sourceRec?.domain || !targetRec?.domain) return true;
-        const key = [sourceRec.domain, targetRec.domain].sort().join(":");
-        return !excludedPairs.has(key);
+        return (
+          sourceRec?.domain != null &&
+          targetRec?.domain != null &&
+          selectedGuidelines.has(sourceRec.domain) &&
+          selectedGuidelines.has(targetRec.domain)
+        );
       }),
     };
-  }, [data, excludedPairs]);
+  }, [data, selectedGuidelines, hasSelection]);
 
   if (loading) {
     return (
@@ -167,7 +197,7 @@ function InteractionsContent() {
     );
   }
 
-  if (!data || !filteredData) return null;
+  if (!data) return null;
 
   return (
     <div className="flex h-full" data-testid="interactions-page">
@@ -175,26 +205,43 @@ function InteractionsContent() {
         data={data}
         edgeTypeFilter={edgeTypeFilter}
         onEdgeTypeChange={handleEdgeTypeChange}
-        excludedPairs={excludedPairs}
-        onTogglePair={handleTogglePair}
+        selectedGuidelines={selectedGuidelines}
+        onToggleGuideline={handleToggleGuideline}
       />
       <div className="flex-1 relative">
-        <InteractionsCanvas
-          data={filteredData}
-          edgeTypeFilter={edgeTypeFilter}
-          focusNodeId={focusId}
-          selectedNodeId={selectedNodeId}
-          selectedEdgeId={selectedEdgeId}
-          onNodeClick={handleNodeClick}
-          onEdgeClick={handleEdgeClick}
-          onBackgroundClick={handleBackgroundClick}
-        />
+        {hasSelection && filteredData ? (
+          <InteractionsCanvas
+            data={filteredData}
+            edgeTypeFilter={edgeTypeFilter}
+            focusNodeId={focusId}
+            selectedNodeId={selectedNodeId}
+            selectedEdgeId={selectedEdgeId}
+            onNodeClick={handleNodeClick}
+            onEdgeClick={handleEdgeClick}
+            onBackgroundClick={handleBackgroundClick}
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center max-w-sm">
+              <p className="text-sm text-slate-500 mb-1">
+                Select two or more guidelines to compare
+              </p>
+              <p className="text-xs text-slate-400">
+                Choose from the sidebar to view preemption and modifier edges between guidelines.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
-      <InteractionDetail
-        data={data}
-        selectedEdgeId={selectedEdgeId}
-        selectedNodeId={selectedNodeId}
-      />
+      {hasSelection && filteredData ? (
+        <InteractionDetail
+          data={filteredData}
+          selectedEdgeId={selectedEdgeId}
+          selectedNodeId={selectedNodeId}
+        />
+      ) : (
+        <div className="w-72 border-l border-slate-200 bg-white" />
+      )}
     </div>
   );
 }

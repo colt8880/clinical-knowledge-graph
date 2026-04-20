@@ -182,7 +182,7 @@ export default function LogicView({
         )}
       </div>
 
-      <aside className="w-[380px] bg-slate-50 border-l border-slate-200 overflow-y-auto shrink-0">
+      <aside className="w-[600px] bg-slate-50 border-l border-slate-200 overflow-y-auto shrink-0">
         <NodeDetail node={detailNode} edge={detailEdge} />
       </aside>
     </div>

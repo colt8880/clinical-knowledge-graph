@@ -30,13 +30,22 @@ from harness.config import (
 from harness import judge
 
 
+def _patient_file(case_dir: Path) -> Path | None:
+    """Return the patient context file path, accepting either naming convention."""
+    for name in ("patient.json", "patient-context.json"):
+        p = case_dir / name
+        if p.exists():
+            return p
+    return None
+
+
 def discover_fixtures(fixture_filter: str | None = None) -> list[Path]:
     """Discover fixture directories under evals/fixtures/.
 
     If fixture_filter is set (e.g., "statins/01-high-risk-55m-smoker"),
     return only that fixture. If it starts with "_guideline:", return all
     fixtures for that guideline directory. Otherwise return all fixtures
-    that have both patient.json and expected-actions.json.
+    that have a patient file and expected-actions.json.
     """
     # Handle --guideline filter: return all fixtures for a guideline directory
     if fixture_filter and fixture_filter.startswith("_guideline:"):
@@ -49,7 +58,7 @@ def discover_fixtures(fixture_filter: str | None = None) -> list[Path]:
         for case_dir in sorted(guideline_dir.iterdir()):
             if not case_dir.is_dir():
                 continue
-            if (case_dir / "patient.json").exists() and (case_dir / "expected-actions.json").exists():
+            if _patient_file(case_dir) and (case_dir / "expected-actions.json").exists():
                 fixtures.append(case_dir)
         return fixtures
 
@@ -83,14 +92,17 @@ def discover_fixtures(fixture_filter: str | None = None) -> list[Path]:
         for case_dir in sorted(guideline_dir.iterdir()):
             if not case_dir.is_dir():
                 continue
-            if (case_dir / "patient.json").exists() and (case_dir / "expected-actions.json").exists():
+            if _patient_file(case_dir) and (case_dir / "expected-actions.json").exists():
                 fixtures.append(case_dir)
     return fixtures
 
 
 def load_fixture(fixture_dir: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     """Load patient context and expected actions from a fixture directory."""
-    patient = json.loads((fixture_dir / "patient.json").read_text())
+    pf = _patient_file(fixture_dir)
+    if pf is None:
+        raise FileNotFoundError(f"No patient file in {fixture_dir}")
+    patient = json.loads(pf.read_text())
     expected = json.loads((fixture_dir / "expected-actions.json").read_text())
     return patient, expected
 

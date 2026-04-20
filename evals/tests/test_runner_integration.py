@@ -17,9 +17,9 @@ from harness.runner import discover_fixtures, fixture_id, load_fixture
 
 class TestFixtureDiscovery:
     def test_discovers_fixtures_with_expected_actions(self):
-        """All 5 v0 fixtures should be discoverable now that expected-actions.json exists."""
+        """All 16 fixtures (5 statins + 4 cholesterol + 3 kdigo + 4 cross-domain) should be discoverable."""
         fixtures = discover_fixtures()
-        assert len(fixtures) == 5
+        assert len(fixtures) == 16
 
     def test_fixture_ids_are_readable(self):
         fixtures = discover_fixtures()

@@ -24,7 +24,8 @@ export default function GuidelineCard({ guideline }: GuidelineCardProps) {
   const colors = DOMAIN_COLORS[domain] ?? { bg: "bg-slate-50", border: "border-slate-300", text: "text-slate-800" };
   const headerColor = DOMAIN_HEADER_COLORS[domain] ?? "bg-slate-600";
 
-  const modeledCount = guideline.coverage?.modeled?.length ?? 0;
+  const modeled = guideline.coverage?.modeled ?? [];
+  const modeledCount = modeled.length;
   const deferredItems = guideline.coverage?.deferred ?? [];
 
   return (
@@ -51,9 +52,9 @@ export default function GuidelineCard({ guideline }: GuidelineCardProps) {
             <div>
               <span className="font-medium">Modeled:</span>{" "}
               {modeledCount} grade{modeledCount !== 1 ? "s" : ""}
-              {guideline.coverage.modeled.length > 0 && (
+              {modeled.length > 0 && (
                 <span className="text-slate-400">
-                  {" "}({guideline.coverage.modeled.map((m) => m.label).join(", ")})
+                  {" "}({modeled.map((m) => m.label).join(", ")})
                 </span>
               )}
             </div>

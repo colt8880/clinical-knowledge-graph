@@ -39,28 +39,33 @@ predicates:
     args: { min: "int", max: "int" }
     default_policy: require
     semantics: "floor((evaluation_time - date_of_birth)/P1Y) in [min, max] inclusive"
+    nl_template: "Patient is age {min}–{max}"
 
   - name: age_greater_than_or_equal
     category: demographics
     args: { value: "int" }
     default_policy: require
     semantics: "computed age >= value"
+    nl_template: "Patient is age ≥ {value}"
 
   - name: age_less_than
     category: demographics
     args: { value: "int" }
     default_policy: require
     semantics: "computed age < value"
+    nl_template: "Patient is age < {value}"
 
   - name: administrative_sex_is
     category: demographics
     args: { value: "enum[male, female, other, unknown]" }
     default_policy: require
+    nl_template: "Administrative sex is {value}"
 
   - name: has_ancestry_matching
     category: demographics
     args: { populations: "list[string]" }
     default_policy: fail_open
+    nl_template: "Has ancestry matching {populations}"
     notes: "Tokens from the ancestry-population registry. For statins, 'black' is the only token v0 reads (input to Pooled Cohort Equations)."
 
   # --- Conditions ----------------------------------------------------------
@@ -69,18 +74,21 @@ predicates:
     args: { codes: "list[graph_node_id]" }
     default_policy: fail_open
     semantics: "Any Condition with verification_status=confirmed, clinical_status in {active,recurrence,remission,resolved,inactive}, codes intersecting referenced nodes."
+    nl_template: "Has history of {codes}"
 
   - name: has_active_condition
     category: conditions
     args: { codes: "list[graph_node_id]" }
     default_policy: fail_open
     semantics: "has_condition_history restricted to clinical_status in {active, recurrence}."
+    nl_template: "Has active {codes}"
 
   # --- Tobacco exposure ----------------------------------------------------
   - name: smoking_status_is
     category: tobacco
     args: { values: "list[enum[never, former, current_some_day, current_every_day, current, unknown]]" }
     default_policy: fail_closed
+    nl_template: "Smoking status is {values}"
     notes: "Derived token 'current_smoker' = {current, current_some_day, current_every_day} is resolved in-predicate when passed."
 
   # --- Observations --------------------------------------------------------
@@ -94,6 +102,7 @@ predicates:
       unit: "string (UCUM)"
       component: "code, optional"
     default_policy: fail_open
+    nl_template: "Most recent {code} {comparator} {threshold} {unit} (within {window})"
     notes: "Reads latest final/amended/corrected observation matching code within window. 'component' selects a specific component (e.g., SBP within a BP panel)."
 
   # --- Medications ---------------------------------------------------------
@@ -101,6 +110,7 @@ predicates:
     category: medications
     args: { codes: "list[graph_node_id]" }
     default_policy: fail_open
+    nl_template: "Has active medication {codes}"
     notes: "status = active, class-level matching via graph node code list. Class-level Medication nodes (e.g., antihypertensive_class, statin_class) list the full member RxNorm code set."
 
   # --- Risk scores ---------------------------------------------------------
@@ -111,6 +121,7 @@ predicates:
       comparator: "enum[eq, gt, lt, gte, lte]"
       threshold: "number"
     default_policy: fail_closed
+    nl_template: "10-year ASCVD risk {comparator} {threshold}%"
     notes: |
       Evaluator resolution order:
       1. If patient_context.risk_scores[name] present and computed_date within P1Y of evaluation_time, use supplied value.

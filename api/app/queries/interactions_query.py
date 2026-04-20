@@ -142,7 +142,7 @@ async def fetch_interactions(
 
         if edge_type == "PREEMPTED_BY":
             edge_data["edge_priority"] = edge_props.get("edge_priority", edge_props.get("priority"))
-            edge_data["reason"] = edge_props.get("reason", "")
+            edge_data["reason"] = edge_props.get("rationale", edge_props.get("reason", ""))
             # Source is preempted, target is winner.
             recs_map[source_id]["has_preemption_out"] = True
             recs_map[target_id]["has_preemption_in"] = True

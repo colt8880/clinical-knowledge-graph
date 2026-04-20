@@ -80,7 +80,9 @@ export function extractScopedSubgraph(
     }
   }
 
-  const scopedNodeIds = new Set([...guidelineNodeIds, ...sharedEntityIds]);
+  const scopedNodeIds = new Set<string>();
+  guidelineNodeIds.forEach((id) => scopedNodeIds.add(id));
+  sharedEntityIds.forEach((id) => scopedNodeIds.add(id));
 
   // Step 3: collect nodes.
   const nodes = forest.nodes.filter((n) => scopedNodeIds.has(n.id));

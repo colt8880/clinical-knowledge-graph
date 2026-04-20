@@ -1,6 +1,6 @@
 # 31: UI guideline-first navigation (index + single-guideline detail)
 
-**Status**: pending
+**Status**: in-progress
 **Depends on**: 28, 29
 **Components touched**: ui / api / docs
 **Branch**: `feat/ui-guideline-first-nav`

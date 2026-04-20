@@ -59,7 +59,9 @@ ON CREATE SET
   g.provenance_guideline = 'guideline:uspstf-statin-2022',
   g.provenance_version = '2022-08-23',
   g.provenance_source_section = 'Guideline root',
-  g.provenance_publication_date = date('2022-08-23');
+  g.provenance_publication_date = date('2022-08-23')
+SET
+  g.coverage = '{"modeled":[{"label":"Grade B","rec_id":"rec:statin-initiate-grade-b"},{"label":"Grade C","rec_id":"rec:statin-selective-grade-c"},{"label":"Grade I","rec_id":"rec:statin-insufficient-evidence-grade-i"}],"deferred":["pregnancy","secondary prevention"],"exit_only":["age < 40","age > 75"]}';
 
 // ---------------------------------------------------------------------------
 // Recommendations

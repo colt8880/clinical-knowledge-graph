@@ -140,6 +140,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/ForestSubgraph"
 
+  /guidelines:
+    get:
+      tags: [query]
+      summary: List all guideline metadata for the UI index page.
+      description: |
+        Returns metadata for every guideline in the graph, including title,
+        version, domain, rec count, author-declared coverage summary,
+        seed hash, and last-updated timestamp. Used by the guideline index
+        page to render cards.
+      responses:
+        "200":
+          description: Guideline metadata list.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GuidelineMeta"
+
   /search:
     get:
       tags: [query]
@@ -311,6 +330,46 @@ components:
               properties:
                 type: object
                 additionalProperties: true
+
+    GuidelineMeta:
+      type: object
+      required: [id, domain, title, version, publication_date, citation_url, rec_count, coverage, seed_hash, last_updated_in_graph]
+      properties:
+        id:
+          type: string
+          description: "URL-safe slug, e.g., uspstf-statin-2022."
+        domain:
+          type: string
+          nullable: true
+          description: "Human-readable domain label (USPSTF, ACC/AHA, KDIGO)."
+        title: { type: string }
+        version: { type: string }
+        publication_date: { type: string }
+        citation_url: { type: string }
+        rec_count: { type: integer }
+        coverage:
+          type: object
+          nullable: true
+          properties:
+            modeled:
+              type: array
+              items:
+                type: object
+                required: [label, rec_id]
+                properties:
+                  label: { type: string }
+                  rec_id: { type: string }
+            deferred:
+              type: array
+              items: { type: string }
+            exit_only:
+              type: array
+              items: { type: string }
+        seed_hash:
+          type: string
+          nullable: true
+          description: "SHA-256 of the guideline seed cypher file."
+        last_updated_in_graph: { type: string }
 
     Subgraph:
       type: object

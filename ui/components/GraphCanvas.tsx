@@ -121,14 +121,14 @@ function primaryLabel(node: GraphNode): string {
 function computeFontSize(label: string, nodeWidth: number): number {
   const words = label.split(/\s+/);
   const longestWord = words.reduce((a, b) => (a.length > b.length ? a : b), "");
-  const charWidth = 6;
+  const charWidth = 7;
   const maxForWord = Math.floor(
-    (nodeWidth - 20) / (longestWord.length * (charWidth / 10)),
+    (nodeWidth - 24) / (longestWord.length * (charWidth / 12)),
   );
-  const charsPerLine = Math.floor((nodeWidth - 20) / charWidth);
+  const charsPerLine = Math.floor((nodeWidth - 24) / charWidth);
   const lines = Math.ceil(label.length / charsPerLine);
-  const maxForHeight = lines > 4 ? 8 : lines > 3 ? 9 : 10;
-  return Math.max(7, Math.min(maxForWord, maxForHeight, 11));
+  const maxForHeight = lines > 4 ? 10 : lines > 3 ? 11 : 12;
+  return Math.max(9, Math.min(maxForWord, maxForHeight, 13));
 }
 
 // ── Column-mode layout ───────────────────────────────────────────────
@@ -137,10 +137,10 @@ function computeFontSize(label: string, nodeWidth: number): number {
 // directly to screen pixels. This lets us align HTML column headers
 // with Cytoscape node positions without coordinate transforms.
 
-const COL_SPACING = 280;
-const ROW_SPACING = 80;
-const LEFT_PAD = 140;
-const TOP_PAD = 60;
+const COL_SPACING = 320;
+const ROW_SPACING = 90;
+const LEFT_PAD = 160;
+const TOP_PAD = 90;
 
 const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
 
@@ -163,8 +163,8 @@ function buildColumnElements(
       const type = primaryLabel(n);
       const colors = TYPE_COLORS[type] ?? { bg: "#e2e8f0", border: "#64748b" };
       const display = nodeLabel(n);
-      const nodeWidth = type === "Guideline" ? 200 : type === "Recommendation" ? 180 : 150;
-      const nodeHeight = type === "Guideline" ? 70 : 55;
+      const nodeWidth = type === "Guideline" ? 240 : type === "Recommendation" ? 220 : 180;
+      const nodeHeight = type === "Guideline" ? 80 : 65;
       const isSelected = n.id === selectedId;
 
       els.push({
@@ -245,8 +245,8 @@ function buildForestElements(
     }
 
     const display = nodeLabel(n);
-    const nodeWidth = type === "Guideline" ? 180 : type === "Recommendation" ? 160 : 130;
-    const nodeHeight = type === "Guideline" ? 60 : 55;
+    const nodeWidth = type === "Guideline" ? 220 : type === "Recommendation" ? 190 : 155;
+    const nodeHeight = type === "Guideline" ? 72 : 65;
 
     const data: Record<string, unknown> = {
       id: n.id,
@@ -766,14 +766,14 @@ export default function GraphCanvas(props: GraphCanvasProps) {
   const columnCount = !isForestMode ? (props.columns?.length ?? 0) : 0;
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full bg-white">
       {/* Fixed column headers — positioned to match Cytoscape node X coords (zoom=1, pan.x=0). */}
       {!isForestMode && columnCount > 0 && (
-        <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none bg-white/90 backdrop-blur-sm border-b border-slate-200 h-8 flex items-center">
+        <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none h-6 flex items-center bg-white">
           {COLUMN_HEADERS.slice(0, columnCount).map((header, i) => (
             <div
               key={i}
-              className="absolute text-[11px] font-semibold uppercase tracking-wide text-slate-400 text-center"
+              className="absolute text-[11px] font-semibold uppercase tracking-wide text-slate-900 text-center"
               style={{
                 left: LEFT_PAD + i * COL_SPACING,
                 transform: "translateX(-50%)",
@@ -787,7 +787,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       )}
       <div
         ref={containerRef}
-        className={`w-full bg-white ${!isForestMode ? "h-[calc(100%-32px)] mt-8" : "h-full"}`}
+        className={`w-full bg-white ${!isForestMode ? "h-[calc(100%-24px)] mt-6" : "h-full"}`}
         data-testid="graph-canvas"
       />
       <GraphTooltips cyRef={cyRef} cyVersion={cyVersion} />

@@ -82,6 +82,7 @@
           "description": "Branch-specific policy. Keys are descriptive branch labels (e.g., not_pregnant, pregnant_missing_ga)."
         },
         "semantics": { "type": "string" },
+        "nl_template": { "type": "string", "description": "Natural-language template for UI rendering. Placeholders like {min} are replaced with arg values." },
         "notes": { "type": "string" }
       },
       "oneOf": [

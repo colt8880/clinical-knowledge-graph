@@ -58,6 +58,7 @@ Parallelizable with Phase 3.
 | 28 | UI domain filter | ui, api | shipped | 20, 23, 24 | [28](../../docs/build/28-ui-domain-filter.md) | [#26](../../pull/26) |
 | 29 | UI preemption/modifier viz | ui, api | shipped | 25, 26, 28 | [29](../../docs/build/29-ui-preemption-modifier-viz.md) | [#27](../../pull/27) |
 | 30 | UI multi-guideline rec list | ui | pending | 21, 25, 26, 29 | [30](../../docs/build/30-ui-multi-guideline-rec-list.md) | — |
+| 31 | UI guideline-first navigation | ui, api, graph, docs | in-progress | 28, 29 | [31](../../docs/build/31-ui-guideline-first-navigation.md) | [#29](../../pull/29) |
 
 ## v0.1 — stretch goals (deferred)
 

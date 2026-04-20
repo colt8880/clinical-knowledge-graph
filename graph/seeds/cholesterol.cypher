@@ -57,7 +57,9 @@ ON CREATE SET
   g.provenance_guideline = 'guideline:acc-aha-cholesterol-2018',
   g.provenance_version = '2018-11-10',
   g.provenance_source_section = 'Guideline root',
-  g.provenance_publication_date = date('2018-11-10');
+  g.provenance_publication_date = date('2018-11-10')
+SET
+  g.coverage = '{"modeled":[{"label":"Secondary prevention (COR I, LOE A)","rec_id":"rec:accaha-statin-secondary-prevention"},{"label":"Severe hypercholesterolemia (COR I, LOE B-NR)","rec_id":"rec:accaha-statin-severe-hypercholesterolemia"},{"label":"Diabetes mellitus (COR I, LOE A)","rec_id":"rec:accaha-statin-diabetes"},{"label":"Primary prevention (COR I, LOE A)","rec_id":"rec:accaha-statin-primary-prevention"}],"deferred":["adults over 75","ezetimibe add-on","PCSK9 inhibitor intensification","non-statin lipid therapies"],"exit_only":[]}';
 
 // ---------------------------------------------------------------------------
 // Recommendations — four statin benefit groups

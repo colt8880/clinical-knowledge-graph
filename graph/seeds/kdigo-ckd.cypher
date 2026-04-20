@@ -60,7 +60,9 @@ ON CREATE SET
   g.provenance_guideline = 'guideline:kdigo-ckd-2024',
   g.provenance_version = '2024-03-14',
   g.provenance_source_section = 'Guideline root',
-  g.provenance_publication_date = date('2024-03-14');
+  g.provenance_publication_date = date('2024-03-14')
+SET
+  g.coverage = '{"modeled":[{"label":"CKD monitoring (1B)","rec_id":"rec:kdigo-ckd-monitoring"},{"label":"SGLT2 inhibitor for CKD (1A)","rec_id":"rec:kdigo-sglt2-for-ckd"},{"label":"Statin for CKD (1A)","rec_id":"rec:kdigo-statin-for-ckd"},{"label":"ACEi/ARB for albuminuric CKD (1B)","rec_id":"rec:kdigo-acei-arb-for-ckd"}],"deferred":["dialysis-specific recommendations","kidney transplant recipients","pediatric CKD","acute kidney injury","CKD-MBD"],"exit_only":[]}';
 
 // ---------------------------------------------------------------------------
 // Recommendations — four CKD management decision points

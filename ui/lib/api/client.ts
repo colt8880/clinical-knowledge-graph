@@ -74,6 +74,12 @@ export async function fetchSubgraph(
   return apiFetch<ForestSubgraph>(`/subgraph${qs ? `?${qs}` : ""}`);
 }
 
+export type GuidelineMeta = components["schemas"]["GuidelineMeta"];
+
+export async function fetchGuidelines(): Promise<GuidelineMeta[]> {
+  return apiFetch<GuidelineMeta[]>("/guidelines");
+}
+
 export async function searchNodes(
   q: string,
   nodeTypes?: string[],

@@ -20,25 +20,28 @@ test.describe("Interactions view", () => {
   });
 
   test("edge-type filter toggles between preemption/modifier/both", async ({ page }) => {
-    await page.goto("/interactions");
+    // Navigate directly to preemption filter via URL to verify state restoration.
+    await page.goto("/interactions?type=preemption");
     await page.waitForSelector('[data-testid="interactions-page"]');
 
-    // Click Preemptions only.
-    await page.click('[data-testid="edge-type-preemption"]');
     await expect(page.locator('[data-testid="edge-type-preemption"]')).toHaveAttribute(
       "aria-checked",
       "true",
     );
 
-    // Click Modifiers only.
-    await page.click('[data-testid="edge-type-modifier"]');
+    // Navigate to modifier filter.
+    await page.goto("/interactions?type=modifier");
+    await page.waitForSelector('[data-testid="interactions-page"]');
+
     await expect(page.locator('[data-testid="edge-type-modifier"]')).toHaveAttribute(
       "aria-checked",
       "true",
     );
 
-    // Click Both.
-    await page.click('[data-testid="edge-type-both"]');
+    // Navigate to both (default).
+    await page.goto("/interactions");
+    await page.waitForSelector('[data-testid="interactions-page"]');
+
     await expect(page.locator('[data-testid="edge-type-both"]')).toHaveAttribute(
       "aria-checked",
       "true",

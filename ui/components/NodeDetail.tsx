@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import type { GraphNode, GraphEdge } from "@/lib/api/client";
+import { predicateToNaturalLanguage } from "@/lib/predicates/naturalLanguage";
 
 interface NodeDetailProps {
   node: (GraphNode & { domain?: string | null }) | null;
@@ -147,6 +149,8 @@ function PredicateTree({ node, depth = 0 }: { node: PredicateNode; depth?: numbe
 }
 
 function EligibilityBlock({ value }: { value: unknown }) {
+  const [showJson, setShowJson] = useState(false);
+
   if (!value) return null;
 
   // Try parsing if it's a string (JSON stored as text in Neo4j).
@@ -165,9 +169,31 @@ function EligibilityBlock({ value }: { value: unknown }) {
     parsed = value as PredicateNode;
   }
 
+  const nlText = predicateToNaturalLanguage(parsed);
+
   return (
-    <div className="bg-slate-50 border border-slate-200 rounded p-3 space-y-0.5">
-      <PredicateTree node={parsed} />
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => setShowJson(!showJson)}
+          className="text-[10px] font-medium text-blue-600 hover:text-blue-800 uppercase tracking-wide"
+          data-testid="toggle-json"
+        >
+          {showJson ? "Show Natural Language" : "Show JSON"}
+        </button>
+      </div>
+      {showJson ? (
+        <div className="bg-slate-50 border border-slate-200 rounded p-3 space-y-0.5">
+          <PredicateTree node={parsed} />
+        </div>
+      ) : (
+        <div
+          className="bg-slate-50 border border-slate-200 rounded p-3 text-sm text-slate-800 leading-relaxed"
+          data-testid="nl-predicate"
+        >
+          {nlText}
+        </div>
+      )}
     </div>
   );
 }

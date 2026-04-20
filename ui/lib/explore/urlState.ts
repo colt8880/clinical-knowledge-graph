@@ -5,7 +5,7 @@
  * Legacy v0 params (?g=&r=&s=) log a console warning and load the default forest view.
  */
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useMemo, useEffect, useRef } from "react";
 
 /** All available domain keys (lowercase, hyphenated for URL). */
@@ -47,6 +47,7 @@ export interface ExploreUrlState {
 export function useExploreUrlState(): ExploreUrlState {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
   const hasWarnedLegacy = useRef(false);
 
   // Detect legacy v0 params.
@@ -117,9 +118,11 @@ export function useExploreUrlState(): ExploreUrlState {
         params.set("focus", newFocus);
       }
       const qs = params.toString();
-      return `/explore${qs ? `?${qs}` : ""}`;
+      // Preserve the current pathname (works for both /explore and /explore/all).
+      const base = pathname ?? "/explore";
+      return `${base}${qs ? `?${qs}` : ""}`;
     },
-    [],
+    [pathname],
   );
 
   const setDomains = useCallback(

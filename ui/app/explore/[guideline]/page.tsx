@@ -107,7 +107,7 @@ function GuidelineDetailContent() {
   return (
     <div className="flex flex-col h-full" data-testid="guideline-detail-page">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-6 py-3 shrink-0">
+      <div className="bg-white px-6 pt-2 pb-0 shrink-0">
         <div className="flex items-center gap-3 mb-1">
           <Link
             href="/explore"

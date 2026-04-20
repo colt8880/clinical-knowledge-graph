@@ -31,7 +31,7 @@ export default function GuidelineCard({ guideline }: GuidelineCardProps) {
   return (
     <Link
       href={`/explore/${guideline.id}`}
-      className={`block rounded-lg border ${colors.border} overflow-hidden hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500`}
+      className={`flex flex-col rounded-lg border ${colors.border} overflow-hidden hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-500`}
       data-testid={`guideline-card-${guideline.id}`}
     >
       <div className={`${headerColor} px-4 py-2`}>
@@ -39,7 +39,7 @@ export default function GuidelineCard({ guideline }: GuidelineCardProps) {
           {domain}
         </span>
       </div>
-      <div className={`${colors.bg} p-4`}>
+      <div className={`${colors.bg} p-4 flex-1`}>
         <h3 className={`text-sm font-semibold ${colors.text} mb-1 line-clamp-2`}>
           {guideline.title}
         </h3>

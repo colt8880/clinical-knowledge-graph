@@ -113,7 +113,8 @@ def test_write_readme_no_braintrust(tmp_path, passing_scorecard):
     content = readme_path.read_text()
 
     assert "abc1234" in content
-    assert "braintrust" not in content.lower() or "Braintrust" not in content
+    # No Braintrust experiment URL should appear when none was provided
+    assert "braintrust.dev" not in content
 
 
 def test_scorecard_md_has_per_fixture_table(tmp_path, passing_scorecard):

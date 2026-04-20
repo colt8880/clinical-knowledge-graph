@@ -39,6 +39,10 @@ strategies as structured nodes and edges.
 
 {matched_recs}
 
+### Cross-Guideline Convergence
+
+{convergence_section}
+
 ### Graph Structure (relevant subgraph)
 
 {subgraph_summary}
@@ -82,6 +86,36 @@ def get_prompt(
 
     matched_recs_text = json.dumps(trace_summary.get("matched_recs", []), indent=2)
 
+    # Build convergence section
+    convergence = graph_context.get("convergence_summary", {})
+    shared_actions = convergence.get("shared_actions", [])
+    convergence_prose = convergence.get("convergence_prose", "")
+
+    if shared_actions:
+        conv_lines: list[str] = []
+        conv_lines.append(convergence_prose)
+        conv_lines.append("")
+        conv_lines.append("| Entity | Type | Guidelines | Convergence |")
+        conv_lines.append("|--------|------|------------|-------------|")
+        for action in shared_actions:
+            guidelines = ", ".join(
+                f"{rb['guideline']} ({rb['evidence_grade']})"
+                for rb in action["recommended_by"]
+            )
+            conv_lines.append(
+                f"| {action['entity_label']} | {action['entity_type']} "
+                f"| {guidelines} | {action['convergence_type']} |"
+            )
+        conv_lines.append("")
+        conv_lines.append(
+            "Where multiple guidelines converge on the same therapeutic action, "
+            "this represents independent clinical agreement that should strengthen "
+            "your confidence in that recommendation."
+        )
+        convergence_section = "\n".join(conv_lines)
+    else:
+        convergence_section = "No cross-guideline convergence detected (single guideline or no shared actions)."
+
     # Build a readable subgraph summary
     nodes = subgraph.get("nodes", [])
     edges = subgraph.get("edges", [])
@@ -101,6 +135,7 @@ def get_prompt(
         patient_context=pc_text,
         rendered_prose=rendered_prose,
         matched_recs=matched_recs_text,
+        convergence_section=convergence_section,
         subgraph_summary=subgraph_summary,
     )
 

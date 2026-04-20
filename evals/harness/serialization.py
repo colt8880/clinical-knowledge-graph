@@ -14,6 +14,10 @@ Frozen output shape (documented in evals/SPEC.md):
     nodes: [...],
     edges: [...],
     rendered_prose: "..."
+  },
+  convergence_summary: {
+    shared_actions: [...],
+    convergence_prose: "..."
   }
 }
 """
@@ -219,13 +223,181 @@ def _render_subgraph_prose(trace: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def serialize_convergence_summary(
+    trace: dict[str, Any], subgraph: dict[str, Any]
+) -> dict[str, Any]:
+    """Identify shared clinical entities targeted by 2+ guidelines.
+
+    Walks action_checked events in the trace, groups by action_node_id,
+    and surfaces entities where strategies from multiple guidelines converge
+    on the same Medication/Condition/Observation/Procedure node.
+
+    Args:
+        trace: The full EvalTrace dict.
+        subgraph: The already-serialized subgraph (from serialize_subgraph).
+
+    Returns:
+        A convergence_summary dict with shared_actions and convergence_prose.
+    """
+    events = trace.get("events", [])
+
+    # Build lookup: node_id -> label from the subgraph
+    node_labels: dict[str, str] = {}
+    node_types: dict[str, str] = {}
+    for node in subgraph.get("nodes", []):
+        node_labels[node["id"]] = node.get("label", node["id"])
+        node_types[node["id"]] = node.get("type", "Entity")
+
+    # Build lookup: rec_id -> emitted rec details
+    rec_details: dict[str, dict[str, Any]] = {}
+    for event in events:
+        if event.get("type") == "recommendation_emitted":
+            rec_details[event["recommendation_id"]] = {
+                "rec_id": event["recommendation_id"],
+                "guideline_id": event.get("guideline_id"),
+                "evidence_grade": event["evidence_grade"],
+                "status": event["status"],
+            }
+
+    # Group action_checked events by action_node_id, collecting
+    # which guideline/rec/strategy chains target each entity.
+    action_sources: dict[str, list[dict[str, str]]] = {}
+    seen_action_guideline_rec: set[tuple[str, str, str]] = set()
+
+    for event in events:
+        if event.get("type") != "action_checked":
+            continue
+        action_id = event["action_node_id"]
+        guideline_id = event.get("guideline_id", "")
+        rec_id = event["recommendation_id"]
+        strategy_id = event["strategy_id"]
+
+        # Deduplicate: same action from same guideline+rec only counted once
+        dedup_key = (action_id, guideline_id, rec_id)
+        if dedup_key in seen_action_guideline_rec:
+            continue
+        seen_action_guideline_rec.add(dedup_key)
+
+        if action_id not in action_sources:
+            action_sources[action_id] = []
+        action_sources[action_id].append({
+            "guideline_id": guideline_id,
+            "rec_id": rec_id,
+            "strategy_id": strategy_id,
+        })
+
+    # Filter to entities with 2+ distinct guidelines
+    shared_actions: list[dict[str, Any]] = []
+    for action_id, sources in sorted(action_sources.items()):
+        guideline_ids = {s["guideline_id"] for s in sources}
+        if len(guideline_ids) < 2:
+            continue
+
+        recommended_by = []
+        for source in sorted(sources, key=lambda s: (s["guideline_id"], s["rec_id"])):
+            rec = rec_details.get(source["rec_id"], {})
+            # Derive a short guideline label from the guideline_id
+            guideline_label = _guideline_label(source["guideline_id"])
+            recommended_by.append({
+                "rec_id": source["rec_id"],
+                "guideline": guideline_label,
+                "evidence_grade": rec.get("evidence_grade", ""),
+                "status": rec.get("status", ""),
+                "via_strategy": source["strategy_id"],
+            })
+
+        shared_actions.append({
+            "entity_id": action_id,
+            "entity_label": node_labels.get(action_id, action_id),
+            "entity_type": node_types.get(action_id, "Entity"),
+            "recommended_by": recommended_by,
+            "guideline_count": len(guideline_ids),
+            "convergence_type": "reinforcing",
+        })
+
+    convergence_prose = _render_convergence_prose(shared_actions)
+
+    return {
+        "shared_actions": shared_actions,
+        "convergence_prose": convergence_prose,
+    }
+
+
+def _guideline_label(guideline_id: str) -> str:
+    """Derive a human-readable short label from a guideline id."""
+    labels: dict[str, str] = {
+        "guideline:uspstf-statin-2022": "USPSTF 2022 Statin",
+        "guideline:acc-aha-cholesterol-2018": "ACC/AHA 2018 Cholesterol",
+        "guideline:kdigo-ckd-2024": "KDIGO 2024 CKD",
+    }
+    return labels.get(guideline_id, guideline_id)
+
+
+def _render_convergence_prose(shared_actions: list[dict[str, Any]]) -> str:
+    """Render a natural-language paragraph summarising cross-guideline convergence."""
+    if not shared_actions:
+        return ""
+
+    lines: list[str] = []
+    # Group shared actions by entity type for readability
+    by_type: dict[str, list[dict[str, Any]]] = {}
+    for action in shared_actions:
+        etype = action["entity_type"]
+        if etype not in by_type:
+            by_type[etype] = []
+        by_type[etype].append(action)
+
+    total = len(shared_actions)
+    guideline_names = set()
+    for action in shared_actions:
+        for rb in action["recommended_by"]:
+            guideline_names.add(rb["guideline"])
+
+    lines.append(
+        f"{total} clinical entit{'y' if total == 1 else 'ies'} "
+        f"{'is' if total == 1 else 'are'} independently recommended by "
+        f"{len(guideline_names)} guidelines ({', '.join(sorted(guideline_names))})."
+    )
+
+    for etype, actions in sorted(by_type.items()):
+        entity_labels = [a["entity_label"] for a in actions]
+        if len(entity_labels) <= 3:
+            label_str = ", ".join(entity_labels)
+        else:
+            label_str = f"{', '.join(entity_labels[:3])}, and {len(entity_labels) - 3} more"
+
+        # Collect the unique guideline+grade combos for this type
+        grade_parts: list[str] = []
+        seen_guidelines: set[str] = set()
+        for action in actions:
+            for rb in action["recommended_by"]:
+                key = rb["guideline"]
+                if key not in seen_guidelines:
+                    seen_guidelines.add(key)
+                    grade_parts.append(f"{rb['guideline']} (Grade {rb['evidence_grade']})")
+
+        lines.append(
+            f"{etype} convergence: {label_str}. "
+            f"Recommended by: {'; '.join(sorted(grade_parts))}."
+        )
+
+    lines.append(
+        "Where multiple guidelines converge on the same therapeutic action, "
+        "this represents independent clinical agreement."
+    )
+
+    return " ".join(lines)
+
+
 def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
     """Build the full Arm C context object from an EvalTrace.
 
     This is the frozen output shape injected into the graph-context arm's
     prompt alongside the PatientContext.
     """
+    subgraph = serialize_subgraph(trace)
     return {
         "trace_summary": serialize_trace_summary(trace),
-        "subgraph": serialize_subgraph(trace),
+        "subgraph": subgraph,
+        "convergence_summary": serialize_convergence_summary(trace, subgraph),
     }

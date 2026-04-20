@@ -4,6 +4,7 @@ import pytest
 
 from harness.serialization import (
     build_arm_c_context,
+    serialize_convergence_summary,
     serialize_subgraph,
     serialize_trace_summary,
 )
@@ -165,6 +166,7 @@ class TestBuildArmCContext:
         ctx = build_arm_c_context(SAMPLE_TRACE)
         assert "trace_summary" in ctx
         assert "subgraph" in ctx
+        assert "convergence_summary" in ctx
 
     def test_trace_summary_has_expected_keys(self):
         ctx = build_arm_c_context(SAMPLE_TRACE)
@@ -179,3 +181,295 @@ class TestBuildArmCContext:
         assert "nodes" in subgraph
         assert "edges" in subgraph
         assert "rendered_prose" in subgraph
+
+    def test_convergence_summary_has_expected_keys(self):
+        ctx = build_arm_c_context(SAMPLE_TRACE)
+        conv = ctx["convergence_summary"]
+        assert "shared_actions" in conv
+        assert "convergence_prose" in conv
+
+
+# --- Multi-guideline trace for convergence tests ---
+
+MULTI_GUIDELINE_TRACE = {
+    "envelope": {
+        "spec_tag": "spec/v2-2026-04-15",
+        "graph_version": "test",
+        "evaluator_version": "test",
+    },
+    "events": [
+        # USPSTF guideline
+        {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+        {
+            "seq": 2,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "guideline_title": "USPSTF 2022 Statin Primary Prevention",
+        },
+        {
+            "seq": 3,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-selective-grade-c",
+            "recommendation_title": "Selectively offer statin (Grade C)",
+            "evidence_grade": "C",
+            "intent": "primary_prevention",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 4,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-selective-grade-c",
+            "strategy_id": "strategy:uspstf-moderate-intensity",
+            "strategy_name": "Moderate-intensity statin therapy",
+        },
+        {
+            "seq": 5,
+            "type": "action_checked",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-selective-grade-c",
+            "strategy_id": "strategy:uspstf-moderate-intensity",
+            "action_node_id": "med:atorvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 6,
+            "type": "action_checked",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-selective-grade-c",
+            "strategy_id": "strategy:uspstf-moderate-intensity",
+            "action_node_id": "med:rosuvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 7,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-selective-grade-c",
+            "status": "due",
+            "evidence_grade": "C",
+            "reason": "Patient eligible, no strategy satisfied",
+            "offered_strategies": ["strategy:uspstf-moderate-intensity"],
+        },
+        # ACC/AHA guideline
+        {
+            "seq": 8,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "guideline_title": "ACC/AHA 2018 Cholesterol",
+        },
+        {
+            "seq": 9,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "recommendation_title": "Statin for primary prevention",
+            "evidence_grade": "COR I, LOE A",
+            "intent": "primary_prevention",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 10,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "strategy_id": "strategy:accaha-moderate-intensity",
+            "strategy_name": "Moderate-intensity statin therapy",
+        },
+        {
+            "seq": 11,
+            "type": "action_checked",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "strategy_id": "strategy:accaha-moderate-intensity",
+            "action_node_id": "med:atorvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 12,
+            "type": "action_checked",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "strategy_id": "strategy:accaha-moderate-intensity",
+            "action_node_id": "med:rosuvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 13,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "status": "due",
+            "evidence_grade": "COR I, LOE A",
+            "reason": "Patient eligible, no strategy satisfied",
+            "offered_strategies": ["strategy:accaha-moderate-intensity"],
+        },
+        # KDIGO guideline
+        {
+            "seq": 14,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "guideline_title": "KDIGO 2024 CKD",
+        },
+        {
+            "seq": 15,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "recommendation_title": "Statin for CKD patients",
+            "evidence_grade": "1A",
+            "intent": "treatment",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 16,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "strategy_id": "strategy:kdigo-statin-therapy",
+            "strategy_name": "Statin therapy for CKD",
+        },
+        {
+            "seq": 17,
+            "type": "action_checked",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "strategy_id": "strategy:kdigo-statin-therapy",
+            "action_node_id": "med:atorvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 18,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "status": "due",
+            "evidence_grade": "1A",
+            "reason": "Patient eligible, no strategy satisfied",
+            "offered_strategies": ["strategy:kdigo-statin-therapy"],
+        },
+        # KDIGO also checks an entity unique to itself (not shared)
+        {
+            "seq": 19,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-ckd-monitoring",
+            "recommendation_title": "CKD monitoring",
+            "evidence_grade": "1B",
+            "intent": "monitoring",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 20,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-ckd-monitoring",
+            "strategy_id": "strategy:kdigo-monitoring",
+            "strategy_name": "CKD monitoring protocol",
+        },
+        {
+            "seq": 21,
+            "type": "action_checked",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-ckd-monitoring",
+            "strategy_id": "strategy:kdigo-monitoring",
+            "action_node_id": "obs:egfr",
+            "action_entity_type": "Observation",
+            "satisfied": False,
+        },
+        {
+            "seq": 22,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-ckd-monitoring",
+            "status": "due",
+            "evidence_grade": "1B",
+            "reason": "Monitoring needed",
+            "offered_strategies": ["strategy:kdigo-monitoring"],
+        },
+        {"seq": 23, "type": "evaluation_completed", "guideline_id": None},
+    ],
+}
+
+
+class TestSerializeConvergenceSummary:
+    """Tests for serialize_convergence_summary."""
+
+    def test_multi_guideline_shared_statin_medications(self):
+        """Three guidelines targeting the same statin meds should appear in shared_actions."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+
+        shared_ids = {a["entity_id"] for a in conv["shared_actions"]}
+        # atorvastatin is targeted by all 3 guidelines
+        assert "med:atorvastatin" in shared_ids
+        # rosuvastatin is targeted by USPSTF + ACC/AHA (2 guidelines)
+        assert "med:rosuvastatin" in shared_ids
+
+        # Check atorvastatin has all 3 guidelines
+        atorva = next(a for a in conv["shared_actions"] if a["entity_id"] == "med:atorvastatin")
+        assert atorva["guideline_count"] == 3
+        assert atorva["entity_type"] == "Medication"
+        assert atorva["convergence_type"] == "reinforcing"
+        guideline_names = {rb["guideline"] for rb in atorva["recommended_by"]}
+        assert "USPSTF 2022 Statin" in guideline_names
+        assert "ACC/AHA 2018 Cholesterol" in guideline_names
+        assert "KDIGO 2024 CKD" in guideline_names
+
+    def test_single_guideline_entity_not_in_shared_actions(self):
+        """An entity targeted by only one guideline should NOT appear in shared_actions."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+
+        shared_ids = {a["entity_id"] for a in conv["shared_actions"]}
+        # obs:egfr is only checked by KDIGO — not convergence
+        assert "obs:egfr" not in shared_ids
+
+    def test_empty_trace_empty_convergence(self):
+        """An empty trace should produce an empty convergence summary."""
+        empty_trace = {"events": []}
+        subgraph = serialize_subgraph(empty_trace)
+        conv = serialize_convergence_summary(empty_trace, subgraph)
+
+        assert conv["shared_actions"] == []
+        assert conv["convergence_prose"] == ""
+
+    def test_convergence_prose_nonempty_when_shared_actions_exist(self):
+        """Convergence prose should be a non-empty string when shared actions exist."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+
+        assert len(conv["convergence_prose"]) > 0
+        assert "independently recommended" in conv["convergence_prose"]
+
+    def test_single_guideline_trace_no_convergence(self):
+        """A trace with only one guideline should produce no shared_actions."""
+        subgraph = serialize_subgraph(SAMPLE_TRACE)
+        conv = serialize_convergence_summary(SAMPLE_TRACE, subgraph)
+
+        assert conv["shared_actions"] == []
+        assert conv["convergence_prose"] == ""
+
+    def test_recommended_by_includes_evidence_grade_and_status(self):
+        """Each recommended_by entry should carry evidence_grade and status from the trace."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+
+        atorva = next(a for a in conv["shared_actions"] if a["entity_id"] == "med:atorvastatin")
+        for rb in atorva["recommended_by"]:
+            assert rb["evidence_grade"] != ""
+            assert rb["status"] != ""
+            assert rb["via_strategy"] != ""
+
+    def test_determinism(self):
+        """Same trace + same subgraph = same convergence summary."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv1 = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+        conv2 = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+        assert conv1 == conv2

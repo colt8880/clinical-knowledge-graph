@@ -47,7 +47,7 @@ Required ADRs (draft alongside Phase 1; merge before the corresponding feature):
 | --- | ------------------------------ | ----------------------- | ------- | ------------------ | ----------------------------------------------------- | -------------------- |
 | 25  | Preemption, USPSTF ↔ ACC/AHA   | graph, api, docs, evals | shipped | 23                 | [25](../../docs/build/25-preemption-uspstf-accaha.md) | [#24](../../pull/24) |
 | 26  | MODIFIES edges from KDIGO      | graph, api, docs, evals | shipped | 24, 25             | [26](../../docs/build/26-modifies-edges-kdigo.md)     | [#25](../../pull/25) |
-| 33  | Arm C convergence serialization | evals, docs           | pending | 22                 | [33](../../docs/build/33-arm-c-convergence-serialization.md) | —                    |
+| 33  | Arm C convergence serialization | evals, docs           | shipped | 22                 | [33](../../docs/build/33-arm-c-convergence-serialization.md) | [#32](../../pull/32) |
 | 27  | Full harness run + thesis test | evals, docs             | pending | 22, 23, 24, 33 | [27](../../docs/build/27-full-harness-thesis-test.md) | —                    |
 
 ### Phase 4: UI polish
@@ -58,7 +58,7 @@ Parallelizable with Phase 3.
 |---|---------|------------|--------|------------|------|----|
 | 28 | UI domain filter | ui, api | shipped | 20, 23, 24 | [28](../../docs/build/28-ui-domain-filter.md) | [#26](../../pull/26) |
 | 29 | UI preemption/modifier viz | ui, api | shipped | 25, 26, 28 | [29](../../docs/build/29-ui-preemption-modifier-viz.md) | [#27](../../pull/27) |
-| 30 | UI multi-guideline rec list | ui | pending | 21, 29 | [30](../../docs/build/30-ui-multi-guideline-rec-list.md) | — |
+| 30 | UI multi-guideline rec list | ui | in-progress | 21, 29 | [30](../../docs/build/30-ui-multi-guideline-rec-list.md) | — |
 | 31 | UI guideline-first navigation | ui, api, graph, docs | shipped | 28, 29 | [31](../../docs/build/31-ui-guideline-first-navigation.md) | [#29](../../pull/29) |
 | 32 | UI cross-guideline interactions view | ui, api, docs | shipped | 25, 26, 28, 29, 31 | [32](../../docs/build/32-ui-cross-guideline-interactions-view.md) | [#30](../../pull/30) |
 

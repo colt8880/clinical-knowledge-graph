@@ -147,7 +147,7 @@ Offered strategies:
 | intent | primary_prevention |
 | trigger | patient_state |
 | source_section | Section 4.4 — Primary Prevention |
-| clinical_nuance | For adults aged 40-75 without diabetes and with LDL-C 70-189 mg/dL, a 10-year ASCVD risk ≥7.5% warrants moderate-to-high-intensity statin initiation. At borderline risk (5% to <7.5%, COR IIb, LOE B-R), risk enhancers favor statin initiation. A CAC score of 0 supports deferral. This Rec overlaps conceptually with USPSTF Grade C; cross-edges land in F25. |
+| clinical_nuance | For adults aged 40-75 without diabetes and with LDL-C 70-189 mg/dL, a 10-year ASCVD risk ≥7.5% warrants moderate-to-high-intensity statin initiation. At borderline risk (5% to <7.5%, COR IIb, LOE B-R), risk enhancers favor statin initiation. A CAC score of 0 supports deferral. |
 
 Structured eligibility:
 

@@ -9,8 +9,7 @@
  * and fixed compound positions for layout stability.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const INTERACTIONS_LAYOUT_OPTIONS: Record<string, any> = {
+export const INTERACTIONS_LAYOUT_OPTIONS: { name: string; [key: string]: unknown } = {
   name: "cose-bilkent",
   quality: "default",
   nodeDimensionsIncludeLabels: true,

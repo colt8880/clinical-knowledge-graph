@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { Suspense, useEffect, useState, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { fetchInteractions, type InteractionsResponse } from "@/lib/api/client";
 import type { EdgeTypeFilter } from "@/lib/interactions/collapse";
@@ -14,6 +14,20 @@ function parseEdgeType(val: string | null): EdgeTypeFilter {
 }
 
 export default function InteractionsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-full text-slate-400">
+          Loading...
+        </div>
+      }
+    >
+      <InteractionsContent />
+    </Suspense>
+  );
+}
+
+function InteractionsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 

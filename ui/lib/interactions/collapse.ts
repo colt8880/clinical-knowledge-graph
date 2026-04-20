@@ -7,7 +7,6 @@
  * cross-guideline edges are rendered — no within-guideline edges.
  */
 
-import type { ElementDefinition } from "cytoscape";
 import type {
   InteractionsResponse,
   InteractionEdge,
@@ -35,7 +34,7 @@ const DOMAIN_COLORS: Record<string, { bg: string; border: string }> = {
 };
 
 export interface CollapsedGraph {
-  elements: ElementDefinition[];
+  elements: { data: Record<string, unknown>; position?: { x: number; y: number } }[];
   /** Map from guideline domain → list of rec IDs in that cluster. */
   clusterRecs: Map<string, string[]>;
 }
@@ -47,13 +46,13 @@ export function collapseInteractions(
   edgeTypeFilter: EdgeTypeFilter = "both",
   visibleGuidelines?: Set<string>,
 ): CollapsedGraph {
-  const elements: ElementDefinition[] = [];
+  const elements: CollapsedGraph["elements"] = [];
   const clusterRecs = new Map<string, string[]>();
 
   // Determine which guidelines to show.
   const allDomains = new Set(data.guidelines.map((g) => g.domain));
   const activeDomains = visibleGuidelines
-    ? new Set([...allDomains].filter((d) => visibleGuidelines.has(d)))
+    ? new Set(Array.from(allDomains).filter((d) => visibleGuidelines.has(d)))
     : allDomains;
 
   // Filter edges by type and guideline visibility.
@@ -78,7 +77,7 @@ export function collapseInteractions(
   }
 
   // Always render compound parents for all active domains (even if empty).
-  for (const domain of activeDomains) {
+  for (const domain of Array.from(activeDomains)) {
     const parentId = GUIDELINE_PARENTS[domain];
     if (!parentId) continue;
     const colors = DOMAIN_COLORS[domain] ?? { bg: "#f1f5f9", border: "#94a3b8" };

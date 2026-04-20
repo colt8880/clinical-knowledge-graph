@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
-import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
+import cytoscape, { type Core } from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
 import type { InteractionsResponse } from "@/lib/api/client";
 import type { EdgeTypeFilter } from "@/lib/interactions/collapse";

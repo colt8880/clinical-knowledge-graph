@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.db import init_driver, close_driver
-from app.routes import health, nodes, evaluate, subgraph, guidelines
+from app.routes import health, nodes, evaluate, subgraph, guidelines, interactions
 
 
 @asynccontextmanager
@@ -35,3 +35,4 @@ app.include_router(nodes.router)
 app.include_router(evaluate.router)
 app.include_router(subgraph.router)
 app.include_router(guidelines.router)
+app.include_router(interactions.router)

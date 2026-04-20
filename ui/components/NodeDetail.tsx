@@ -268,6 +268,290 @@ function ProvenanceBlock({ properties }: { properties: Record<string, unknown> }
   );
 }
 
+// ── Eligibility table renderer ────────────────────────────────────
+
+/** Category labels and colors for grouping eligibility predicates. */
+const PREDICATE_CATEGORIES: Record<string, { label: string; color: string }> = {
+  demographics: { label: "Demographics", color: "bg-blue-50 border-blue-200" },
+  conditions: { label: "Conditions", color: "bg-green-50 border-green-200" },
+  risk: { label: "Risk Factors", color: "bg-amber-50 border-amber-200" },
+  labs: { label: "Lab Values", color: "bg-indigo-50 border-indigo-200" },
+  medications: { label: "Medications", color: "bg-pink-50 border-pink-200" },
+  exclusions: { label: "Exclusions", color: "bg-red-50 border-red-200" },
+};
+
+/** Map predicate names to categories. */
+function predicateCategory(name: string): string {
+  if (name === "age_between" || name === "age_greater_than_or_equal" || name === "age_less_than" || name === "administrative_sex_is" || name === "has_ancestry_matching") return "demographics";
+  if (name === "has_active_condition" || name === "has_condition_history") return "conditions";
+  if (name === "risk_score_compares" || name === "smoking_status_is") return "risk";
+  if (name === "most_recent_observation_value") return "labs";
+  if (name === "has_medication_active") return "medications";
+  return "conditions"; // fallback
+}
+
+interface FlatPredicate {
+  category: string;
+  label: string;
+  detail: string;
+  isExclusion: boolean;
+  isAnyOf: boolean;
+}
+
+/** NL templates for table display. */
+const TABLE_TEMPLATES: Record<string, (args: Record<string, unknown>) => { label: string; detail: string }> = {
+  age_between: (a) => ({ label: "Age range", detail: `${a.min}–${a.max} years` }),
+  age_greater_than_or_equal: (a) => ({ label: "Minimum age", detail: `≥ ${a.value} years` }),
+  age_less_than: (a) => ({ label: "Maximum age", detail: `< ${a.value} years` }),
+  administrative_sex_is: (a) => ({ label: "Sex", detail: String(a.value) }),
+  has_ancestry_matching: (a) => ({ label: "Ancestry", detail: Array.isArray(a.populations) ? (a.populations as string[]).join(", ") : String(a.populations) }),
+  has_condition_history: (a) => ({ label: "Condition history", detail: Array.isArray(a.codes) ? (a.codes as string[]).map(formatCodeForTable).join(", ") : formatCodeForTable(String(a.codes)) }),
+  has_active_condition: (a) => ({ label: "Active condition", detail: Array.isArray(a.codes) ? (a.codes as string[]).map(formatCodeForTable).join(", ") : formatCodeForTable(String(a.codes)) }),
+  smoking_status_is: (a) => ({ label: "Smoking status", detail: Array.isArray(a.values) ? (a.values as string[]).map(v => v.replace(/_/g, " ")).join(", ") : String(a.values) }),
+  most_recent_observation_value: (a) => {
+    const comp = { eq: "=", ne: "≠", gt: ">", lt: "<", gte: "≥", lte: "≤" }[String(a.comparator)] ?? a.comparator;
+    return { label: formatCodeForTable(String(a.code)), detail: `${comp} ${a.threshold} ${a.unit ?? ""}${a.window ? ` (within ${a.window})` : ""}`.trim() };
+  },
+  has_medication_active: (a) => ({ label: "Active medication", detail: Array.isArray(a.codes) ? (a.codes as string[]).map(formatCodeForTable).join(", ") : formatCodeForTable(String(a.codes)) }),
+  risk_score_compares: (a) => {
+    const comp = { eq: "=", ne: "≠", gt: ">", lt: "<", gte: "≥", lte: "≤" }[String(a.comparator)] ?? a.comparator;
+    return { label: "10-year ASCVD risk", detail: `${comp} ${a.threshold}%` };
+  },
+};
+
+function formatCodeForTable(code: string): string {
+  return code.replace(/^(cond|med|obs|proc):/, "").replace(/-/g, " ");
+}
+
+/** Flatten a predicate tree into categorized rows. */
+function flattenPredicates(
+  node: PredicateNode,
+  isExclusion = false,
+  isAnyOf = false,
+): FlatPredicate[] {
+  const results: FlatPredicate[] = [];
+
+  for (const [key, value] of Object.entries(node)) {
+    if (key === "none_of" && Array.isArray(value)) {
+      for (const child of value as PredicateNode[]) {
+        results.push(...flattenPredicates(child, true, false));
+      }
+    } else if (key === "any_of" && Array.isArray(value)) {
+      for (const child of value as PredicateNode[]) {
+        results.push(...flattenPredicates(child, isExclusion, true));
+      }
+    } else if (key === "all_of" && Array.isArray(value)) {
+      for (const child of value as PredicateNode[]) {
+        results.push(...flattenPredicates(child, isExclusion, isAnyOf));
+      }
+    } else if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+      const template = TABLE_TEMPLATES[key];
+      const category = isExclusion ? "exclusions" : predicateCategory(key);
+      if (template) {
+        const { label, detail } = template(value as Record<string, unknown>);
+        results.push({ category, label, detail, isExclusion, isAnyOf });
+      } else {
+        const args = Object.entries(value as Record<string, unknown>)
+          .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+          .join(", ");
+        results.push({ category, label: key, detail: args, isExclusion, isAnyOf });
+      }
+    }
+  }
+
+  return results;
+}
+
+function EligibilityTable({ value }: { value: unknown }) {
+  const [showJson, setShowJson] = useState(false);
+
+  if (!value) return null;
+
+  let parsed: PredicateNode;
+  if (typeof value === "string") {
+    try {
+      parsed = JSON.parse(value) as PredicateNode;
+    } catch {
+      return (
+        <pre className="bg-white border border-slate-200 rounded p-2 text-xs font-mono overflow-x-auto">
+          {value}
+        </pre>
+      );
+    }
+  } else {
+    parsed = value as PredicateNode;
+  }
+
+  const flat = flattenPredicates(parsed);
+
+  // Group by category, preserving order but with exclusions always last.
+  const grouped = new Map<string, FlatPredicate[]>();
+  for (const pred of flat) {
+    if (!grouped.has(pred.category)) grouped.set(pred.category, []);
+    grouped.get(pred.category)!.push(pred);
+  }
+  // Move exclusions to the end.
+  const exclusions = grouped.get("exclusions");
+  if (exclusions) {
+    grouped.delete("exclusions");
+    grouped.set("exclusions", exclusions);
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => setShowJson(!showJson)}
+          className="text-[10px] font-medium text-blue-600 hover:text-blue-800 uppercase tracking-wide"
+          data-testid="toggle-json"
+        >
+          {showJson ? "Show Table" : "Show JSON"}
+        </button>
+      </div>
+      {showJson ? (
+        <pre className="bg-slate-50 border border-slate-200 rounded p-3 text-xs font-mono overflow-x-auto max-h-80 overflow-y-auto">
+          {JSON.stringify(parsed, null, 2)}
+        </pre>
+      ) : (
+        <div className="space-y-3">
+          {Array.from(grouped.entries()).map(([category, preds]) => {
+            const catInfo = PREDICATE_CATEGORIES[category] ?? { label: category, color: "bg-slate-50 border-slate-200" };
+            return (
+              <div key={category} className={`rounded border ${catInfo.color}`}>
+                <div className="px-3 py-1.5 border-b border-inherit">
+                  <span className="text-[11px] uppercase tracking-wide font-semibold text-slate-600">
+                    {catInfo.label}
+                  </span>
+                </div>
+                <table className="w-full text-xs">
+                  <tbody>
+                    {preds.map((pred, i) => (
+                      <tr key={i} className="border-b border-inherit last:border-b-0">
+                        <td className="px-3 py-1.5 text-slate-600 font-medium whitespace-nowrap align-top w-1/3">
+                          {pred.isAnyOf && (
+                            <span className="text-amber-600 text-[10px] font-semibold mr-1">OR</span>
+                          )}
+                          {pred.label}
+                        </td>
+                        <td className="px-3 py-1.5 text-slate-900">
+                          {pred.detail}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Recommendation-specific panel ────────────────────────────────
+
+const GRADE_COLORS: Record<string, string> = {
+  A: "bg-green-100 text-green-800 border-green-300",
+  B: "bg-green-100 text-green-800 border-green-300",
+  C: "bg-amber-100 text-amber-800 border-amber-300",
+  D: "bg-red-100 text-red-800 border-red-300",
+  I: "bg-slate-100 text-slate-600 border-slate-300",
+};
+
+/** Rec properties shown in the summary row, not in the generic list. */
+const REC_SUMMARY_KEYS = new Set([
+  "evidence_grade", "intent", "trigger", "structured_eligibility", "clinical_nuance",
+  ...HEADER_KEYS, ...PROVENANCE_KEYS,
+]);
+
+function RecommendationPanel({ node }: { node: GraphNode & { domain?: string | null } }) {
+  const props = node.properties;
+  const displayName = (props.title as string) ?? (props.name as string) ?? node.id;
+  const grade = props.evidence_grade as string | undefined;
+  const intent = (props.intent as string | undefined)?.replace(/_/g, " ");
+  const trigger = (props.trigger as string | undefined)?.replace(/_/g, " ");
+  const nuance = props.clinical_nuance as string | undefined;
+  const eligibility = props.structured_eligibility;
+
+  const otherProps = Object.entries(props).filter(([k]) => !REC_SUMMARY_KEYS.has(k));
+
+  return (
+    <>
+      <h3 className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 mb-1">
+        Recommendation
+      </h3>
+      <h2 className="text-base font-semibold text-slate-900 mb-2 break-words">
+        {displayName}
+      </h2>
+      <div className="flex gap-1.5 flex-wrap mb-4">
+        {node.domain && <DomainBadge domain={node.domain} />}
+        {grade && (
+          <span className={`inline-block px-2.5 py-0.5 text-[11px] font-semibold rounded border ${GRADE_COLORS[grade] ?? GRADE_COLORS.I}`}>
+            Grade {grade}
+          </span>
+        )}
+        {intent && (
+          <span className="inline-block px-2.5 py-0.5 text-[11px] font-medium rounded border bg-slate-100 text-slate-700 border-slate-300 capitalize">
+            {intent}
+          </span>
+        )}
+        {trigger && (
+          <span className="inline-block px-2.5 py-0.5 text-[11px] font-medium rounded border bg-slate-100 text-slate-700 border-slate-300 capitalize">
+            {trigger}
+          </span>
+        )}
+      </div>
+
+      {/* Eligibility table */}
+      {eligibility && (
+        <section className="mb-4">
+          <h3 className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 mb-2">
+            Eligibility Criteria
+          </h3>
+          <EligibilityTable value={eligibility} />
+        </section>
+      )}
+
+      {/* Clinical nuance */}
+      {nuance && (
+        <section className="mb-4 border-t border-slate-200 pt-4">
+          <h3 className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 mb-2">
+            Clinical Nuance
+          </h3>
+          <p className="text-sm text-slate-700 leading-relaxed">{nuance}</p>
+        </section>
+      )}
+
+      {/* ID */}
+      <div className="text-xs text-slate-400 mb-4 font-mono">{node.id}</div>
+
+      {/* Remaining properties */}
+      {otherProps.length > 0 && (
+        <section className="border-t border-slate-200 pt-4">
+          <h3 className="text-[11px] uppercase tracking-wide font-semibold text-slate-500 mb-2">
+            Other Properties
+          </h3>
+          <div className="space-y-3">
+            {otherProps.map(([key, value]) => (
+              <div key={key}>
+                <div className="text-[11px] uppercase tracking-wide font-semibold text-slate-400">
+                  {key}
+                </div>
+                <div className="text-slate-900">
+                  <PropertyValue value={value} propKey={key} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <ProvenanceBlock properties={props} />
+    </>
+  );
+}
+
 function NodePanel({ node }: { node: GraphNode & { domain?: string | null } }) {
   const displayName =
     (node.properties.title as string) ??
@@ -401,7 +685,7 @@ export default function NodeDetail({ node, edge }: NodeDetailProps) {
 
   return (
     <div className="p-5 overflow-y-auto h-full" data-testid="node-detail">
-      {node && <NodePanel node={node} />}
+      {node && (node.labels.includes("Recommendation") ? <RecommendationPanel node={node} /> : <NodePanel node={node} />)}
       {!node && edge && <EdgePanel edge={edge} />}
     </div>
   );

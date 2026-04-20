@@ -43,6 +43,12 @@ export default function RootLayout({
               Explore
             </Link>
             <Link
+              href="/interactions"
+              className="px-3 py-1.5 rounded hover:bg-slate-700 transition-colors"
+            >
+              Interactions
+            </Link>
+            <Link
               href="/eval"
               className="px-3 py-1.5 rounded hover:bg-slate-700 transition-colors"
             >

@@ -80,6 +80,60 @@ export async function fetchGuidelines(): Promise<GuidelineMeta[]> {
   return apiFetch<GuidelineMeta[]>("/guidelines");
 }
 
+// ── Interactions view types ─────────────────────────────────────────
+
+export interface InteractionGuideline {
+  id: string;
+  domain: string;
+  title: string;
+}
+
+export interface InteractionRec {
+  id: string;
+  title: string;
+  domain: string | null;
+  evidence_grade: string | null;
+  has_preemption_in: boolean;
+  has_preemption_out: boolean;
+  modifier_count: number;
+}
+
+export interface InteractionSharedEntity {
+  id: string;
+  type: string;
+  title: string;
+}
+
+export interface InteractionEdge {
+  type: "PREEMPTED_BY" | "MODIFIES";
+  source: string;
+  target: string;
+  edge_priority?: number;
+  reason?: string;
+  nature?: string;
+  note?: string;
+  suppressed_by_preemption?: boolean;
+}
+
+export interface InteractionsResponse {
+  guidelines: InteractionGuideline[];
+  recommendations: InteractionRec[];
+  shared_entities: InteractionSharedEntity[];
+  edges: InteractionEdge[];
+}
+
+export async function fetchInteractions(
+  type: "preemption" | "modifier" | "both" = "both",
+  guidelines?: string[],
+): Promise<InteractionsResponse> {
+  const params = new URLSearchParams();
+  params.set("type", type);
+  if (guidelines && guidelines.length > 0) {
+    params.set("guidelines", guidelines.join(","));
+  }
+  return apiFetch<InteractionsResponse>(`/interactions?${params.toString()}`);
+}
+
 export async function searchNodes(
   q: string,
   nodeTypes?: string[],

@@ -14,6 +14,10 @@ Frozen output shape (documented in evals/SPEC.md):
     nodes: [...],
     edges: [...],
     rendered_prose: "..."
+  },
+  convergence_summary: {
+    shared_actions: [...],
+    convergence_prose: "..."
   }
 }
 """

@@ -384,11 +384,17 @@ function EligibilityTable({ value }: { value: unknown }) {
 
   const flat = flattenPredicates(parsed);
 
-  // Group by category, preserving order.
+  // Group by category, preserving order but with exclusions always last.
   const grouped = new Map<string, FlatPredicate[]>();
   for (const pred of flat) {
     if (!grouped.has(pred.category)) grouped.set(pred.category, []);
     grouped.get(pred.category)!.push(pred);
+  }
+  // Move exclusions to the end.
+  const exclusions = grouped.get("exclusions");
+  if (exclusions) {
+    grouped.delete("exclusions");
+    grouped.set("exclusions", exclusions);
   }
 
   return (

@@ -146,6 +146,7 @@ const CY_STYLE: any[] = [
 interface InteractionsCanvasProps {
   data: InteractionsResponse;
   edgeTypeFilter: EdgeTypeFilter;
+  visibleGuidelines?: Set<string>;
   focusNodeId?: string | null;
   selectedNodeId?: string | null;
   selectedEdgeId?: string | null;
@@ -157,6 +158,7 @@ interface InteractionsCanvasProps {
 export default function InteractionsCanvas({
   data,
   edgeTypeFilter,
+  visibleGuidelines,
   focusNodeId,
   selectedNodeId,
   selectedEdgeId,
@@ -177,8 +179,8 @@ export default function InteractionsCanvas({
 
   // Memoize elements so cy only rebuilds when data or filter actually change.
   const elements = useMemo(
-    () => collapseInteractions(data, edgeTypeFilter).elements,
-    [data, edgeTypeFilter],
+    () => collapseInteractions(data, edgeTypeFilter, visibleGuidelines).elements,
+    [data, edgeTypeFilter, visibleGuidelines],
   );
 
   // Stable JSON key for initCy dependency — avoids new-reference-every-render.

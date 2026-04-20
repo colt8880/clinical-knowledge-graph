@@ -213,6 +213,7 @@ function InteractionsContent() {
           <InteractionsCanvas
             data={filteredData}
             edgeTypeFilter={edgeTypeFilter}
+            visibleGuidelines={selectedGuidelines}
             focusNodeId={focusId}
             selectedNodeId={selectedNodeId}
             selectedEdgeId={selectedEdgeId}

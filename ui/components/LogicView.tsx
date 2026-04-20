@@ -103,9 +103,21 @@ export default function LogicView({
       selectedId: detailNodeId,
     }));
 
-    const edges = scoped.edges.filter(
-      (e) => visibleIds.has(e.start) && visibleIds.has(e.end),
-    );
+    // Collect strategy IDs so we can filter INCLUDES_ACTION edges
+    // to only the expanded strategy.
+    const strategyIds = new Set<string>();
+    for (const n of scoped.nodes) {
+      if (nodeType(n) === "Strategy") strategyIds.add(n.id);
+    }
+
+    const edges = scoped.edges.filter((e) => {
+      if (!visibleIds.has(e.start) || !visibleIds.has(e.end)) return false;
+      // Only show INCLUDES_ACTION edges from the expanded strategy.
+      if (e.type === "INCLUDES_ACTION" && strategyIds.has(e.start)) {
+        return e.start === expandedStrategyId;
+      }
+      return true;
+    });
 
     return { columns: canvasColumns, visibleEdges: edges };
   }, [scoped, detailNodeId, expandedStrategyId, edgeIndex]);

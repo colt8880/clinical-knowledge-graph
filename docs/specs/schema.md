@@ -10,7 +10,8 @@ The schema is split into a **knowledge layer** (Guideline, Recommendation, Strat
 
 ### Knowledge layer
 
-- **`Guideline`** — source document. Attrs: `publisher`, `version`, `effective_date`, `url`, `status`.
+- **`Guideline`** — source document. Attrs: `publisher`, `version`, `effective_date`, `url`, `status`, `coverage`.
+  - `coverage` — JSON string containing `{modeled, deferred, exit_only}`. Author-declared, not inferred. `modeled` lists Recs with their display labels. `deferred` lists clinical areas the seed author intentionally omitted. `exit_only` lists conditions that trigger an exit event but are not modeled as full Recs. Stored as a JSON string (Neo4j Community lacks native map properties). Added in F31.
 - **`Recommendation`** — the actionable unit. Attrs:
   - `evidence_grade` (enum: A/B/C/D/I for USPSTF; GRADE equivalents for others)
   - `intent` (enum: screening, diagnostic, treatment, surveillance, shared_decision, counseling, primary_prevention)

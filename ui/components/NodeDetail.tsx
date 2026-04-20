@@ -39,6 +39,9 @@ const DOMAIN_DISPLAY: Record<string, string> = {
   KDIGO: "KDIGO",
 };
 
+/** Domain labels to filter out of generic badge list (shown via DomainBadge instead). */
+const DOMAIN_LABELS = new Set(["USPSTF", "ACC_AHA", "KDIGO"]);
+
 function Badge({ label }: { label: string }) {
   const colors =
     TYPE_BADGE_COLORS[label] ?? "bg-slate-100 text-slate-700 border-slate-300";
@@ -286,9 +289,11 @@ function NodePanel({ node }: { node: GraphNode & { domain?: string | null } }) {
         {displayName}
       </h2>
       <div className="flex gap-1.5 flex-wrap mb-3">
-        {node.labels.map((l) => (
-          <Badge key={l} label={l} />
-        ))}
+        {node.labels
+          .filter((l) => !DOMAIN_LABELS.has(l))
+          .map((l) => (
+            <Badge key={l} label={l} />
+          ))}
         {node.domain && <DomainBadge domain={node.domain} />}
       </div>
       <div className="text-xs text-slate-500 mb-4 font-mono">{node.id}</div>

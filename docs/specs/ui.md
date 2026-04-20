@@ -35,74 +35,98 @@ One Cytoscape instance. Accepts:
 
 Node labels must render the human-readable `name` or `title`, not the id. This is a core principle (clinician-reviewable) and the component should fail a render check if a node lacks one.
 
-## Explore tab (`/app/explore`)
+## Explore — guideline-first navigation (`/app/explore`)
 
 ### Goal
 
-Whole-forest graph canvas showing all guideline subgraphs simultaneously. A domain filter toggles which guidelines are visible. Shared clinical entities (Medications, Conditions, etc.) always render. Clicking any node opens a detail panel with provenance, codes, and domain badge.
+Clinician-oriented guideline inspection. The primary flow: land on the guideline index, pick a guideline, inspect its encoded logic in isolation, check coverage, verify provenance. The whole-forest view is preserved at `/explore/all` for engineers.
 
-This replaced the v0 hierarchical column navigator (F05) as of F28. The column model didn't scale to multiple guidelines or cross-guideline edges.
+### Structure (F31)
 
-### Surfaces
+Two-level hierarchy:
 
-- **Domain filter** (left sidebar). Multi-select chip control for USPSTF / ACC-AHA / KDIGO. Toggling a domain hides/shows the relevant guideline-scoped nodes via Cytoscape `.style("display")` — no re-fetch. Shared entities remain visible even when all guidelines are hidden.
-- **`GraphCanvas` view** (center). Renders the full forest using cose-bilkent layout with compound nodes (one per guideline cluster). Shared entities sit outside compound nodes. Domain coloring: USPSTF blue, ACC/AHA purple, KDIGO green. Shared entities use neutral type-based colors (Medication pink, Condition red, etc.). Rec/Strategy nodes display a domain label in the node body.
-- **Detail panel** (right). When a node is selected:
-  - `labels` (node types), `id`, human-readable `name` / `title`.
-  - Domain badge for guideline-scoped nodes.
-  - Full codes list (RxNorm / SNOMED / ICD-10-CM / LOINC / CPT) for shared entities.
-  - Properties in a flat key/value list. `structured_eligibility` rendered as a predicate tree.
-  - Provenance block — always visible, never behind a click.
-- **URL state.** `?domains=uspstf,acc-aha,kdigo&focus=<node_id>`. Default (no params) = all three domains. URL updates are push (back button navigates filter history). Filter state also persisted to localStorage; URL wins on conflict.
+1. **Guideline index** (`/explore`) — landing page. Cards for each guideline + one "All guidelines (forest view)" card linking to `/explore/all`.
+2. **Per-guideline detail** (`/explore/<slug>`) — three tabs: Logic, Coverage, Provenance.
+3. **Whole-forest view** (`/explore/all`) — preserved F28 canvas with domain filter. Not the default.
 
-### Data flow
+### Guideline index (`/explore`)
 
-Explore fetches the entire forest via `GET /subgraph` (one bulk call, no pagination). The client filters visibility client-side using Cytoscape's `.style("display", "none")` / `.style("display", "element")`. Re-toggling a domain is instant (< 100ms).
+- Fetches `GET /guidelines` for metadata.
+- Renders `GuidelineIndex` → `GuidelineCard` grid.
+- Each card shows: domain badge, title, version, rec count, coverage summary (modeled count, deferred list).
+- Clicking a card navigates to `/explore/<slug>`.
+- "All guidelines" card navigates to `/explore/all`.
+- Backward compatibility: `/explore?domains=X` redirects to `/explore/all?domains=X`.
 
-### Layout
+### Per-guideline detail (`/explore/<slug>`)
 
-**Algorithm:** cose-bilkent with compound nodes. Each guideline domain gets a compound parent node; guideline-scoped nodes are children of their domain's compound. Shared entities sit outside all compounds and are positioned centrally by the layout engine. This produces tree-ish clusters per guideline with shared entities bridging them.
+Three tabs, URL-synced via `?tab=logic|coverage|provenance`. Default: `logic`.
 
-**Choice rationale:** cose-bilkent handles compound nodes well and was already a dependency. Preferred over dagre-per-cluster (too rigid with shared entities) and plain fcose (less structured).
+#### Logic tab
 
-### Interactions
+Wraps `GraphCanvas` in scoped mode. Shows only the target guideline's nodes + shared clinical entities reachable from its strategies. No domain filter sidebar (implicitly one domain).
 
-- Click a node → opens detail panel, syncs URL `?focus=<id>`, focus ring on node, pan/zoom to center it.
-- Click background → closes detail panel, clears focus.
-- Toggle domain chip → hides/shows that domain's nodes and edges. No re-fetch.
-- Escape key → closes detail panel.
-- URL-driven: loading `/explore?focus=X` selects and centers that node.
-- Loading `/explore?domains=kdigo` shows only KDIGO + shared entities.
-- Loading `/explore?domains=` shows only shared entities.
+- **Nodes included:** Guideline, Recommendation, Strategy nodes with the target domain + shared entities (Medication, Condition, Observation, Procedure) reachable via edges from the guideline's nodes.
+- **Edges included:** all edges where both endpoints are in scope. `PREEMPTED_BY` and `MODIFIES` edges excluded from rendering (other endpoint out of scope).
+- **Cross-guideline badge:** nodes with incoming cross-guideline edges show an amber badge linking to `/interactions?focus=<node_id>` (F32).
+- **Layout:** column-based (Guideline → Recs → Strategies → Actions). Reads cleaner than cose-bilkent for single-domain view.
+- **Node detail panel:** right sidebar with NL predicate rendering by default, JSON toggle.
 
-### Legacy URL handling
+#### Coverage tab
 
-v0's `?g=&r=&s=` params are deprecated. If detected, a console warning is logged and the page loads with all guidelines visible and no focus. No redirect.
+Renders `Guideline.coverage` from the graph. Author-declared, not inferred.
+
+- Modeled Recs table: label + rec_id, with grade badges where applicable.
+- Deferred areas: bulleted list.
+- Exit-only areas: bulleted list.
+- HTML table — fully accessible.
+
+#### Provenance tab
+
+Guideline-level provenance: domain, title, version, publication date, citation URL, seed hash (SHA-256), last-updated-in-graph timestamp, rec count. HTML table — fully accessible.
+
+### Whole-forest view (`/explore/all`)
+
+Preserved F28 behavior. Same domain filter, same cose-bilkent layout, same interactions. URL params `?domains=` and `?focus=` work as before. Filter state persisted to localStorage.
+
+### Predicate natural-language rendering (F31)
+
+- Default on in NodeDetail. JSON is a toggle ("Show JSON" / "Show Natural Language").
+- Catalog-driven: `nl_template` field on each predicate in `predicate-catalog.yaml`.
+- Composite handling: `all_of` → AND, `any_of` → OR, `none_of` → NOT. Nested composites parenthesized.
+- Fallback: missing template → render raw `predicate_name(args)` + `console.warn`.
+- Pure function: `predicateToNaturalLanguage(tree) → string`.
+
+### URL state
+
+- `/explore` — index.
+- `/explore/all` — full forest (F28). `?domains=` and `?focus=` preserved.
+- `/explore/<slug>?tab=logic|coverage|provenance&focus=<node_id>` — per-guideline detail.
 
 ### Accessibility
 
-- DomainFilter is a group of checkboxes with keyboard navigation (Space/Enter to toggle, arrow keys to move).
-- Node detail panel closes with Escape, is keyboard-navigable via Tab.
-- Cytoscape canvas has known a11y limitations (no screen reader support for graph nodes). Documented as v2 item.
-- Domain badges use sufficient color contrast.
+- Guideline cards are keyboard-navigable; Enter opens detail.
+- Tabs use ARIA tab role; arrow keys switch.
+- NodeDetail predicate tree is readable by screen readers (plain text, not canvas-rendered).
+- Coverage and Provenance views are HTML tables, not canvas; fully accessible.
+- DomainFilter on `/explore/all` is a group of checkboxes with keyboard navigation.
 
 ### Performance targets
 
-- Initial render: < 2s for ~400–600 nodes (full v1 graph).
-- Filter toggle: < 100ms.
-- Node click to detail panel: < 50ms.
-- Bulk subgraph fetch: < 500ms server-side.
+- Index load: < 300ms.
+- Scoped Logic view initial render: < 1s.
+- Tab switch: < 100ms (no re-fetch).
+- Full forest render: < 2s.
 
 ### Out of scope
 
-- Search / find-by-name (deferred to v2).
-- Editing nodes or edges.
-- Flagging or commenting.
-- Diff view between graph versions.
-- Alternative layout toggle.
+- Source-alongside-encoding view (F33).
+- Scenario / patient builder (F34).
+- Annotations / sign-off workflow.
+- Editing guidelines from the UI.
+- Search / fuzzy node finder across guidelines.
+- Exporting as PDF/PNG.
 - Mobile / narrow viewport.
-- Keyboard-driven canvas navigation.
-- Export as PNG/SVG.
 
 ## Eval tab (`/app/eval`)
 

@@ -169,7 +169,7 @@ export default function LogicView({
 
         {/* Cross-guideline badge overlay */}
         {scoped.crossGuidelineNodeIds.size > 0 && detailNodeId && scoped.crossGuidelineNodeIds.has(detailNodeId) && (
-          <div className="absolute top-12 right-4 z-20">
+          <div className="absolute bottom-4 right-4 z-20">
             <Link
               href={`/interactions?focus=${encodeURIComponent(detailNodeId)}`}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 border border-amber-300 text-amber-800 text-xs font-medium hover:bg-amber-200 transition-colors"

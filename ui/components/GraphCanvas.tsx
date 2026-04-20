@@ -140,7 +140,7 @@ function computeFontSize(label: string, nodeWidth: number): number {
 const COL_SPACING = 280;
 const ROW_SPACING = 80;
 const LEFT_PAD = 140;
-const TOP_PAD = 60;
+const TOP_PAD = 80;
 
 const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
 
@@ -769,7 +769,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     <div className="relative w-full h-full">
       {/* Fixed column headers — positioned to match Cytoscape node X coords (zoom=1, pan.x=0). */}
       {!isForestMode && columnCount > 0 && (
-        <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none bg-white/90 backdrop-blur-sm border-b border-slate-200 h-8 flex items-center">
+        <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none bg-white/90 backdrop-blur-sm h-8 flex items-center">
           {COLUMN_HEADERS.slice(0, columnCount).map((header, i) => (
             <div
               key={i}

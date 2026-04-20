@@ -20,6 +20,8 @@ export default function LogicView({
 }: LogicViewProps) {
   const [detailNodeId, setDetailNodeId] = useState<string | null>(null);
   const [detailEdgeId, setDetailEdgeId] = useState<string | null>(null);
+  // Progressive drill-down: click a Strategy to reveal its Actions.
+  const [expandedStrategyId, setExpandedStrategyId] = useState<string | null>(null);
 
   // Sync focus from URL.
   useEffect(() => {
@@ -42,17 +44,21 @@ export default function LogicView({
     [scoped.edges, detailEdgeId],
   );
 
-  // Build column layout: Guideline → Recommendations → Strategies → Actions.
+  // Build edge index for drill-down.
+  const edgeIndex = useMemo(() => {
+    const bySource = new Map<string, { type: string; target: string }[]>();
+    for (const e of scoped.edges) {
+      const list = bySource.get(e.start) ?? [];
+      list.push({ type: e.type, target: e.end });
+      bySource.set(e.start, list);
+    }
+    return bySource;
+  }, [scoped.edges]);
+
+  // Build column layout: Guideline → Recommendations → Strategies → Actions (on click).
   const { columns, visibleEdges } = useMemo(() => {
     const cols: ForestNode[][] = [[], [], [], []];
     const visibleIds = new Set<string>();
-
-    const edgeIndex = new Map<string, { type: string; target: string }[]>();
-    for (const e of scoped.edges) {
-      const list = edgeIndex.get(e.start) ?? [];
-      list.push({ type: e.type, target: e.end });
-      edgeIndex.set(e.start, list);
-    }
 
     const nodeById = new Map<string, ForestNode>();
     for (const n of scoped.nodes) nodeById.set(n.id, n);
@@ -69,7 +75,7 @@ export default function LogicView({
       }
     }
 
-    // Col 2: All strategies.
+    // Col 2: All strategies (always visible in scoped view).
     for (const n of scoped.nodes) {
       if (nodeType(n) === "Strategy") {
         cols[2].push(n);
@@ -77,13 +83,19 @@ export default function LogicView({
       }
     }
 
-    // Col 3: All shared entity actions.
-    for (const n of scoped.nodes) {
-      const type = nodeType(n);
-      if (["Medication", "Condition", "Observation", "Procedure"].includes(type)) {
-        cols[3].push(n);
-        visibleIds.add(n.id);
+    // Col 3: Actions only for the expanded Strategy.
+    if (expandedStrategyId) {
+      const targets = edgeIndex.get(expandedStrategyId) ?? [];
+      for (const { type, target } of targets) {
+        if (type === "INCLUDES_ACTION") {
+          const node = nodeById.get(target);
+          if (node) {
+            cols[3].push(node);
+            visibleIds.add(node.id);
+          }
+        }
       }
+      visibleIds.add(expandedStrategyId);
     }
 
     const canvasColumns = cols.map((nodes) => ({
@@ -96,15 +108,21 @@ export default function LogicView({
     );
 
     return { columns: canvasColumns, visibleEdges: edges };
-  }, [scoped, detailNodeId]);
+  }, [scoped, detailNodeId, expandedStrategyId, edgeIndex]);
 
   const handleNodeClick = useCallback(
     (nodeId: string) => {
       setDetailNodeId(nodeId);
       setDetailEdgeId(null);
       onFocusChange(nodeId);
+
+      // Progressive drill-down: clicking a Strategy expands its Actions.
+      const node = scoped.nodes.find((n) => n.id === nodeId);
+      if (node && nodeType(node) === "Strategy") {
+        setExpandedStrategyId((prev) => (prev === nodeId ? null : nodeId));
+      }
     },
-    [onFocusChange],
+    [onFocusChange, scoped.nodes],
   );
 
   const handleEdgeClick = useCallback((edgeId: string) => {
@@ -117,6 +135,7 @@ export default function LogicView({
       if (e.key === "Escape") {
         setDetailNodeId(null);
         setDetailEdgeId(null);
+        setExpandedStrategyId(null);
         onFocusChange(null);
       }
     };

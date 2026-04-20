@@ -199,11 +199,34 @@ The graph-context arm receives a frozen context object:
     "nodes": [{"id": "string", "type": "string", "label": "string"}],
     "edges": [{"source": "string", "target": "string", "type": "string"}],
     "rendered_prose": "natural-language rendering of the evaluation"
+  },
+  "convergence_summary": {
+    "shared_actions": [
+      {
+        "entity_id": "string",
+        "entity_label": "string",
+        "entity_type": "Medication | Condition | Observation | Procedure",
+        "recommended_by": [
+          {
+            "rec_id": "string",
+            "guideline": "string",
+            "evidence_grade": "string",
+            "status": "string",
+            "via_strategy": "string"
+          }
+        ],
+        "guideline_count": "integer (>= 2)",
+        "convergence_type": "reinforcing"
+      }
+    ],
+    "convergence_prose": "natural-language paragraph summarising cross-guideline agreement"
   }
 }
 ```
 
 The `rendered_prose` field is a natural-language summary so the LLM doesn't have to reason over JSON alone.
+
+The `convergence_summary` key surfaces clinical entities targeted by strategies from two or more guidelines. `shared_actions` is empty when only one guideline is traversed or no entities are shared. `convergence_type` is always `"reinforcing"` until clinician-reviewed cross-guideline edges return (at which point conflicting convergence may also be detected). `convergence_prose` is a human-readable paragraph when shared actions exist, empty string otherwise.
 
 ### Cache rules
 

@@ -66,6 +66,7 @@ def _mean(values: list[float]) -> float:
 
 
 def _stddev(values: list[float]) -> float:
+    """Sample standard deviation (Bessel's correction, N-1 denominator)."""
     if len(values) < 2:
         return 0.0
     m = _mean(values)
@@ -96,7 +97,7 @@ def build_scorecard(
     all_fixtures: set[str] = set()
     all_arms: set[str] = set()
 
-    for run_idx, run in enumerate(run_results):
+    for run in run_results:
         for entry in run:
             fid = entry["fixture"]
             arm = entry["arm"]

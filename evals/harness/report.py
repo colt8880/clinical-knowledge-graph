@@ -239,7 +239,7 @@ def _render_readme(
     lines.append("# v1 Thesis Run")
     lines.append("")
     lines.append(f"**Commit:** `{commit_sha}`")
-    lines.append(f"**Date:** {scorecard.get('run_name', 'v1-thesis')}")
+    lines.append(f"**Run name:** {scorecard.get('run_name', 'v1-thesis')}")
     lines.append(f"**Rubric:** {scorecard['rubric_version']}")
     lines.append(f"**Judge runs:** {scorecard['n_runs']} (self-consistency)")
     if braintrust_url:

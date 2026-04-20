@@ -10,14 +10,22 @@
 
 ## Purpose
 
-v0 proved one guideline can be modeled as a traversable graph and evaluated deterministically. v1 proves the thesis: **a graph-retrieved context produces more accurate clinical next-best-action recommendations than vanilla LLMs or flat RAG**, specifically on multi-morbidity patients where decision points interact across guidelines.
+v0 proved one guideline can be modeled as a traversable graph and evaluated deterministically. v1 proves the thesis: **a graph-retrieved context produces more accurate clinical next-best-action recommendations than vanilla LLMs or flat RAG**, specifically on multi-morbidity patients where multiple guidelines apply.
 
 Two work streams of roughly equal weight:
 
-1. **Content**: add ACC/AHA 2018 Cholesterol and KDIGO 2024 CKD as independent subgraphs, then wire cross-guideline edges. This activates `PREEMPTED_BY` (schema-only in v0) and demonstrates graph-shaped reasoning that flat retrieval cannot replicate.
+1. **Content**: add ACC/AHA 2018 Cholesterol and KDIGO 2024 CKD as independent subgraphs sharing a canonical clinical entity layer. The shared entity layer is the structural differentiator: when three guidelines independently point at the same medication node, the graph knows they converge — a property flat retrieval cannot replicate.
 2. **Measurement**: build a three-arm eval harness using Braintrust. Without this, adding content is decoration. With this, content becomes thesis proof.
 
-v1 is done when the harness shows Arm C (graph context) beating Arm B (flat RAG) on the multi-domain fixture set by a measurable margin, on a preregistered rubric.
+v1 is done when the harness shows Arm C (graph context) beating Arm B (flat RAG) on the multi-guideline fixture set by a measurable margin, on a preregistered rubric.
+
+### Thesis pivot (2026-04-20)
+
+The original plan activated cross-guideline edges (`PREEMPTED_BY`, `MODIFIES`) as the thesis differentiator. During F32, those edges were found to contain modeling errors (e.g., preemption between recs with non-overlapping eligibility criteria) and were removed pending clinician review (see `docs/ISSUES.md`).
+
+The thesis now measures **convergence visibility**: the graph's ability to surface that multiple guidelines independently recommend the same therapeutic actions via shared clinical entities. This is a more fundamental graph capability — structural, emergent from the shared entity layer, not dependent on curated interaction edges. F33 (Arm C convergence serialization) extends the graph-context arm to surface this convergence explicitly.
+
+Cross-guideline edges remain in the schema and evaluator (F25/F26 code is shipped). When clinician-reviewed edges are re-added, they will layer preemption/modifier resolution on top of convergence. A follow-up thesis run can measure the incremental value.
 
 ## Scope
 

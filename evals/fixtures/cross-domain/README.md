@@ -1,28 +1,32 @@
 # Cross-domain fixtures
 
-Fixtures exercising cross-guideline interactions: `PREEMPTED_BY` (F25, ADR 0018) and `MODIFIES` (F26, ADR 0019) edges between USPSTF 2022 Statins, ACC/AHA 2018 Cholesterol, and KDIGO 2024 CKD.
+Fixtures exercising multi-guideline convergence: patients matching recommendations from two or more guidelines (USPSTF 2022 Statins, ACC/AHA 2018 Cholesterol, KDIGO 2024 CKD) that target the same shared clinical entities.
+
+These are the thesis differentiators for the v1 harness run (F27). The graph's shared entity layer enables Arm C to surface explicit convergence — "three guidelines independently recommend statin therapy for this patient" — while Arm B's flat RAG retrieves disconnected prose chunks.
 
 ## Fixture catalog
 
-| Case | Patient | USPSTF outcome | ACC/AHA outcome | KDIGO outcome | Preemption? | Modification? |
-|------|---------|----------------|-----------------|---------------|-------------|---------------|
-| case-01 | 62M post-MI, on simvastatin | Exit: secondary prevention | R1 (secondary prevention): due | — | No — USPSTF exits | No — no KDIGO Recs match |
-| case-02 | 55M, HTN, LDL 165, ASCVD risk 8.5% | Grade C: due | R4 (primary prevention): due | — | **Yes** — ACC/AHA R4 preempts USPSTF Grade C | No — no CKD |
-| case-03 | 65M post-MI, CKD 3b (eGFR 35) | Exit: secondary prevention | R1 (secondary prevention): due | Monitoring, SGLT2, statin, ACEi/ARB: due | No — USPSTF exits | **Yes** — KDIGO statin-for-CKD modifies ACC/AHA R1 intensity to moderate |
-| case-04 | 55M, HTN, CKD 3a (eGFR 52), ASCVD risk 8.5% | Grade C: due (preempted) | R4 (primary prevention): due | Monitoring, statin: due | **Yes** — ACC/AHA R4 preempts USPSTF Grade C | **Yes** — KDIGO modifies ACC/AHA R4 (not preempted USPSTF) |
+| Case | Patient | Guidelines matched | Convergence |
+|------|---------|-------------------|-------------|
+| case-01 | 62M post-MI, on simvastatin | ACC/AHA only (USPSTF exits) | None — single guideline match |
+| case-02 | 55M, HTN, LDL 165, ASCVD risk 8.5% | USPSTF + ACC/AHA | 2-guideline convergence on statin medications |
+| case-03 | 65M post-MI, CKD 3b (eGFR 35) | ACC/AHA + KDIGO (USPSTF exits) | 2-guideline convergence on statin medications |
+| case-04 | 55M, HTN, CKD 3a (eGFR 52), ASCVD risk 8.5% | USPSTF + ACC/AHA + KDIGO | **3-guideline convergence** on statin medications |
+
+## History
+
+Originally these fixtures tested cross-guideline edges (PREEMPTED_BY, MODIFIES). Those edges were removed (2026-04-20) pending clinician review after modeling errors were found. The fixtures now test multi-guideline convergence via shared clinical entities — a more fundamental graph capability that doesn't require curated interaction edges.
 
 ## File structure
 
 Each fixture directory contains:
 
 - `patient-context.json` — synthetic `PatientContext` input
-- `expected-trace.json` — assertion templates for trace events, recommendations (including `preempted_by` and `modifiers` fields)
+- `expected-trace.json` — assertion templates for trace events and recommendations
 - `expected-actions.json` — curated next-best-action list with rationale
 
 ## Related
 
-- `docs/reference/guidelines/cross-guideline-map.md` — full edge table (preemption + modifiers)
-- `docs/decisions/0018-preemption-precedence.md` — preemption precedence rules
-- `docs/decisions/0019-modifies-edge-semantics.md` — modifier semantics
-- `graph/seeds/cross-edges-uspstf-accaha.cypher` — PREEMPTED_BY edges
-- `graph/seeds/cross-edges-kdigo.cypher` — MODIFIES edges
+- `docs/build/33-arm-c-convergence-serialization.md` — Arm C convergence serialization
+- `docs/build/27-full-harness-thesis-test.md` — thesis test spec
+- `docs/ISSUES.md` — cross-guideline edge removal and clinician review requirement

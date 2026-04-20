@@ -1,12 +1,11 @@
 {
-  "description": "62M post-MI (clinical ASCVD), on simvastatin. USPSTF exits with out_of_scope_secondary_prevention. ACC/AHA R1 (secondary prevention) matches — patient on moderate-intensity statin, due for high-intensity upgrade. No preemption fires because USPSTF emits no Rec.",
+  "description": "62M post-MI (clinical ASCVD), on simvastatin. USPSTF exits with out_of_scope_secondary_prevention. ACC/AHA R1 (secondary prevention) matches — patient on moderate-intensity statin, due for high-intensity upgrade. Single-guideline match (no convergence — USPSTF exits before emitting a Rec).",
   "expected_recommendations": [
     {
       "recommendation_id": "rec:accaha-statin-secondary-prevention",
       "status": "due",
       "evidence_grade": "COR I, LOE A",
-      "guideline_id": "guideline:acc-aha-cholesterol-2018",
-      "preempted_by": null
+      "guideline_id": "guideline:acc-aha-cholesterol-2018"
     }
   ],
   "expected_trace_contains": [
@@ -35,9 +34,6 @@
     }
   ],
   "must_not_contain": [
-    {
-      "type": "preemption_resolved"
-    },
     {
       "type": "recommendation_emitted",
       "guideline_id": "guideline:uspstf-statin-2022"

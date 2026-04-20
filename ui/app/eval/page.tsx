@@ -17,7 +17,7 @@ import GraphCanvas, { type CanvasColumn, type RecState } from "@/components/Grap
 import FixturePicker from "@/components/FixturePicker";
 import TraceStepper from "@/components/TraceStepper";
 import TraceEventList from "@/components/TraceEventList";
-import RecommendationStrip from "@/components/RecommendationStrip";
+import RecList from "@/components/Eval/RecList";
 import EventDetail from "@/components/EventDetail";
 
 // Patient fixture JSONs are loaded statically at build time via dynamic import.
@@ -377,8 +377,8 @@ function EvalContent() {
         </aside>
       </div>
 
-      {/* Bottom: recommendation strip */}
-      {trace && <RecommendationStrip recommendations={recommendations} />}
+      {/* Bottom: recommendation list */}
+      {trace && <RecList trace={trace} />}
     </div>
   );
 }

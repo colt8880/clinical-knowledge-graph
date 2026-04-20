@@ -154,7 +154,14 @@ Given a `PatientContext`, produce a recommendation set by running the evaluator,
   - `inputs_read` as a readable table: source, locator, value, present.
   - For `predicate_evaluated`: predicate signature (from the catalog), args, result, and any `missing_data_policy_applied`.
   - For `risk_score_lookup` computed from inputs: a sub-panel that shows the ASCVD inputs, method, and output, in that order.
-- **Recommendations strip** (bottom). Compact read of `trace.recommendations` (the derived view). Each item shows status badge, grade, and reason.
+- **Recommendation list** (bottom, scrollable). Multi-guideline-aware list of `RecCard` components derived from the `EvalTrace`. Each card shows:
+  - **Guideline badge**: domain-colored (USPSTF blue, ACC/AHA purple, KDIGO green) per F28 palette.
+  - **Evidence grade pill**: source-accurate formatting — ACC/AHA as `COR I / LOE A`, USPSTF as `Grade B`, KDIGO as `1B`.
+  - **Status badge**: due / up_to_date / not_applicable / insufficient_evidence.
+  - **Action summary**: top-level therapeutic action from the Rec's primary Strategy; click expands to show full strategy fan-out.
+  - **Convergence indicator**: when multiple guidelines emit Recs whose strategies target the same shared clinical entity, an amber badge shows "Also recommended by: ..." with domain-colored dots. Clicking highlights related cards.
+  - **Ordering**: primary sort by guideline priority (descending: ACC/AHA 200, KDIGO 200, USPSTF 100); secondary by evidence grade rank (higher wins); tertiary by rec id for determinism. Same trace always produces the same ordering.
+  - Convergence detection is client-side in `ui/lib/recListBuilder.ts`: walks trace `action_checked` events to map recs → entities, then groups entities targeted by ≥2 guidelines. Preempted recs are excluded from convergence.
 
 ### Interactions
 

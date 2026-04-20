@@ -131,7 +131,6 @@ function GuidelineDetailContent() {
         {activeTab === "logic" && (
           <LogicView
             scoped={scoped}
-            guidelineSlug={guidelineSlug}
             focusNodeId={focusNodeId}
             onFocusChange={handleFocusChange}
           />

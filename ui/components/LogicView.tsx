@@ -2,21 +2,19 @@
 
 import { useMemo, useCallback, useState, useEffect } from "react";
 import Link from "next/link";
-import type { ForestNode, GraphEdge } from "@/lib/api/client";
+import type { ForestNode } from "@/lib/api/client";
 import type { ScopedSubgraph } from "@/lib/explore/scopedSubgraph";
 import GraphCanvas, { nodeType } from "@/components/GraphCanvas";
 import NodeDetail from "@/components/NodeDetail";
 
 interface LogicViewProps {
   scoped: ScopedSubgraph;
-  guidelineSlug: string;
   focusNodeId: string | null;
   onFocusChange: (nodeId: string | null) => void;
 }
 
 export default function LogicView({
   scoped,
-  guidelineSlug,
   focusNodeId,
   onFocusChange,
 }: LogicViewProps) {

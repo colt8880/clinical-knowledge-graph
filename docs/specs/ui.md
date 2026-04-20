@@ -228,6 +228,73 @@ The Explore tab is done when:
 2. Every node rendered shows its human-readable label, code list, and provenance in the detail panel.
 3. Neighbor expansion works for all node types in the v0 seed.
 
+## Interactions view (`/interactions`) (F32)
+
+### Goal
+
+Edge-first view of cross-guideline connections. Answers: "Which guidelines conflict?" "What does ACC/AHA override from USPSTF?" "Which modifiers does KDIGO apply?" One screen, no noise — only `PREEMPTED_BY` and `MODIFIES` edges rendered, with each guideline collapsed to a single compound cluster.
+
+### Structure
+
+Single-route view at `/interactions`. Three-panel layout:
+
+1. **Left sidebar (`InteractionsLegend`):** edge-type filter (Preemptions / Modifiers / Both), guideline-pair filter chips, legend (color/style key), summary counts.
+2. **Center canvas (`InteractionsCanvas`):** collapsed graph — each guideline is a compound Cytoscape node containing only Recs with cross-guideline edges. `PREEMPTED_BY` and `MODIFIES` edges rendered between cluster children. No within-guideline edges.
+3. **Right panel (`InteractionDetail`):** selected edge or node detail. For `PREEMPTED_BY`: preempted Rec, winner Rec, priority, reason, "Open in Explore" links. For `MODIFIES`: source Rec, target Rec, nature, note, suppression flag. For clusters: roll-up counts. For Recs: participation summary + "Open in Explore."
+
+### Visual language
+
+- **Preemption arrows:** 3px desaturated red (`#991b1b`), solid, arrowhead preempted → winner. Reuses F29 styling.
+- **Modifier edges:** 2px dotted amber (`#d97706`). Reuses F29 styling.
+- **Suppressed modifier:** amber dotted stroke with opacity 0.5. Detail panel explicitly states "This modifier is suppressed by a preemption on the target Rec."
+- **Collapsed guideline clusters:** compound Cytoscape nodes with guideline title header, domain-colored border (blue USPSTF, purple ACC/AHA, green KDIGO per F28 palette). Fixed triangle layout: USPSTF top, ACC/AHA bottom-right, KDIGO bottom-left.
+- **Preempted Recs:** opacity 0.4, dashed outline (consistent with F29).
+
+### Interactions
+
+- Click edge → detail panel; URL syncs `?focus=<edge_id>`.
+- Click Rec → detail panel with participation summary and "Open in Explore" link.
+- Click cluster header → cluster roll-up.
+- Click background → closes panel.
+- Edge-type filter: toggles edge visibility; no re-fetch.
+- Guideline-pair filter: multi-select chips; toggle to hide edges by endpoint pair.
+
+### URL state
+
+`?type=preemption|modifier|both`, `?guidelines=uspstf,acc-aha,kdigo`, `?focus=<node_or_edge_id>`. All round-trippable.
+
+### Navigation
+
+- **From Explore (F31):** cross-guideline badge on a scoped Rec deep-links to `/interactions?focus=<node_id>`.
+- **To Explore:** every Rec and edge endpoint has "Open in Explore" link navigating to `/explore/<guideline>?focus=<rec_id>`.
+- **Top-level nav:** "Interactions" link in app header alongside Explore and Eval.
+
+### API
+
+`GET /interactions?type=preemption|modifier|both&guidelines=uspstf,acc-aha,kdigo` returns the minimal cross-guideline structure: guidelines, recommendations (only those with cross-guideline edges), shared entities (empty in v1), and edges with full metadata.
+
+### Accessibility
+
+- Legend controls keyboard-navigable (radio group for edge type, checkboxes for pairs).
+- Detail panel is HTML, not canvas-rendered — screen-reader accessible.
+- Canvas inherits Cytoscape's known a11y limits (same as F28).
+
+### Performance
+
+- Initial render: < 1s for v1 edge counts (~15 edges).
+- Filter toggle: < 100ms (no re-fetch).
+- Layout: seeded cose-bilkent with compound constraints; deterministic across renders.
+
+### Out of scope
+
+- Cascade visualization.
+- LLM-generated explanation text.
+- Editing edges from UI. Read-only.
+- Timeline / version-diff view.
+- Heat map / matrix view.
+- Export.
+- Mobile / narrow viewport.
+
 ## Related
 
 - `docs/contracts/api.openapi.yaml`

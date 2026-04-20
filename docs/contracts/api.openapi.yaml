@@ -159,6 +159,36 @@ paths:
                 items:
                   $ref: "#/components/schemas/GuidelineMeta"
 
+  /interactions:
+    get:
+      tags: [query]
+      summary: Cross-guideline interaction structure for the Interactions view.
+      description: |
+        Returns PREEMPTED_BY and MODIFIES edges with their participating
+        Recommendation endpoints, guideline metadata, and shared entity
+        references. One bulk fetch for the /interactions UI.
+      parameters:
+        - in: query
+          name: type
+          description: "Edge type filter: preemption, modifier, or both."
+          schema:
+            type: string
+            enum: [preemption, modifier, both]
+            default: both
+        - in: query
+          name: guidelines
+          description: |
+            Comma-separated guideline slugs (uspstf, acc-aha, kdigo).
+            Default returns all.
+          schema: { type: string }
+      responses:
+        "200":
+          description: Cross-guideline interactions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InteractionsResponse"
+
   /search:
     get:
       tags: [query]
@@ -370,6 +400,59 @@ components:
           nullable: true
           description: "SHA-256 of the guideline seed cypher file."
         last_updated_in_graph: { type: string }
+
+    InteractionsResponse:
+      type: object
+      required: [guidelines, recommendations, shared_entities, edges]
+      description: |
+        Cross-guideline interaction structure for the Interactions view.
+        Only Recs that participate in at least one edge are included.
+      properties:
+        guidelines:
+          type: array
+          items:
+            type: object
+            required: [id, domain, title]
+            properties:
+              id: { type: string }
+              domain: { type: string }
+              title: { type: string }
+        recommendations:
+          type: array
+          items:
+            type: object
+            required: [id, title, domain, has_preemption_in, has_preemption_out, modifier_count]
+            properties:
+              id: { type: string }
+              title: { type: string }
+              domain: { type: string, nullable: true }
+              evidence_grade: { type: string, nullable: true }
+              has_preemption_in: { type: boolean }
+              has_preemption_out: { type: boolean }
+              modifier_count: { type: integer }
+        shared_entities:
+          type: array
+          items:
+            type: object
+            required: [id, type, title]
+            properties:
+              id: { type: string }
+              type: { type: string }
+              title: { type: string }
+        edges:
+          type: array
+          items:
+            type: object
+            required: [type, source, target]
+            properties:
+              type: { type: string, enum: [PREEMPTED_BY, MODIFIES] }
+              source: { type: string }
+              target: { type: string }
+              edge_priority: { type: integer, nullable: true }
+              reason: { type: string, nullable: true }
+              nature: { type: string, nullable: true }
+              note: { type: string, nullable: true }
+              suppressed_by_preemption: { type: boolean, nullable: true }
 
     Subgraph:
       type: object

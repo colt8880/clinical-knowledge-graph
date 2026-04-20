@@ -59,7 +59,7 @@ Parallelizable with Phase 3.
 | 29 | UI preemption/modifier viz | ui, api | shipped | 25, 26, 28 | [29](../../docs/build/29-ui-preemption-modifier-viz.md) | [#27](../../pull/27) |
 | 30 | UI multi-guideline rec list | ui | pending | 21, 25, 26, 29 | [30](../../docs/build/30-ui-multi-guideline-rec-list.md) | — |
 | 31 | UI guideline-first navigation | ui, api, graph, docs | shipped | 28, 29 | [31](../../docs/build/31-ui-guideline-first-navigation.md) | [#29](../../pull/29) |
-| 32 | UI cross-guideline interactions view | ui, api, docs | pending | 25, 26, 28, 29, 31 | [32](../../docs/build/32-ui-cross-guideline-interactions-view.md) | — |
+| 32 | UI cross-guideline interactions view | ui, api, docs | in-progress | 25, 26, 28, 29, 31 | [32](../../docs/build/32-ui-cross-guideline-interactions-view.md) | — |
 
 ## v0.1 — stretch goals (deferred)
 

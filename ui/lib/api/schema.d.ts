@@ -267,6 +267,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/guidelines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all guideline metadata for the UI index page.
+         * @description Returns metadata for every guideline in the graph, including title,
+         *     version, domain, rec count, author-declared coverage summary,
+         *     seed hash, and last-updated timestamp. Used by the guideline index
+         *     page to render cards.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Guideline metadata list. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GuidelineMeta"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/search": {
         parameters: {
             query?: never;
@@ -413,6 +455,28 @@ export interface components {
                     [key: string]: unknown;
                 };
             }[];
+        };
+        GuidelineMeta: {
+            /** @description URL-safe slug, e.g., uspstf-statin-2022. */
+            id: string;
+            /** @description Human-readable domain label (USPSTF, ACC/AHA, KDIGO). */
+            domain: string | null;
+            title: string;
+            version: string;
+            publication_date: string;
+            citation_url: string;
+            rec_count: number;
+            coverage: {
+                modeled?: {
+                    label: string;
+                    rec_id: string;
+                }[];
+                deferred?: string[];
+                exit_only?: string[];
+            } | null;
+            /** @description SHA-256 of the guideline seed cypher file. */
+            seed_hash: string | null;
+            last_updated_in_graph: string;
         };
         Subgraph: {
             center: string;

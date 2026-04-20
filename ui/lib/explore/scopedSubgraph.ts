@@ -47,6 +47,12 @@ export function extractScopedSubgraph(
     return { nodes: [], edges: [], crossGuidelineNodeIds: new Set() };
   }
 
+  // Build node lookup by ID for O(1) access.
+  const nodeById = new Map<string, ForestNode>();
+  for (const node of forest.nodes) {
+    nodeById.set(node.id, node);
+  }
+
   // Step 1: collect guideline-scoped nodes.
   const guidelineNodeIds = new Set<string>();
   for (const node of forest.nodes) {
@@ -61,13 +67,13 @@ export function extractScopedSubgraph(
     if (CROSS_GUIDELINE_EDGE_TYPES.has(edge.type)) continue;
 
     if (guidelineNodeIds.has(edge.start)) {
-      const targetNode = forest.nodes.find((n) => n.id === edge.end);
+      const targetNode = nodeById.get(edge.end);
       if (targetNode && targetNode.domain === null) {
         sharedEntityIds.add(edge.end);
       }
     }
     if (guidelineNodeIds.has(edge.end)) {
-      const sourceNode = forest.nodes.find((n) => n.id === edge.start);
+      const sourceNode = nodeById.get(edge.start);
       if (sourceNode && sourceNode.domain === null) {
         sharedEntityIds.add(edge.start);
       }

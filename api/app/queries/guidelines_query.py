@@ -7,7 +7,16 @@ import json
 from pathlib import Path
 from typing import Any
 
-from app.db import get_driver, _serialise_value
+import neo4j.time
+
+from app.db import get_driver
+
+
+def _to_str(val: Any) -> str:
+    """Convert a Neo4j temporal value to its ISO string, or str() otherwise."""
+    if isinstance(val, (neo4j.time.Date, neo4j.time.DateTime)):
+        return val.iso_format()
+    return str(val) if val is not None else ""
 
 # Pre-compute seed hashes at import time — files don't change at runtime.
 _SEED_DIR = Path(__file__).resolve().parents[3] / "graph" / "seeds"
@@ -87,13 +96,13 @@ async def fetch_guidelines() -> list[dict[str, Any]]:
             "id": _DOMAIN_SLUGS.get(domain, g_id) if domain else g_id,
             "domain": _DOMAIN_LABELS.get(domain, domain) if domain else None,
             "title": props.get("title", ""),
-            "version": _serialise_value(props.get("version", "")),
-            "publication_date": _serialise_value(props.get("effective_date", "")),
+            "version": _to_str(props.get("version", "")),
+            "publication_date": _to_str(props.get("effective_date", "")),
             "citation_url": props.get("url", ""),
             "rec_count": record["rec_count"],
             "coverage": coverage,
             "seed_hash": _SEED_HASHES.get(g_id),
-            "last_updated_in_graph": _serialise_value(
+            "last_updated_in_graph": _to_str(
                 props.get("provenance_publication_date", "")
             ),
         })

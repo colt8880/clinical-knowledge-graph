@@ -74,23 +74,7 @@ export async function fetchSubgraph(
   return apiFetch<ForestSubgraph>(`/subgraph${qs ? `?${qs}` : ""}`);
 }
 
-/** Guideline metadata for the index page. */
-export interface GuidelineMeta {
-  id: string;
-  domain: string | null;
-  title: string;
-  version: string;
-  publication_date: string;
-  citation_url: string;
-  rec_count: number;
-  coverage: {
-    modeled: { label: string; rec_id: string }[];
-    deferred: string[];
-    exit_only: string[];
-  } | null;
-  seed_hash: string | null;
-  last_updated_in_graph: string;
-}
+export type GuidelineMeta = components["schemas"]["GuidelineMeta"];
 
 export async function fetchGuidelines(): Promise<GuidelineMeta[]> {
   return apiFetch<GuidelineMeta[]>("/guidelines");

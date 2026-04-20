@@ -9,6 +9,7 @@ export default defineConfig({
     include: [
       "lib/**/*.test.{ts,tsx}",
       "tests/components/**/*.test.{ts,tsx}",
+      "tests/lib/**/*.test.{ts,tsx}",
     ],
   },
   resolve: {

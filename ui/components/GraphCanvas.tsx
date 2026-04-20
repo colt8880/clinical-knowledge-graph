@@ -140,7 +140,7 @@ function computeFontSize(label: string, nodeWidth: number): number {
 const COL_SPACING = 320;
 const ROW_SPACING = 90;
 const LEFT_PAD = 160;
-const TOP_PAD = 80;
+const TOP_PAD = 60;
 
 const COLUMN_HEADERS = ["Guidelines", "Recommendations", "Strategies", "Actions"];
 
@@ -769,11 +769,11 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     <div className="relative w-full h-full bg-white">
       {/* Fixed column headers — positioned to match Cytoscape node X coords (zoom=1, pan.x=0). */}
       {!isForestMode && columnCount > 0 && (
-        <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none h-8 flex items-center">
+        <div className="absolute top-0 left-0 right-0 z-10 pointer-events-none h-6 flex items-center">
           {COLUMN_HEADERS.slice(0, columnCount).map((header, i) => (
             <div
               key={i}
-              className="absolute text-[11px] font-semibold uppercase tracking-wide text-slate-400 text-center"
+              className="absolute text-[11px] font-semibold uppercase tracking-wide text-slate-900 text-center"
               style={{
                 left: LEFT_PAD + i * COL_SPACING,
                 transform: "translateX(-50%)",
@@ -787,7 +787,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       )}
       <div
         ref={containerRef}
-        className={`w-full bg-white ${!isForestMode ? "h-[calc(100%-32px)] mt-8" : "h-full"}`}
+        className={`w-full bg-white ${!isForestMode ? "h-[calc(100%-24px)] mt-6" : "h-full"}`}
         data-testid="graph-canvas"
       />
       <GraphTooltips cyRef={cyRef} cyVersion={cyVersion} />

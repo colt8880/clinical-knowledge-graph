@@ -62,13 +62,19 @@ Parallelizable with Phase 3.
 | 31 | UI guideline-first navigation | ui, api, graph, docs | shipped | 28, 29 | [31](../../docs/build/31-ui-guideline-first-navigation.md) | [#29](../../pull/29) |
 | 32 | UI cross-guideline interactions view | ui, api, docs | shipped | 25, 26, 28, 29, 31 | [32](../../docs/build/32-ui-cross-guideline-interactions-view.md) | [#30](../../pull/30) |
 
-## v0.1 — stretch goals (deferred)
+## v2 — deeper graph reasoning + validated interactions + scale
 
-No features assigned. Candidates: live ASCVD/PCE calculation, boundary-age fixtures, missing-lipid-panel semantics. Likely rolls into v1 fixtures organically as cross-domain cases surface them; revisit after v1 ships.
+Macro spec: [`docs/build/v2-spec.md`](../../docs/build/v2-spec.md). Validates cross-guideline edges with clinician review, upgrades Arm B to production-quality RAG, improves Arm C serialization, and measures incremental value. Phase 2+ adds ADA Diabetes and LLM-assisted ingestion.
 
-## post-v1
+### Phase 1: validated interactions + stronger baseline
 
-No features assigned yet. Candidates: ADA Standards of Care, ACIP immunizations, multi-morbidity archetype patient (5-domain), LLM-assisted ingestion, historical replay, cross-vendor arm validation, CI-integrated eval runs.
+| # | Feature | Components | Status | Depends on | Spec | PR |
+|---|---------|------------|--------|------------|------|----|
+| 40 | Cross-guideline edge review tool | docs, scripts | pending | v1 shipped | [40](../../docs/build/40-cross-edge-review-tool.md) | — |
+| 41 | Re-add clinician-validated cross edges | graph, api, evals, docs | pending | 40 + clinician review | [41](../../docs/build/41-validated-cross-edges.md) | — |
+| 42 | Arm B retrieval upgrade (section + multi-query) | evals, docs | pending | v1 shipped | [42](../../docs/build/42-arm-b-retrieval-upgrade.md) | — |
+| 43 | Arm C serialization v2 (concise + intensity) | evals, docs | pending | v1 shipped | [43](../../docs/build/43-arm-c-serialization-v2.md) | — |
+| 44 | v2 Phase 1 thesis run | evals, docs | pending | 41, 42, 43 | [44](../../docs/build/44-v2-phase1-thesis-run.md) | — |
 
 ## Archived
 

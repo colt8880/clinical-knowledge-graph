@@ -64,11 +64,17 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 | 02 | `fixtures/cross-domain/case-02/` | 55M, HTN, LDL 165, ASCVD risk 8.5%. Both USPSTF Grade C and ACC/AHA R4 match. ACC/AHA preempts USPSTF (priority 200 > 100). |
 | 03 | `fixtures/cross-domain/case-03/` | 65M post-MI, CKD 3b (eGFR 35), ACR 180. USPSTF exits. ACC/AHA R1 (secondary prevention) fires. KDIGO statin-for-CKD MODIFIES ACC/AHA R1 intensity to moderate. |
 | 04 | `fixtures/cross-domain/case-04/` | 55M, HTN, CKD 3a (eGFR 52), LDL 145, ASCVD risk 8.5%. ACC/AHA R4 preempts USPSTF Grade C. KDIGO MODIFIES ACC/AHA R4 (not preempted USPSTF). Demonstrates preemption + modification interaction. |
+| 05 | `fixtures/cross-domain/case-05/` | 50M, T2DM, HTN, ASCVD 12%. ACC/AHA diabetes rec (R3) preempts USPSTF Grade B (P1) and Grade C (P2). Tests diabetes-specific preemption. |
+| 06 | `fixtures/cross-domain/case-06/` | 48F, dyslipidemia, LDL 155, ASCVD 11%, no diabetes. ACC/AHA primary prevention R4 preempts USPSTF Grade B (P3). Tests higher-risk preemption spectrum. |
+| 07 | `fixtures/cross-domain/case-07/` | 45M, LDL 210 (≥190), HTN, familial pattern. ACC/AHA severe hypercholesterolemia R2 preempts USPSTF (P5 + P6). High-intensity mandated, not moderate. |
+| 08 | `fixtures/cross-domain/case-08/` | 60F, LDL 195, CKD G4 (eGFR 22), ACR 145. ACC/AHA R2 high-intensity modified to moderate by KDIGO R3 (M2). Second MODIFIES edge not covered by case-03. |
+| 09 | `fixtures/cross-domain/case-09/` | 58M, Black, HTN, smoker, CKD G3b (eGFR 38), ASCVD 9%. ACC/AHA R4 preempts USPSTF Grade C (P4), then KDIGO R3 modifies to moderate (M1). Chains preemption + modification. |
+| 10 | `fixtures/cross-domain/case-10/` | Bias probe: 52F, ASCVD 6.8%, LDL 160, CKD G3a (eGFR 55), controlled HTN on ACEi. Only KDIGO CKD statin fires — ASCVD below both USPSTF and ACC/AHA thresholds. Tests trace-divergent correct answer. |
 
 ### Deferred
 
-- Diabetes overlap fixture (USPSTF Grade B + ACC/AHA R3) — candidate for F27 full harness run.
-- ASCVD risk ≥10% overlap (USPSTF Grade B + ACC/AHA R4) — candidate for F27.
+- Dialysis patient (CKD G5D) — KDIGO statin evidence different for dialysis.
+- CKD + diabetes deep integration fixture.
 
 ## Archived
 

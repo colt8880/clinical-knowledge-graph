@@ -40,12 +40,16 @@ def _task_arm_b(input: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def _task_arm_c(input: dict[str, Any], api_base: str = "http://localhost:8000") -> dict[str, Any]:
+# Module-level API base URL, set by run_eval() before Eval() calls.
+_arm_c_api_base = "http://localhost:8000"
+
+
+def _task_arm_c(input: dict[str, Any]) -> dict[str, Any]:
     """Arm C: PatientContext + graph context + convergence."""
     return graph_context.run(
         input,
         anthropic_api_key=os.environ.get("ANTHROPIC_API_KEY"),
-        api_base=api_base,
+        api_base=_arm_c_api_base,
     )
 
 
@@ -76,14 +80,14 @@ def run_eval(
     print(f"Trial count: {trial_count}")
     print()
 
+    global _arm_c_api_base
+    _arm_c_api_base = api_base
+
     for arm_id in arms:
         experiment_name = f"{run_name}-arm-{arm_id}"
         print(f"--- Running Arm {arm_id.upper()} as experiment '{experiment_name}' ---")
 
-        if arm_id == "c":
-            task_fn = lambda input, _base=api_base: _task_arm_c(input, api_base=_base)
-        else:
-            task_fn = TASK_MAP[arm_id]
+        task_fn = TASK_MAP[arm_id]
 
         Eval(
             "clinical-knowledge-graph",

@@ -279,12 +279,14 @@ def clinical_scorer(
     output: dict[str, Any],
     expected: dict[str, Any],
     metadata: dict[str, Any] | None = None,
-) -> list[dict[str, Any]]:
+) -> list:
     """Braintrust-compatible scorer wrapping the LLM judge + structural checks.
 
-    Returns a list of 5 score dicts (one per dimension + composite),
+    Returns a list of Score objects (one per dimension + composite),
     each normalized to [0, 1] for Braintrust.
     """
+    from braintrust.framework import Score
+
     metadata = metadata or {}
     multi_guideline = metadata.get("subset") == "multi-guideline"
 
@@ -304,20 +306,20 @@ def clinical_scorer(
         rationale = ""
         if isinstance(rubric.get(dim), dict):
             rationale = rubric[dim].get("rationale", "")
-        scores.append({
-            "name": dim,
-            "score": _normalize_score(raw),
-            "metadata": {"raw_1_5": raw, "rationale": rationale},
-        })
+        scores.append(Score(
+            name=dim,
+            score=_normalize_score(raw),
+            metadata={"raw_1_5": raw, "rationale": rationale},
+        ))
 
     composite_raw = float(rubric.get("composite", 0))
-    scores.append({
-        "name": "composite",
-        "score": _normalize_score(composite_raw),
-        "metadata": {
+    scores.append(Score(
+        name="composite",
+        score=_normalize_score(composite_raw),
+        metadata={
             "raw_1_5": composite_raw,
             "structural_checks": structural,
         },
-    })
+    ))
 
     return scores

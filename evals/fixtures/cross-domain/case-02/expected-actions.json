@@ -1,10 +1,10 @@
 {
-  "description": "55M, HTN, LDL 165, ASCVD risk 8.5%. Both USPSTF Grade C and ACC/AHA R4 independently recommend statin therapy. ACC/AHA provides more definitive COR I recommendation; USPSTF Grade C requires shared decision-making. Multi-guideline convergence on statin initiation.",
+  "description": "55M, HTN, LDL 165, ASCVD risk 8.5%. ACC/AHA R4 (COR I, LOE A) provides definitive statin guidance; USPSTF Grade C is preempted (P4, ADR 0018). ACC/AHA rec drives the statin action.",
   "actions": [
     {
       "id": "initiate-statin-moderate-to-high-intensity",
       "label": "Initiate moderate-to-high-intensity statin therapy",
-      "rationale": "ACC/AHA COR I, LOE A: adults 40-75 without diabetes, LDL 70-189 mg/dL, and 10-year ASCVD risk ≥7.5% should initiate moderate-to-high-intensity statin. USPSTF Grade C also recommends statin via shared decision-making for risk 7.5-<10%. Patient has LDL 165, ASCVD risk 8.5%. Two-guideline convergence strengthens recommendation.",
+      "rationale": "ACC/AHA COR I, LOE A: adults 40-75 without diabetes, LDL 70-189 mg/dL, and 10-year ASCVD risk ≥7.5% should initiate moderate-to-high-intensity statin. USPSTF Grade C also matched but is preempted by the more specific ACC/AHA guidance (ADR 0018). Patient has LDL 165, ASCVD risk 8.5%.",
       "source_rec_id": "rec:accaha-statin-primary-prevention",
       "priority": 1
     },

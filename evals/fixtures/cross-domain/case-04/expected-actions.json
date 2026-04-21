@@ -1,10 +1,10 @@
 {
-  "description": "55M, HTN, CKD 3a (eGFR 52), LDL 145, ASCVD risk 8.5%. Three-guideline convergence: USPSTF Grade C, ACC/AHA R4, and KDIGO statin-for-CKD all independently recommend statin therapy via shared medication entities. CKD context favors moderate intensity.",
+  "description": "55M, HTN, CKD 3a (eGFR 52), LDL 145, ASCVD risk 8.5%. ACC/AHA R4 (COR I) and KDIGO statin-for-CKD (1A) both recommend statin. USPSTF Grade C also matched but is preempted by ACC/AHA (P4, ADR 0018). CKD context favors moderate intensity.",
   "actions": [
     {
       "id": "initiate-statin-moderate-intensity",
       "label": "Initiate moderate-intensity statin therapy",
-      "rationale": "Three-guideline convergence on statin initiation: ACC/AHA COR I, LOE A for primary prevention (ASCVD risk ≥7.5%, LDL 70-189); USPSTF Grade C for shared decision-making (risk 7.5-<10%); KDIGO 1A for CKD statin therapy. CKD G3a (eGFR 52) context favors moderate intensity. CKD is a cardiovascular risk enhancer that strengthens the case for initiation.",
+      "rationale": "ACC/AHA COR I, LOE A for primary prevention (ASCVD risk ≥7.5%, LDL 70-189); KDIGO 1A for CKD statin therapy. USPSTF Grade C also matched but is preempted by ACC/AHA (ADR 0018). CKD G3a (eGFR 52) context favors moderate intensity. CKD is a cardiovascular risk enhancer that strengthens the case for initiation.",
       "source_rec_id": "rec:accaha-statin-primary-prevention",
       "priority": 1
     },

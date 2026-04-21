@@ -10,7 +10,8 @@
         {
           "source_rec_id": "rec:kdigo-statin-for-ckd",
           "source_guideline_id": "guideline:kdigo-ckd-2024",
-          "nature": "intensity_reduction"
+          "nature": "intensity_reduction",
+          "note": "KDIGO 2024 (1A) recommends moderate-intensity statin in CKD G3-G5 not on dialysis due to altered pharmacokinetics and increased myopathy risk. Overrides ACC/AHA high-intensity default for the CKD overlap population. Consider renal dosing adjustments."
         }
       ]
     },
@@ -66,6 +67,7 @@
       "source_rec_id": "rec:kdigo-statin-for-ckd",
       "target_rec_id": "rec:accaha-statin-secondary-prevention",
       "nature": "intensity_reduction",
+      "note": "KDIGO 2024 (1A) recommends moderate-intensity statin in CKD G3-G5 not on dialysis due to altered pharmacokinetics and increased myopathy risk. Overrides ACC/AHA high-intensity default for the CKD overlap population. Consider renal dosing adjustments.",
       "source_guideline_id": "guideline:kdigo-ckd-2024",
       "target_guideline_id": "guideline:acc-aha-cholesterol-2018"
     }

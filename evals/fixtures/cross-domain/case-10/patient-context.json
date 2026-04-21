@@ -1,0 +1,102 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1974-03-08",
+    "administrative_sex": "female",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-htn",
+      "codes": [
+        { "system": "snomed", "code": "38341003", "display": "Essential hypertension" },
+        { "system": "icd10", "code": "I10", "display": "Essential (primary) hypertension" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2020-09-15"
+    },
+    {
+      "id": "cond-ckd",
+      "codes": [
+        { "system": "snomed", "code": "709044004", "display": "Chronic kidney disease" },
+        { "system": "icd10", "code": "N18.3", "display": "Chronic kidney disease, stage 3" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2022-06-20"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-egfr-2026-01",
+      "codes": [{ "system": "loinc", "code": "48642-3", "display": "Glomerular filtration rate/1.73 sq M.predicted" }],
+      "status": "final",
+      "effective_date": "2026-01-18T09:00:00Z",
+      "value": { "value_quantity": { "value": 55, "unit": "mL/min/1.73m2" } }
+    },
+    {
+      "id": "obs-acr-2026-01",
+      "codes": [{ "system": "loinc", "code": "9318-7", "display": "Albumin/Creatinine [Mass Ratio] in Urine" }],
+      "status": "final",
+      "effective_date": "2026-01-18T09:00:00Z",
+      "value": { "value_quantity": { "value": 25, "unit": "mg/g" } }
+    },
+    {
+      "id": "obs-tc-2026-02",
+      "codes": [{ "system": "loinc", "code": "2093-3", "display": "Cholesterol [Mass/volume] in Serum or Plasma" }],
+      "status": "final",
+      "effective_date": "2026-02-12T09:00:00Z",
+      "value": { "value_quantity": { "value": 245, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-hdl-2026-02",
+      "codes": [{ "system": "loinc", "code": "2085-9", "display": "HDL Cholesterol [Mass/volume] in Serum or Plasma" }],
+      "status": "final",
+      "effective_date": "2026-02-12T09:00:00Z",
+      "value": { "value_quantity": { "value": 55, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-ldl-2026-02",
+      "codes": [{ "system": "loinc", "code": "13457-7", "display": "LDL Cholesterol (calculated) in Serum or Plasma" }],
+      "status": "final",
+      "effective_date": "2026-02-12T09:00:00Z",
+      "value": { "value_quantity": { "value": 160, "unit": "mg/dL" } }
+    },
+    {
+      "id": "obs-bp-2026-02",
+      "codes": [{ "system": "loinc", "code": "85354-9", "display": "Blood pressure panel" }],
+      "status": "final",
+      "effective_date": "2026-02-12T08:30:00Z",
+      "value": null,
+      "components": [
+        { "codes": [{ "system": "loinc", "code": "8480-6" }], "value": { "value_quantity": { "value": 126, "unit": "mm[Hg]" } } },
+        { "codes": [{ "system": "loinc", "code": "8462-4" }], "value": { "value_quantity": { "value": 76, "unit": "mm[Hg]" } } }
+      ]
+    }
+  ],
+  "medications": [
+    {
+      "id": "med-lisinopril",
+      "codes": [{ "system": "rxnorm", "code": "29046", "display": "Lisinopril" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2020-10-01"
+    }
+  ],
+  "social_history": {
+    "tobacco": { "status": "never", "as_of": "2026-02-12" }
+  },
+  "risk_scores": {
+    "ascvd_10yr": {
+      "name": "ascvd_10yr",
+      "value": 6.8,
+      "computed_date": "2026-02-12",
+      "method_version": "pooled_cohort_equations_2013_goff"
+    }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

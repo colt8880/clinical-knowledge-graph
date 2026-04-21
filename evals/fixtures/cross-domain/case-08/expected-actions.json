@@ -1,0 +1,44 @@
+{
+  "description": "60F, LDL 195 (≥190), CKD G4 (eGFR 22), ACR 145. ACC/AHA severe hypercholesterolemia R2 says high-intensity statin. KDIGO statin-for-CKD R3 MODIFIES intensity to moderate (M2) due to CKD G4 pharmacokinetics and myopathy risk. This exercises the second MODIFIES edge that case-03 doesn't reach (M2 targets severe hypercholesterolemia, not secondary prevention).",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "ACC/AHA R2 (COR I, LOE B-NR): LDL ≥190, age 20-75, no ASCVD — high-intensity statin indicated. However, KDIGO R3 (1A) MODIFIES intensity to moderate for CKD G4 (eGFR 22) due to altered pharmacokinetics and increased myopathy risk at high-intensity doses (M2 edge, ADR 0018). Consider atorvastatin 10-20mg or rosuvastatin 5-10mg — lower doses than standard high-intensity to account for reduced renal clearance.",
+      "source_rec_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "priority": 1
+    },
+    {
+      "id": "ckd-monitoring",
+      "label": "Monitor eGFR and urine ACR per KDIGO",
+      "rationale": "KDIGO R1 (1B): regular monitoring of eGFR and urine ACR. CKD G4 (eGFR 22) with A2 albuminuria (ACR 145) indicates very high risk. Monitor every 3-6 months at this stage.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 2
+    },
+    {
+      "id": "continue-arb",
+      "label": "Continue ARB therapy for albuminuric CKD",
+      "rationale": "Patient already on losartan (ARB) for CKD with albuminuria (ACR 145, A2). Satisfies KDIGO R4 (1B). Continue and titrate to maximally tolerated dose.",
+      "source_rec_id": "rec:kdigo-acei-arb-for-ckd",
+      "priority": 3
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure to <130/80",
+      "rationale": "BP 142/88 above target. CKD G4 + albuminuria requires aggressive BP control. Target <130/80 per KDIGO. Losartan dose may need uptitration; consider adding a second agent.",
+      "priority": 4
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-high-intensity-statin",
+      "label": "Do not recommend high-intensity statin despite LDL ≥190",
+      "rationale": "KDIGO R3 (1A) modifies ACC/AHA R2's high-intensity recommendation to moderate-intensity in CKD G4 (eGFR 22). High-intensity statins have altered pharmacokinetics in advanced CKD with reduced clearance leading to higher plasma levels and increased myopathy risk (M2 edge). The KDIGO modifier takes precedence for dosing intensity."
+    },
+    {
+      "id": "no-sglt2-initiation",
+      "label": "Do not initiate SGLT2 inhibitor",
+      "rationale": "eGFR 22 is ≥20 (KDIGO threshold for initiation), but ACR 145 is below the 200 mg/g threshold for non-diabetic SGLT2 use, and patient has no diabetes. KDIGO SGLT2 R2 requires either (CKD + diabetes) or (ACR ≥200). Neither pathway is met."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "description": "58M, Black, primary prevention, HTN, smoker, CKD G3b (eGFR 38), ACR 65, LDL 152, ASCVD 9%. ACC/AHA R4 preempts USPSTF Grade C (P4). KDIGO R3 (statin for CKD ≥50) fires independently — both ACC/AHA R4 and KDIGO R3 recommend moderate-intensity statin, producing convergence. No MODIFIES edge exists between KDIGO and ACC/AHA primary prevention; the moderate-intensity agreement is convergence, not modification. Tests preemption + convergence on the same patient.",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "ACC/AHA R4 (COR I, LOE A): primary prevention, age 40-75, no diabetes, LDL 70-189 (LDL 152), ASCVD risk ≥7.5% (9%). USPSTF Grade C also matched (ASCVD 7.5-<10%, HTN as risk factor) but is preempted by ACC/AHA (P4, ADR 0018). ACC/AHA recommends moderate-to-high-intensity. KDIGO R3 (1A) independently recommends moderate-intensity statin for CKD (age ≥50, eGFR 15-59). Both guidelines converge on moderate-intensity — ACC/AHA's lower range aligns with KDIGO's explicit moderate recommendation. CKD pharmacokinetics favor moderate over high intensity.",
+      "source_rec_id": "rec:accaha-statin-primary-prevention",
+      "priority": 1
+    },
+    {
+      "id": "ckd-monitoring",
+      "label": "Monitor eGFR and urine ACR per KDIGO",
+      "rationale": "KDIGO R1 (1B): regular monitoring for CKD G3b (eGFR 38) with A2 albuminuria (ACR 65). High risk category — monitor at least every 6 months.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 2
+    },
+    {
+      "id": "smoking-cessation",
+      "label": "Counsel on smoking cessation",
+      "rationale": "Current smoker. Smoking is a major modifiable CVD risk factor and accelerates CKD progression. Cessation is the single most impactful risk reduction intervention.",
+      "priority": 3
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure to <130/80",
+      "rationale": "BP 144/90 well above target despite lisinopril. CKD G3b + albuminuria requires target <130/80 per KDIGO. HTN is also a CVD risk factor driving the ASCVD risk score. Consider uptitrating ACEi or adding a second agent.",
+      "priority": 4
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-high-intensity-statin",
+      "label": "Do not recommend high-intensity statin",
+      "rationale": "Although ACC/AHA R4 allows moderate-to-high-intensity, KDIGO R3 (1A) explicitly recommends moderate-intensity for CKD G3b (eGFR 38) due to altered pharmacokinetics and increased myopathy risk. The convergence of both guidelines on moderate-intensity reinforces this choice. High-intensity should be avoided in advanced CKD."
+    },
+    {
+      "id": "no-uspstf-grade-c-sdm-framing",
+      "label": "Do not frame statin recommendation as shared decision-making (USPSTF Grade C)",
+      "rationale": "USPSTF Grade C is preempted by ACC/AHA R4 (P4, ADR 0018). The Grade C framing of 'selectively offer based on shared decision' underrepresents the strength of the ACC/AHA recommendation (COR I, definitive). The statin recommendation should be framed as a definitive clinical action, not a shared decision discussion."
+    }
+  ]
+}

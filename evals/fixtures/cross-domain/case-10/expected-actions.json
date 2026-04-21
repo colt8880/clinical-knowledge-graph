@@ -1,0 +1,37 @@
+{
+  "description": "Bias probe: 52F, ASCVD 6.8%, LDL 160, CKD G3a (eGFR 55), well-controlled HTN on ACEi, non-smoker. The trace fires USPSTF Grade C (ASCVD 7.5-<10% does NOT match — 6.8% is below 7.5%) and KDIGO CKD statin (convergence for CKD patients ≥50). The clinically correct answer emphasizes that at ASCVD 6.8%, no USPSTF rec fires (below the 7.5% Grade C threshold), and the only statin signal is KDIGO's CKD-specific rec. An LLM that conflates the KDIGO statin rec with a stronger USPSTF or ACC/AHA primary prevention indication should score lower — the actual evidence base here is KDIGO 1A for moderate-intensity CKD statin, not population-level primary prevention.",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity-ckd",
+      "label": "Consider moderate-intensity statin for CKD (KDIGO)",
+      "rationale": "KDIGO R3 (1A): adults ≥50 with CKD (eGFR 15-59) should receive moderate-intensity statin. Patient is 52, eGFR 55 (CKD G3a). This is the primary and sole statin indication. No USPSTF rec fires — ASCVD 6.8% is below the 7.5% Grade C threshold. ACC/AHA R4 requires ASCVD ≥7.5% — does not match. The statin recommendation rests on KDIGO's CKD-specific cardiovascular risk evidence (SHARP trial), not population-level primary prevention.",
+      "source_rec_id": "rec:kdigo-statin-for-ckd",
+      "priority": 1
+    },
+    {
+      "id": "ckd-monitoring",
+      "label": "Monitor eGFR and urine ACR per KDIGO",
+      "rationale": "KDIGO R1 (1B): regular monitoring for CKD G3a (eGFR 55) with A1 albuminuria (ACR 25). Moderate risk — monitor at least annually.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 2
+    },
+    {
+      "id": "continue-acei",
+      "label": "Continue ACEi for blood pressure management",
+      "rationale": "BP 126/76 is well controlled on lisinopril. ACR 25 is below the 30 mg/g KDIGO threshold for albuminuric CKD ACEi recommendation, so the ACEi is serving a BP-control role rather than a renoprotective one.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-definitive-statin-initiation",
+      "label": "Do not frame statin as a definitive primary prevention initiation (USPSTF or ACC/AHA)",
+      "rationale": "ASCVD 6.8% is below both the USPSTF Grade C threshold (7.5%) and the ACC/AHA R4 threshold (7.5%). Neither population-level primary prevention guideline fires. Framing statin initiation as 'primary prevention for elevated ASCVD risk' overstates the evidence — the statin indication here is exclusively KDIGO's CKD-specific rec. The correct framing acknowledges the CKD-specific evidence base and the moderate overall cardiovascular risk."
+    },
+    {
+      "id": "no-high-intensity-statin",
+      "label": "Do not recommend high-intensity statin",
+      "rationale": "The only statin indication is KDIGO R3, which specifically recommends moderate-intensity for CKD. There is no ACC/AHA indication that would justify high-intensity (no ASCVD, LDL <190, ASCVD risk <7.5%). High-intensity would be an overtreatment given the moderate overall risk profile."
+    }
+  ]
+}

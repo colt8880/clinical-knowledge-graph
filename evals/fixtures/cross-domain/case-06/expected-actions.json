@@ -1,0 +1,25 @@
+{
+  "description": "48F, dyslipidemia, LDL 155, ASCVD 11%, no diabetes, no ASCVD. ACC/AHA primary prevention R4 (COR I, LOE A) preempts USPSTF Grade B (P3). Tests the higher-risk end of the preemption spectrum — previous fixtures only tested P4 (Grade C preemption).",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-to-high-intensity",
+      "label": "Initiate moderate-to-high-intensity statin therapy for primary prevention",
+      "rationale": "ACC/AHA R4 (COR I, LOE A): adults 40-75 without diabetes, LDL 70-189, ASCVD risk ≥7.5% should initiate moderate-to-high-intensity statin. LDL 155 is within the 70-189 range. ASCVD risk 11% (≥10%) strengthens the case for high-intensity. USPSTF Grade B also matched (ASCVD ≥10%, ≥1 risk factor: dyslipidemia) but is preempted by the more specific ACC/AHA guidance (P3, ADR 0018).",
+      "source_rec_id": "rec:accaha-statin-primary-prevention",
+      "priority": 1
+    },
+    {
+      "id": "lipid-monitoring",
+      "label": "Monitor lipid panel response to statin therapy",
+      "rationale": "Follow-up lipid panel 4-12 weeks after statin initiation to assess LDL-C response. ACC/AHA recommends ≥30% LDL-C reduction on moderate-intensity, ≥50% on high-intensity.",
+      "priority": 2
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-uspstf-grade-b-only",
+      "label": "Do not recommend statin based solely on USPSTF Grade B guidance",
+      "rationale": "USPSTF Grade B is preempted by ACC/AHA primary prevention rec (P3, ADR 0018). ACC/AHA provides LDL-stratified guidance and intensity recommendations that USPSTF lacks. Recommending under USPSTF alone yields only moderate-intensity; ACC/AHA's risk-stratified approach may warrant high-intensity at ASCVD 11%."
+    }
+  ]
+}

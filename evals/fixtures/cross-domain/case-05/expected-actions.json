@@ -1,0 +1,31 @@
+{
+  "description": "50M with T2DM, HTN, ASCVD 12%. ACC/AHA diabetes-specific statin rec (R3, COR I, LOE A) preempts both USPSTF Grade B (P1) and Grade C (P2). The diabetes rec is more targeted than the population-level USPSTF screen. With ASCVD risk ≥7.5% and diabetes risk enhancers (HTN), high-intensity statin is reasonable per ACC/AHA R3.",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-to-high-intensity",
+      "label": "Initiate moderate-to-high-intensity statin therapy for diabetes statin benefit group",
+      "rationale": "ACC/AHA R3 (COR I, LOE A): adults 40-75 with diabetes should initiate at least moderate-intensity statin. With ASCVD risk 12% (≥7.5%) and HTN as a diabetes-specific risk enhancer, high-intensity is reasonable (COR IIa, LOE B-NR). USPSTF Grade B (ASCVD ≥10%) also matched but is preempted by the more specific ACC/AHA diabetes rec (P1, ADR 0018). USPSTF Grade C is also preempted (P2).",
+      "source_rec_id": "rec:accaha-statin-diabetes",
+      "priority": 1
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure management for diabetic patient",
+      "rationale": "BP 136/84 on lisinopril. Target <130/80 for diabetes per ADA. HTN is a modifiable CVD risk factor and a diabetes-specific statin risk enhancer.",
+      "priority": 2
+    },
+    {
+      "id": "diabetes-management-continuation",
+      "label": "Continue diabetes management (metformin, monitoring)",
+      "rationale": "Active T2DM on metformin. Ongoing glycemic control is integral to CVD risk management in the diabetic statin benefit group.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-uspstf-grade-b-action",
+      "label": "Do not recommend statin based solely on USPSTF Grade B guidance",
+      "rationale": "USPSTF Grade B is preempted by ACC/AHA diabetes-specific rec (P1, ADR 0018). The ACC/AHA rec is more specific — it addresses the diabetes population directly rather than the general population screen. Recommending under USPSTF alone misses the diabetes-specific intensity consideration."
+    }
+  ]
+}

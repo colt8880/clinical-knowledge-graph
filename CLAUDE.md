@@ -133,6 +133,7 @@ Each code directory has its own `CLAUDE.md` with load order, scope, and DoD.
 - No PHI. Synthetic data only.
 - Cite the guideline in code comments and commit messages.
 - Prefer Cypher over app-layer joins.
+- When adding a new guideline subgraph, re-run `scripts/discover-interactions.py --from-seeds` after seeding to identify new cross-guideline interaction candidates. Commit the updated `docs/review/interaction-candidates.md`.
 - Colton is a senior healthcare PM with an engineering background. Skip 101-level explanations; surface tradeoffs.
 
 ## Build workflow

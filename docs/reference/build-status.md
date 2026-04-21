@@ -77,7 +77,7 @@ Each improvement is measured in isolation before the combined run. ~$2 per run, 
 | 42  | Edge-value thesis run                           | evals, docs             | shipped | 41                    | [42](../../docs/build/42-edge-value-thesis-run.md)           | [#39](../../pull/39) |
 | 43  | Arm B retrieval upgrade (section + multi-query) | evals, docs             | shipped | v1 shipped            | [43](../../docs/build/43-arm-b-retrieval-upgrade.md)         | [#41](../../pull/41) |
 | 44  | Arm B upgrade thesis run                        | evals, docs             | shipped | 43                    | [44](../../docs/build/44-arm-b-upgrade-thesis-run.md)        | [#42](../../pull/42) |
-| 45  | Arm C serialization v2 (concise + intensity)    | evals, docs             | in-progress | v1 shipped            | [45](../../docs/build/45-arm-c-serialization-v2.md)          | —                    |
+| 45  | Arm C serialization v2 (concise + intensity)    | evals, docs             | in-progress | v1 shipped            | [45](../../docs/build/45-arm-c-serialization-v2.md)          | [#43](../../pull/43) |
 | 46  | Serialization v2 thesis run                     | evals, docs             | pending | 45                    | [46](../../docs/build/46-serialization-thesis-run.md)        | —                    |
 | 48  | Expand multi-guideline fixtures                 | evals, docs             | shipped | 42                    | [48](../../docs/build/48-expand-multi-guideline-fixtures.md) | [#40](../../pull/40) |
 | 47  | v2 Phase 1 combined thesis run                  | evals, docs             | pending | 42, 44, 46, 48        | [47](../../docs/build/47-v2-phase1-combined-run.md)          | —                    |

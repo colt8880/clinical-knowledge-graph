@@ -1,6 +1,6 @@
 # 44: Arm B upgrade thesis run
 
-**Status**: pending
+**Status**: in-progress
 **Depends on**: 43
 **Components touched**: evals / docs
 **Branch**: `feat/arm-b-upgrade-thesis-run`

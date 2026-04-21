@@ -38,14 +38,10 @@ strategies as structured nodes and edges.
 ### Matched Recommendations
 
 {matched_recs}
-
+{cross_guideline_interactions}
 ### Cross-Guideline Convergence
 
 {convergence_section}
-
-### Graph Structure (relevant subgraph)
-
-{subgraph_summary}
 
 Use the graph evaluation results to inform and validate your recommendations. \
 The graph provides deterministic, guideline-based reasoning that should \
@@ -86,58 +82,54 @@ def get_prompt(
 
     matched_recs_text = json.dumps(trace_summary.get("matched_recs", []), indent=2)
 
-    # Build convergence section
+    # Build cross-guideline interactions section (preemption + modifier prose)
+    cross_guideline_interactions = _build_interactions_section(trace_summary)
+
+    # Build convergence section — v2 uses grouped therapeutic classes
     convergence = graph_context.get("convergence_summary", {})
-    shared_actions = convergence.get("shared_actions", [])
     convergence_prose = convergence.get("convergence_prose", "")
 
-    if shared_actions:
-        conv_lines: list[str] = []
-        conv_lines.append(convergence_prose)
-        conv_lines.append("")
-        conv_lines.append("| Entity | Type | Guidelines | Convergence |")
-        conv_lines.append("|--------|------|------------|-------------|")
-        for action in shared_actions:
-            guidelines = ", ".join(
-                f"{rb['guideline']} ({rb['evidence_grade']})"
-                for rb in action["recommended_by"]
-            )
-            conv_lines.append(
-                f"| {action['entity_label']} | {action['entity_type']} "
-                f"| {guidelines} | {action['convergence_type']} |"
-            )
-        conv_lines.append("")
-        conv_lines.append(
+    if convergence_prose:
+        convergence_section = (
+            f"{convergence_prose}\n\n"
             "Where multiple guidelines converge on the same therapeutic action, "
             "this represents independent clinical agreement that should strengthen "
             "your confidence in that recommendation."
         )
-        convergence_section = "\n".join(conv_lines)
     else:
         convergence_section = "No cross-guideline convergence detected (single guideline or no shared actions)."
-
-    # Build a readable subgraph summary
-    nodes = subgraph.get("nodes", [])
-    edges = subgraph.get("edges", [])
-    subgraph_lines: list[str] = []
-    for node in nodes:
-        subgraph_lines.append(
-            f"- [{node['type']}] {node['id']}: {node.get('label', '')}"
-        )
-    for edge in edges:
-        satisfied = " (satisfied)" if edge.get("satisfied") else ""
-        subgraph_lines.append(
-            f"- {edge['source']} --[{edge['type']}]--> {edge['target']}{satisfied}"
-        )
-    subgraph_summary = "\n".join(subgraph_lines) if subgraph_lines else "No subgraph data."
 
     return PROMPT_TEMPLATE.format(
         patient_context=pc_text,
         rendered_prose=rendered_prose,
         matched_recs=matched_recs_text,
+        cross_guideline_interactions=cross_guideline_interactions,
         convergence_section=convergence_section,
-        subgraph_summary=subgraph_summary,
     )
+
+
+def _build_interactions_section(trace_summary: dict[str, Any]) -> str:
+    """Build the Cross-Guideline Interactions section.
+
+    Only rendered when preemption or modifier events exist.
+    Returns an empty string when there are no events (the template
+    will just produce a blank line between sections).
+    """
+    preemption_prose = trace_summary.get("preemption_prose", "")
+    modifier_prose = trace_summary.get("modifier_prose", "")
+
+    if not preemption_prose and not modifier_prose:
+        return ""
+
+    lines = ["### Cross-Guideline Interactions", ""]
+    if preemption_prose:
+        lines.append(f"**Preemption:** {preemption_prose}")
+        lines.append("")
+    if modifier_prose:
+        lines.append(f"**Modifier:** {modifier_prose}")
+        lines.append("")
+
+    return "\n".join(lines) + "\n"
 
 
 def run(

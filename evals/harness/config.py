@@ -19,9 +19,13 @@ TEMPERATURE = 0
 RUBRIC_VERSION = "v1.1"
 
 # Arm B chunking parameters
-CHUNK_SIZE_TOKENS = 500
-CHUNK_OVERLAP_TOKENS = 50
-TOP_K_CHUNKS = 5
+CHUNK_STRATEGY = "section"
+CHUNK_SIZE_TOKENS = 500  # only used as fallback for oversized sections
+CHUNK_OVERLAP_TOKENS = 50  # only used as fallback for oversized sections
+MAX_SECTION_TOKENS = 1000  # sections above this get token-based splitting
+TOP_K_PER_QUERY = 3
+MAX_UNIQUE_CHUNKS = 8
+TOP_K_CHUNKS = 5  # kept for backwards compat; unused in section strategy
 EMBEDDING_MODEL = "text-embedding-3-small"
 
 # Paths

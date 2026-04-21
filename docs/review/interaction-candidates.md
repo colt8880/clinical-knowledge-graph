@@ -19,8 +19,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C1: Moderate-intensity statin for diabetes mellitus, age 40-75 ↔ Moderate-intensity statin for CKD patients aged ≥50, not on dialysis
 
-> **Clinical scenario:** A 62-year-old with Diabetes, Egfr < 60 mL/min/1.73m2, Egfr ≥ 15 mL/min/1.73m2 (without Ascvd Established, Ldl Cholesterol ≥ 190 mg/dL, active Atorvastatin, +6 more) would trigger both the ACC/AHA rec (Moderate-intensity statin for diabetes mellitus, age 40-75) and the KDIGO rec (Moderate-intensity statin for CKD patients aged ≥50, not ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -32,8 +30,11 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established; Ldl Cholesterol ≥ 190 mg/dL | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 50–75
- · **Shared targets:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin
+> **Overlap population:** adults age 50–75 with Diabetes (ACC/AHA), Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), active Atorvastatin (KDIGO), active Rosuvastatin (KDIGO), active Simvastatin (KDIGO), active Pravastatin (KDIGO), active Lovastatin (KDIGO), active Fluvastatin (KDIGO), active Pitavastatin (KDIGO).
+>
+> **Actions:** Both recs prescribe the same actions: Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin. No conflict in agent selection.
 
 ### Verdict
 
@@ -48,8 +49,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C2: Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk ≥7.5%) ↔ Moderate-intensity statin for CKD patients aged ≥50, not on dialysis
 
-> **Clinical scenario:** A 62-year-old with Ldl Cholesterol ≥ 70 mg/dL, Ldl Cholesterol ≤ 189 mg/dL, Egfr < 60 mL/min/1.73m2, Egfr ≥ 15 mL/min/1.73m2, ascvd_10yr ≥ 7.5% (without Ascvd Established, Diabetes, Ldl Cholesterol ≥ 190 mg/dL, +7 more) would trigger both the ACC/AHA rec (Moderate-to-high-intensity statin for primary prevention ...) and the KDIGO rec (Moderate-intensity statin for CKD patients aged ≥50, not ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -61,8 +60,11 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established, Diabetes; Ldl Cholesterol ≥ 190 mg/dL | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 50–75
- · **Shared targets:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin
+> **Overlap population:** adults age 50–75 with Ldl Cholesterol ≥ 70 mg/dL (ACC/AHA), Ldl Cholesterol ≤ 189 mg/dL (ACC/AHA), Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO), ascvd_10yr ≥ 7.5% (ACC/AHA).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Diabetes (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), active Atorvastatin (KDIGO), active Rosuvastatin (KDIGO), active Simvastatin (KDIGO), active Pravastatin (KDIGO), active Lovastatin (KDIGO), active Fluvastatin (KDIGO), active Pitavastatin (KDIGO).
+>
+> **Actions:** Both recs prescribe the same actions: Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin. No conflict in agent selection.
 
 ### Verdict
 
@@ -77,8 +79,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C3: High-intensity statin for secondary prevention in clinical ASCVD (age ≤75) ↔ Moderate-intensity statin for CKD patients aged ≥50, not on dialysis
 
-> **Clinical scenario:** A 62-year-old with Ascvd Established, Egfr < 60 mL/min/1.73m2, Egfr ≥ 15 mL/min/1.73m2 (without active Atorvastatin, active Rosuvastatin, active Simvastatin, +4 more) would trigger both the ACC/AHA rec (High-intensity statin for secondary prevention in clinica...) and the KDIGO rec (Moderate-intensity statin for CKD patients aged ≥50, not ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -90,8 +90,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | — | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin |
 | **Actions** | Atorvastatin, Rosuvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 50–75
- · **Shared targets:** Atorvastatin, Rosuvastatin
+> **Overlap population:** adults age 50–75 with Ascvd Established (ACC/AHA), Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO).
+>
+> **Must NOT have:** active Atorvastatin (KDIGO), active Rosuvastatin (KDIGO), active Simvastatin (KDIGO), active Pravastatin (KDIGO), active Lovastatin (KDIGO), active Fluvastatin (KDIGO), active Pitavastatin (KDIGO).
+>
+> **Shared actions:** Atorvastatin, Rosuvastatin.
+> **KDIGO only:** Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Simvastatin.
 
 ### Verdict
 
@@ -107,8 +111,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C4: High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75) ↔ Moderate-intensity statin for CKD patients aged ≥50, not on dialysis
 
-> **Clinical scenario:** A 62-year-old with Ldl Cholesterol ≥ 190 mg/dL, Egfr < 60 mL/min/1.73m2, Egfr ≥ 15 mL/min/1.73m2 (without Ascvd Established, active Atorvastatin, active Rosuvastatin, +5 more) would trigger both the ACC/AHA rec (High-intensity statin for severe hypercholesterolemia (LD...) and the KDIGO rec (Moderate-intensity statin for CKD patients aged ≥50, not ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -120,8 +122,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin |
 | **Actions** | Atorvastatin, Rosuvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 50–75
- · **Shared targets:** Atorvastatin, Rosuvastatin
+> **Overlap population:** adults age 50–75 with Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), active Atorvastatin (KDIGO), active Rosuvastatin (KDIGO), active Simvastatin (KDIGO), active Pravastatin (KDIGO), active Lovastatin (KDIGO), active Fluvastatin (KDIGO), active Pitavastatin (KDIGO).
+>
+> **Shared actions:** Atorvastatin, Rosuvastatin.
+> **KDIGO only:** Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Simvastatin.
 
 ### Verdict
 
@@ -137,8 +143,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C5: Moderate-intensity statin for diabetes mellitus, age 40-75 ↔ Initiate statin for primary prevention of CVD (Grade B)
 
-> **Clinical scenario:** A 57-year-old with Diabetes, Dyslipidemia, ascvd_10yr ≥ 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL) would trigger both the ACC/AHA rec (Moderate-intensity statin for diabetes mellitus, age 40-75) and the USPSTF rec (Initiate statin for primary prevention of CVD (Grade B)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -150,9 +154,11 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established; Ldl Cholesterol ≥ 190 mg/dL | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 40–75
- · **Conditions:** Shared condition (some disjunctive): Diabetes
- · **Shared targets:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin
+> **Overlap population:** adults age 40–75 with Diabetes (ACC/AHA), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), ascvd_10yr ≥ 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
+>
+> **Actions:** Both recs prescribe the same actions: Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin. No conflict in agent selection.
 
 ### Verdict
 
@@ -168,8 +174,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C6: Moderate-intensity statin for diabetes mellitus, age 40-75 ↔ Selectively offer statin based on shared decision-making (Grade C)
 
-> **Clinical scenario:** A 57-year-old with Diabetes, Dyslipidemia, ascvd_10yr ≥ 7.5%, ascvd_10yr < 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL) would trigger both the ACC/AHA rec (Moderate-intensity statin for diabetes mellitus, age 40-75) and the USPSTF rec (Selectively offer statin based on shared decision-making ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -181,9 +185,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established; Ldl Cholesterol ≥ 190 mg/dL | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-**Age overlap:** 40–75
- · **Conditions:** Shared condition (some disjunctive): Diabetes
- · **Shared targets:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin
+> **Overlap population:** adults age 40–75 with Diabetes (ACC/AHA), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), ascvd_10yr ≥ 7.5% (USPSTF), ascvd_10yr < 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
+>
+> **Shared actions:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin.
+> **USPSTF only:** Sdm Statin Discussion.
 
 ### Verdict
 
@@ -199,8 +206,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C7: Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk ≥7.5%) ↔ Initiate statin for primary prevention of CVD (Grade B)
 
-> **Clinical scenario:** A 57-year-old with Dyslipidemia, Ldl Cholesterol ≥ 70 mg/dL, Ldl Cholesterol ≤ 189 mg/dL, ascvd_10yr ≥ 7.5%, ascvd_10yr ≥ 10% (without Ascvd Established, Diabetes, Familial Hypercholesterolemia, +1 more) would trigger both the ACC/AHA rec (Moderate-to-high-intensity statin for primary prevention ...) and the USPSTF rec (Initiate statin for primary prevention of CVD (Grade B)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -212,8 +217,11 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established, Diabetes; Ldl Cholesterol ≥ 190 mg/dL | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 40–75
- · **Shared targets:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin
+> **Overlap population:** adults age 40–75 with one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Ldl Cholesterol ≥ 70 mg/dL (ACC/AHA), Ldl Cholesterol ≤ 189 mg/dL (ACC/AHA), ascvd_10yr ≥ 7.5% (ACC/AHA), ascvd_10yr ≥ 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Diabetes (ACC/AHA), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
+>
+> **Actions:** Both recs prescribe the same actions: Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin. No conflict in agent selection.
 
 ### Verdict
 
@@ -229,8 +237,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C8: Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk ≥7.5%) ↔ Selectively offer statin based on shared decision-making (Grade C)
 
-> **Clinical scenario:** A 57-year-old with Dyslipidemia, Ldl Cholesterol ≥ 70 mg/dL, Ldl Cholesterol ≤ 189 mg/dL, ascvd_10yr ≥ 7.5%, ascvd_10yr < 10% (without Ascvd Established, Diabetes, Familial Hypercholesterolemia, +1 more) would trigger both the ACC/AHA rec (Moderate-to-high-intensity statin for primary prevention ...) and the USPSTF rec (Selectively offer statin based on shared decision-making ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -242,8 +248,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established, Diabetes; Ldl Cholesterol ≥ 190 mg/dL | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-**Age overlap:** 40–75
- · **Shared targets:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin
+> **Overlap population:** adults age 40–75 with one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Ldl Cholesterol ≥ 70 mg/dL (ACC/AHA), Ldl Cholesterol ≤ 189 mg/dL (ACC/AHA), ascvd_10yr ≥ 7.5% (ACC/AHA), ascvd_10yr < 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Diabetes (ACC/AHA), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
+>
+> **Shared actions:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin.
+> **USPSTF only:** Sdm Statin Discussion.
 
 ### Verdict
 
@@ -259,8 +269,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C9: High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75) ↔ Initiate statin for primary prevention of CVD (Grade B)
 
-> **Clinical scenario:** A 57-year-old with Dyslipidemia, Ldl Cholesterol ≥ 190 mg/dL, ascvd_10yr ≥ 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL) would trigger both the ACC/AHA rec (High-intensity statin for severe hypercholesterolemia (LD...) and the USPSTF rec (Initiate statin for primary prevention of CVD (Grade B)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -272,8 +280,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Rosuvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 40–75
- · **Shared targets:** Atorvastatin, Rosuvastatin
+> **Overlap population:** adults age 40–75 with one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), ascvd_10yr ≥ 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF).
+>
+> **Shared actions:** Atorvastatin, Rosuvastatin.
+> **USPSTF only:** Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Simvastatin.
 
 ### Verdict
 
@@ -289,8 +301,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C10: High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75) ↔ Selectively offer statin based on shared decision-making (Grade C)
 
-> **Clinical scenario:** A 57-year-old with Dyslipidemia, Ldl Cholesterol ≥ 190 mg/dL, ascvd_10yr ≥ 7.5%, ascvd_10yr < 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL) would trigger both the ACC/AHA rec (High-intensity statin for severe hypercholesterolemia (LD...) and the USPSTF rec (Selectively offer statin based on shared decision-making ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -302,8 +312,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Ascvd Established | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Rosuvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-**Age overlap:** 40–75
- · **Shared targets:** Atorvastatin, Rosuvastatin
+> **Overlap population:** adults age 40–75 with one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), ascvd_10yr ≥ 7.5% (USPSTF), ascvd_10yr < 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF).
+>
+> **Shared actions:** Atorvastatin, Rosuvastatin.
+> **USPSTF only:** Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Simvastatin, Sdm Statin Discussion.
 
 ### Verdict
 
@@ -319,8 +333,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C11: Moderate-intensity statin for CKD patients aged ≥50, not on dialysis ↔ Initiate statin for primary prevention of CVD (Grade B)
 
-> **Clinical scenario:** A 62-year-old with Dyslipidemia, Egfr < 60 mL/min/1.73m2, Egfr ≥ 15 mL/min/1.73m2, ascvd_10yr ≥ 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL, +7 more) would trigger both the KDIGO rec (Moderate-intensity statin for CKD patients aged ≥50, not ...) and the USPSTF rec (Initiate statin for primary prevention of CVD (Grade B)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -332,8 +344,11 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 50–75
- · **Shared targets:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin
+> **Overlap population:** adults age 50–75 with one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO), ascvd_10yr ≥ 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Atorvastatin (KDIGO), active Rosuvastatin (KDIGO), active Simvastatin (KDIGO), active Pravastatin (KDIGO), active Lovastatin (KDIGO), active Fluvastatin (KDIGO), active Pitavastatin (KDIGO).
+>
+> **Actions:** Both recs prescribe the same actions: Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin. No conflict in agent selection.
 
 ### Verdict
 
@@ -348,8 +363,6 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ## C12: Moderate-intensity statin for CKD patients aged ≥50, not on dialysis ↔ Selectively offer statin based on shared decision-making (Grade C)
 
-> **Clinical scenario:** A 62-year-old with Dyslipidemia, Egfr < 60 mL/min/1.73m2, Egfr ≥ 15 mL/min/1.73m2, ascvd_10yr ≥ 7.5%, ascvd_10yr < 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL, +7 more) would trigger both the KDIGO rec (Moderate-intensity statin for CKD patients aged ≥50, not ...) and the USPSTF rec (Selectively offer statin based on shared decision-making ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -361,8 +374,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-**Age overlap:** 50–75
- · **Shared targets:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin
+> **Overlap population:** adults age 50–75 with one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO), ascvd_10yr ≥ 7.5% (USPSTF), ascvd_10yr < 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Atorvastatin (KDIGO), active Rosuvastatin (KDIGO), active Simvastatin (KDIGO), active Pravastatin (KDIGO), active Lovastatin (KDIGO), active Fluvastatin (KDIGO), active Pitavastatin (KDIGO).
+>
+> **Shared actions:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin.
+> **USPSTF only:** Sdm Statin Discussion.
 
 ### Verdict
 
@@ -383,8 +400,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M1: Moderate-intensity statin for diabetes mellitus, age 40-75 ↔ ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)
 
-> **Clinical scenario:** A 57-year-old with Diabetes, Urine Acr ≥ 30 mg/g (without Ascvd Established, Ldl Cholesterol ≥ 190 mg/dL, active Lisinopril, +5 more) would trigger both the ACC/AHA rec (Moderate-intensity statin for diabetes mellitus, age 40-75) and the KDIGO rec (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -396,7 +411,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established; Ldl Cholesterol ≥ 190 mg/dL | Active: Lisinopril, Enalapril, Ramipril, Losartan, Valsartan, Irbesartan |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with Diabetes (ACC/AHA), Urine Acr ≥ 30 mg/g (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), active Lisinopril (KDIGO), active Enalapril (KDIGO), active Ramipril (KDIGO), active Losartan (KDIGO), active Valsartan (KDIGO), active Irbesartan (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin; KDIGO prescribes Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan.
 
 ### Verdict
 
@@ -411,8 +430,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M2: Moderate-intensity statin for diabetes mellitus, age 40-75 ↔ Monitor eGFR and urine ACR in patients with CKD
 
-> **Clinical scenario:** A 57-year-old with Diabetes, Egfr < 60 mL/min/1.73m2 (without Ascvd Established, Ldl Cholesterol ≥ 190 mg/dL) would trigger both the ACC/AHA rec (Moderate-intensity statin for diabetes mellitus, age 40-75) and the KDIGO rec (Monitor eGFR and urine ACR in patients with CKD).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -424,7 +441,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established; Ldl Cholesterol ≥ 190 mg/dL | — |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Egfr, Urine Acr |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with Diabetes (ACC/AHA), one of: Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin; KDIGO prescribes Egfr, Urine Acr.
 
 ### Verdict
 
@@ -439,8 +460,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M3: Moderate-intensity statin for diabetes mellitus, age 40-75 ↔ SGLT2 inhibitor for CKD with T2DM or significant albuminuria
 
-> **Clinical scenario:** A 57-year-old with Diabetes, Egfr ≥ 20 mL/min/1.73m2 (without Ascvd Established, Ldl Cholesterol ≥ 190 mg/dL, active Empagliflozin, +1 more) would trigger both the ACC/AHA rec (Moderate-intensity statin for diabetes mellitus, age 40-75) and the KDIGO rec (SGLT2 inhibitor for CKD with T2DM or significant albuminuria).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -452,8 +471,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established; Ldl Cholesterol ≥ 190 mg/dL | Active: Empagliflozin, Dapagliflozin |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Dapagliflozin, Empagliflozin |
 
-**Age overlap:** 40–75
- · **Conditions:** Shared condition (some disjunctive): Diabetes
+> **Overlap population:** adults age 40–75 with Diabetes (ACC/AHA), one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Egfr ≥ 20 mL/min/1.73m2 (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), active Empagliflozin (KDIGO), active Dapagliflozin (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin; KDIGO prescribes Dapagliflozin, Empagliflozin.
 
 ### Verdict
 
@@ -468,8 +490,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M4: Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk ≥7.5%) ↔ ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)
 
-> **Clinical scenario:** A 57-year-old with Ldl Cholesterol ≥ 70 mg/dL, Ldl Cholesterol ≤ 189 mg/dL, Urine Acr ≥ 30 mg/g, ascvd_10yr ≥ 7.5% (without Ascvd Established, Diabetes, Ldl Cholesterol ≥ 190 mg/dL, +6 more) would trigger both the ACC/AHA rec (Moderate-to-high-intensity statin for primary prevention ...) and the KDIGO rec (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -481,7 +501,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established, Diabetes; Ldl Cholesterol ≥ 190 mg/dL | Active: Lisinopril, Enalapril, Ramipril, Losartan, Valsartan, Irbesartan |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with Ldl Cholesterol ≥ 70 mg/dL (ACC/AHA), Ldl Cholesterol ≤ 189 mg/dL (ACC/AHA), Urine Acr ≥ 30 mg/g (KDIGO), ascvd_10yr ≥ 7.5% (ACC/AHA).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Diabetes (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), active Lisinopril (KDIGO), active Enalapril (KDIGO), active Ramipril (KDIGO), active Losartan (KDIGO), active Valsartan (KDIGO), active Irbesartan (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin; KDIGO prescribes Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan.
 
 ### Verdict
 
@@ -496,8 +520,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M5: Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk ≥7.5%) ↔ Monitor eGFR and urine ACR in patients with CKD
 
-> **Clinical scenario:** A 57-year-old with Egfr < 60 mL/min/1.73m2, Ldl Cholesterol ≥ 70 mg/dL, Ldl Cholesterol ≤ 189 mg/dL, ascvd_10yr ≥ 7.5% (without Ascvd Established, Diabetes, Ldl Cholesterol ≥ 190 mg/dL) would trigger both the ACC/AHA rec (Moderate-to-high-intensity statin for primary prevention ...) and the KDIGO rec (Monitor eGFR and urine ACR in patients with CKD).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -509,7 +531,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established, Diabetes; Ldl Cholesterol ≥ 190 mg/dL | — |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Egfr, Urine Acr |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with one of: Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (KDIGO), Ldl Cholesterol ≥ 70 mg/dL (ACC/AHA), Ldl Cholesterol ≤ 189 mg/dL (ACC/AHA), ascvd_10yr ≥ 7.5% (ACC/AHA).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Diabetes (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin; KDIGO prescribes Egfr, Urine Acr.
 
 ### Verdict
 
@@ -524,8 +550,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M6: Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk ≥7.5%) ↔ SGLT2 inhibitor for CKD with T2DM or significant albuminuria
 
-> **Clinical scenario:** A 57-year-old with Diabetes, Ldl Cholesterol ≥ 70 mg/dL, Ldl Cholesterol ≤ 189 mg/dL, Egfr ≥ 20 mL/min/1.73m2, ascvd_10yr ≥ 7.5% (without Ascvd Established, Diabetes, Ldl Cholesterol ≥ 190 mg/dL, +2 more) would trigger both the ACC/AHA rec (Moderate-to-high-intensity statin for primary prevention ...) and the KDIGO rec (SGLT2 inhibitor for CKD with T2DM or significant albuminuria).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -537,7 +561,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established, Diabetes; Ldl Cholesterol ≥ 190 mg/dL | Active: Empagliflozin, Dapagliflozin |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Dapagliflozin, Empagliflozin |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Ldl Cholesterol ≥ 70 mg/dL (ACC/AHA), Ldl Cholesterol ≤ 189 mg/dL (ACC/AHA), Egfr ≥ 20 mL/min/1.73m2 (KDIGO), ascvd_10yr ≥ 7.5% (ACC/AHA).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), Diabetes (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), active Empagliflozin (KDIGO), active Dapagliflozin (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin; KDIGO prescribes Dapagliflozin, Empagliflozin.
 
 ### Verdict
 
@@ -552,8 +580,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M7: High-intensity statin for secondary prevention in clinical ASCVD (age ≤75) ↔ ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)
 
-> **Clinical scenario:** A 46-year-old with Ascvd Established, Urine Acr ≥ 30 mg/g (without active Lisinopril, active Enalapril, active Ramipril, +3 more) would trigger both the ACC/AHA rec (High-intensity statin for secondary prevention in clinica...) and the KDIGO rec (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -565,7 +591,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | — | Active: Lisinopril, Enalapril, Ramipril, Losartan, Valsartan, Irbesartan |
 | **Actions** | Atorvastatin, Rosuvastatin | Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan |
 
-**Age overlap:** 18–75
+> **Overlap population:** adults age 18–75 with Ascvd Established (ACC/AHA), Urine Acr ≥ 30 mg/g (KDIGO).
+>
+> **Must NOT have:** active Lisinopril (KDIGO), active Enalapril (KDIGO), active Ramipril (KDIGO), active Losartan (KDIGO), active Valsartan (KDIGO), active Irbesartan (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Rosuvastatin; KDIGO prescribes Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan.
 
 ### Verdict
 
@@ -580,8 +610,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M8: High-intensity statin for secondary prevention in clinical ASCVD (age ≤75) ↔ Monitor eGFR and urine ACR in patients with CKD
 
-> **Clinical scenario:** A 46-year-old with Ascvd Established, Egfr < 60 mL/min/1.73m2 would trigger both the ACC/AHA rec (High-intensity statin for secondary prevention in clinica...) and the KDIGO rec (Monitor eGFR and urine ACR in patients with CKD).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -593,7 +621,9 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | — | — |
 | **Actions** | Atorvastatin, Rosuvastatin | Egfr, Urine Acr |
 
-**Age overlap:** 18–75
+> **Overlap population:** adults age 18–75 with Ascvd Established (ACC/AHA), one of: Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Rosuvastatin; KDIGO prescribes Egfr, Urine Acr.
 
 ### Verdict
 
@@ -608,8 +638,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M9: High-intensity statin for secondary prevention in clinical ASCVD (age ≤75) ↔ SGLT2 inhibitor for CKD with T2DM or significant albuminuria
 
-> **Clinical scenario:** A 46-year-old with Ascvd Established, Diabetes, Egfr ≥ 20 mL/min/1.73m2 (without active Empagliflozin, active Dapagliflozin) would trigger both the ACC/AHA rec (High-intensity statin for secondary prevention in clinica...) and the KDIGO rec (SGLT2 inhibitor for CKD with T2DM or significant albuminuria).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -621,7 +649,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | — | Active: Empagliflozin, Dapagliflozin |
 | **Actions** | Atorvastatin, Rosuvastatin | Dapagliflozin, Empagliflozin |
 
-**Age overlap:** 18–75
+> **Overlap population:** adults age 18–75 with Ascvd Established (ACC/AHA), one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Egfr ≥ 20 mL/min/1.73m2 (KDIGO).
+>
+> **Must NOT have:** active Empagliflozin (KDIGO), active Dapagliflozin (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Rosuvastatin; KDIGO prescribes Dapagliflozin, Empagliflozin.
 
 ### Verdict
 
@@ -636,8 +668,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M10: High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75) ↔ ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)
 
-> **Clinical scenario:** A 47-year-old with Ldl Cholesterol ≥ 190 mg/dL, Urine Acr ≥ 30 mg/g (without Ascvd Established, active Lisinopril, active Enalapril, +4 more) would trigger both the ACC/AHA rec (High-intensity statin for severe hypercholesterolemia (LD...) and the KDIGO rec (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -649,7 +679,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established | Active: Lisinopril, Enalapril, Ramipril, Losartan, Valsartan, Irbesartan |
 | **Actions** | Atorvastatin, Rosuvastatin | Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan |
 
-**Age overlap:** 20–75
+> **Overlap population:** adults age 20–75 with Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), Urine Acr ≥ 30 mg/g (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), active Lisinopril (KDIGO), active Enalapril (KDIGO), active Ramipril (KDIGO), active Losartan (KDIGO), active Valsartan (KDIGO), active Irbesartan (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Rosuvastatin; KDIGO prescribes Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan.
 
 ### Verdict
 
@@ -664,8 +698,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M11: High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75) ↔ Monitor eGFR and urine ACR in patients with CKD
 
-> **Clinical scenario:** A 47-year-old with Egfr < 60 mL/min/1.73m2, Ldl Cholesterol ≥ 190 mg/dL (without Ascvd Established) would trigger both the ACC/AHA rec (High-intensity statin for severe hypercholesterolemia (LD...) and the KDIGO rec (Monitor eGFR and urine ACR in patients with CKD).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -677,7 +709,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established | — |
 | **Actions** | Atorvastatin, Rosuvastatin | Egfr, Urine Acr |
 
-**Age overlap:** 20–75
+> **Overlap population:** adults age 20–75 with one of: Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (KDIGO), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Rosuvastatin; KDIGO prescribes Egfr, Urine Acr.
 
 ### Verdict
 
@@ -692,8 +728,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M12: High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75) ↔ SGLT2 inhibitor for CKD with T2DM or significant albuminuria
 
-> **Clinical scenario:** A 47-year-old with Diabetes, Ldl Cholesterol ≥ 190 mg/dL, Egfr ≥ 20 mL/min/1.73m2 (without Ascvd Established, active Empagliflozin, active Dapagliflozin) would trigger both the ACC/AHA rec (High-intensity statin for severe hypercholesterolemia (LD...) and the KDIGO rec (SGLT2 inhibitor for CKD with T2DM or significant albuminuria).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | KDIGO |
@@ -705,7 +739,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Ascvd Established | Active: Empagliflozin, Dapagliflozin |
 | **Actions** | Atorvastatin, Rosuvastatin | Dapagliflozin, Empagliflozin |
 
-**Age overlap:** 20–75
+> **Overlap population:** adults age 20–75 with one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), Egfr ≥ 20 mL/min/1.73m2 (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (ACC/AHA), active Empagliflozin (KDIGO), active Dapagliflozin (KDIGO).
+>
+> **Actions:** No shared actions. ACC/AHA prescribes Atorvastatin, Rosuvastatin; KDIGO prescribes Dapagliflozin, Empagliflozin.
 
 ### Verdict
 
@@ -720,8 +758,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M13: ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) ↔ Initiate statin for primary prevention of CVD (Grade B)
 
-> **Clinical scenario:** A 57-year-old with Dyslipidemia, Urine Acr ≥ 30 mg/g, ascvd_10yr ≥ 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL, +6 more) would trigger both the KDIGO rec (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) and the USPSTF rec (Initiate statin for primary prevention of CVD (Grade B)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -733,7 +769,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Active: Lisinopril, Enalapril, Ramipril, Losartan, Valsartan, Irbesartan | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Urine Acr ≥ 30 mg/g (KDIGO), ascvd_10yr ≥ 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Lisinopril (KDIGO), active Enalapril (KDIGO), active Ramipril (KDIGO), active Losartan (KDIGO), active Valsartan (KDIGO), active Irbesartan (KDIGO).
+>
+> **Actions:** No shared actions. KDIGO prescribes Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan; USPSTF prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin.
 
 ### Verdict
 
@@ -748,8 +788,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M14: ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) ↔ Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)
 
-> **Clinical scenario:** A 98-year-old with Urine Acr ≥ 30 mg/g (without Ascvd Established, active Lisinopril, active Enalapril, +4 more) would trigger both the KDIGO rec (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) and the USPSTF rec (Insufficient evidence to recommend for or against initiat...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -761,7 +799,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Active: Lisinopril, Enalapril, Ramipril, Losartan, Valsartan, Irbesartan | Ascvd Established |
 | **Actions** | Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan | — |
 
-**Age overlap:** 76–120
+> **Overlap population:** adults age 76–120 with Urine Acr ≥ 30 mg/g (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), active Lisinopril (KDIGO), active Enalapril (KDIGO), active Ramipril (KDIGO), active Losartan (KDIGO), active Valsartan (KDIGO), active Irbesartan (KDIGO).
+>
+> **Actions:** No shared actions. KDIGO prescribes Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan; USPSTF prescribes —.
 
 ### Verdict
 
@@ -776,8 +818,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M15: ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) ↔ Selectively offer statin based on shared decision-making (Grade C)
 
-> **Clinical scenario:** A 57-year-old with Dyslipidemia, Urine Acr ≥ 30 mg/g, ascvd_10yr ≥ 7.5%, ascvd_10yr < 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL, +6 more) would trigger both the KDIGO rec (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) and the USPSTF rec (Selectively offer statin based on shared decision-making ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -789,7 +829,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Active: Lisinopril, Enalapril, Ramipril, Losartan, Valsartan, Irbesartan | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Urine Acr ≥ 30 mg/g (KDIGO), ascvd_10yr ≥ 7.5% (USPSTF), ascvd_10yr < 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Lisinopril (KDIGO), active Enalapril (KDIGO), active Ramipril (KDIGO), active Losartan (KDIGO), active Valsartan (KDIGO), active Irbesartan (KDIGO).
+>
+> **Actions:** No shared actions. KDIGO prescribes Enalapril, Irbesartan, Lisinopril, Losartan, Ramipril, Valsartan; USPSTF prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion.
 
 ### Verdict
 
@@ -804,8 +848,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M16: Monitor eGFR and urine ACR in patients with CKD ↔ Initiate statin for primary prevention of CVD (Grade B)
 
-> **Clinical scenario:** A 57-year-old with Egfr < 60 mL/min/1.73m2, Dyslipidemia, ascvd_10yr ≥ 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL) would trigger both the KDIGO rec (Monitor eGFR and urine ACR in patients with CKD) and the USPSTF rec (Initiate statin for primary prevention of CVD (Grade B)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -817,7 +859,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | — | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Egfr, Urine Acr | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with one of: Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (KDIGO), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), ascvd_10yr ≥ 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF).
+>
+> **Actions:** No shared actions. KDIGO prescribes Egfr, Urine Acr; USPSTF prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin.
 
 ### Verdict
 
@@ -832,8 +878,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M17: Monitor eGFR and urine ACR in patients with CKD ↔ Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)
 
-> **Clinical scenario:** A 98-year-old with Egfr < 60 mL/min/1.73m2 (without Ascvd Established) would trigger both the KDIGO rec (Monitor eGFR and urine ACR in patients with CKD) and the USPSTF rec (Insufficient evidence to recommend for or against initiat...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -845,7 +889,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | — | Ascvd Established |
 | **Actions** | Egfr, Urine Acr | — |
 
-**Age overlap:** 76–120
+> **Overlap population:** adults age 76–120 with one of: Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (USPSTF).
+>
+> **Actions:** No shared actions. KDIGO prescribes Egfr, Urine Acr; USPSTF prescribes —.
 
 ### Verdict
 
@@ -860,8 +908,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M18: Monitor eGFR and urine ACR in patients with CKD ↔ Selectively offer statin based on shared decision-making (Grade C)
 
-> **Clinical scenario:** A 57-year-old with Egfr < 60 mL/min/1.73m2, Dyslipidemia, ascvd_10yr ≥ 7.5%, ascvd_10yr < 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL) would trigger both the KDIGO rec (Monitor eGFR and urine ACR in patients with CKD) and the USPSTF rec (Selectively offer statin based on shared decision-making ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -873,7 +919,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | — | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Egfr, Urine Acr | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-**Age overlap:** 40–75
+> **Overlap population:** adults age 40–75 with one of: Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (KDIGO), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), ascvd_10yr ≥ 7.5% (USPSTF), ascvd_10yr < 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF).
+>
+> **Actions:** No shared actions. KDIGO prescribes Egfr, Urine Acr; USPSTF prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion.
 
 ### Verdict
 
@@ -888,8 +938,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M19: SGLT2 inhibitor for CKD with T2DM or significant albuminuria ↔ Initiate statin for primary prevention of CVD (Grade B)
 
-> **Clinical scenario:** A 57-year-old with Diabetes, Dyslipidemia, Egfr ≥ 20 mL/min/1.73m2, ascvd_10yr ≥ 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL, +2 more) would trigger both the KDIGO rec (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) and the USPSTF rec (Initiate statin for primary prevention of CVD (Grade B)).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -901,8 +949,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Active: Empagliflozin, Dapagliflozin | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Dapagliflozin, Empagliflozin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 40–75
- · **Conditions:** Shared condition (some disjunctive): Diabetes
+> **Overlap population:** adults age 40–75 with one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Egfr ≥ 20 mL/min/1.73m2 (KDIGO), ascvd_10yr ≥ 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Empagliflozin (KDIGO), active Dapagliflozin (KDIGO).
+>
+> **Actions:** No shared actions. KDIGO prescribes Dapagliflozin, Empagliflozin; USPSTF prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin.
 
 ### Verdict
 
@@ -917,8 +968,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M20: SGLT2 inhibitor for CKD with T2DM or significant albuminuria ↔ Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)
 
-> **Clinical scenario:** A 98-year-old with Diabetes, Egfr ≥ 20 mL/min/1.73m2 (without Ascvd Established, active Empagliflozin, active Dapagliflozin) would trigger both the KDIGO rec (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) and the USPSTF rec (Insufficient evidence to recommend for or against initiat...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -930,7 +979,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Active: Empagliflozin, Dapagliflozin | Ascvd Established |
 | **Actions** | Dapagliflozin, Empagliflozin | — |
 
-**Age overlap:** 76–120
+> **Overlap population:** adults age 76–120 with one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Egfr ≥ 20 mL/min/1.73m2 (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), active Empagliflozin (KDIGO), active Dapagliflozin (KDIGO).
+>
+> **Actions:** No shared actions. KDIGO prescribes Dapagliflozin, Empagliflozin; USPSTF prescribes —.
 
 ### Verdict
 
@@ -945,8 +998,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M21: SGLT2 inhibitor for CKD with T2DM or significant albuminuria ↔ Selectively offer statin based on shared decision-making (Grade C)
 
-> **Clinical scenario:** A 57-year-old with Diabetes, Dyslipidemia, Egfr ≥ 20 mL/min/1.73m2, ascvd_10yr ≥ 7.5%, ascvd_10yr < 10% (without Ascvd Established, Familial Hypercholesterolemia, Ldl Cholesterol ≥ 190 mg/dL, +2 more) would trigger both the KDIGO rec (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) and the USPSTF rec (Selectively offer statin based on shared decision-making ...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -958,8 +1009,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Active: Empagliflozin, Dapagliflozin | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Dapagliflozin, Empagliflozin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-**Age overlap:** 40–75
- · **Conditions:** Shared condition (some disjunctive): Diabetes
+> **Overlap population:** adults age 40–75 with one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), Egfr ≥ 20 mL/min/1.73m2 (KDIGO), ascvd_10yr ≥ 7.5% (USPSTF), ascvd_10yr < 10% (USPSTF).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Empagliflozin (KDIGO), active Dapagliflozin (KDIGO).
+>
+> **Actions:** No shared actions. KDIGO prescribes Dapagliflozin, Empagliflozin; USPSTF prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion.
 
 ### Verdict
 
@@ -974,8 +1028,6 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ## M22: Moderate-intensity statin for CKD patients aged ≥50, not on dialysis ↔ Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)
 
-> **Clinical scenario:** A 537-year-old with Egfr < 60 mL/min/1.73m2, Egfr ≥ 15 mL/min/1.73m2 (without Ascvd Established, active Atorvastatin, active Rosuvastatin, +5 more) would trigger both the KDIGO rec (Moderate-intensity statin for CKD patients aged ≥50, not ...) and the USPSTF rec (Insufficient evidence to recommend for or against initiat...).
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | KDIGO | USPSTF |
@@ -987,7 +1039,11 @@ Both recs can fire for the same patient but target different therapeutic actions
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | Ascvd Established |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | — |
 
-**Age overlap:** ≥76
+> **Overlap population:** adults age ≥76 with Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO).
+>
+> **Must NOT have:** Ascvd Established (USPSTF), active Atorvastatin (KDIGO), active Rosuvastatin (KDIGO), active Simvastatin (KDIGO), active Pravastatin (KDIGO), active Lovastatin (KDIGO), active Fluvastatin (KDIGO), active Pitavastatin (KDIGO).
+>
+> **Actions:** No shared actions. KDIGO prescribes Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin; USPSTF prescribes —.
 
 ### Verdict
 
@@ -1008,8 +1064,6 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ## X1: Moderate-intensity statin for diabetes mellitus, age 40-75 ↔ Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)
 
-> **Clinical scenario:** No patient can trigger both — age ranges do not overlap.
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -1021,7 +1075,7 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 | **Excludes** | Ascvd Established; Ldl Cholesterol ≥ 190 mg/dL | Ascvd Established |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | — |
 
-**Age overlap:** NO OVERLAP (40–75 vs ≥76)
+> **No overlap:** age ranges do not overlap (40–75 vs ≥76)
 
 ### Verdict
 
@@ -1036,8 +1090,6 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ## X2: Moderate-to-high-intensity statin for primary prevention (age 40-75, LDL 70-189, ASCVD risk ≥7.5%) ↔ Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)
 
-> **Clinical scenario:** No patient can trigger both — age ranges do not overlap.
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -1049,7 +1101,7 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 | **Excludes** | Ascvd Established, Diabetes; Ldl Cholesterol ≥ 190 mg/dL | Ascvd Established |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | — |
 
-**Age overlap:** NO OVERLAP (40–75 vs ≥76)
+> **No overlap:** age ranges do not overlap (40–75 vs ≥76)
 
 ### Verdict
 
@@ -1064,8 +1116,6 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ## X3: High-intensity statin for secondary prevention in clinical ASCVD (age ≤75) ↔ Initiate statin for primary prevention of CVD (Grade B)
 
-> **Clinical scenario:** No patient can trigger both — mutually exclusive conditions.
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -1077,9 +1127,7 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 | **Excludes** | — | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Rosuvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-**Age overlap:** 40–75
- · **Conditions:** Rec A requires Ascvd Established which Rec B excludes
- · **Shared targets:** Atorvastatin, Rosuvastatin
+> **No overlap:** Rec A requires Ascvd Established which Rec B excludes
 
 ### Verdict
 
@@ -1095,8 +1143,6 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ## X4: High-intensity statin for secondary prevention in clinical ASCVD (age ≤75) ↔ Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)
 
-> **Clinical scenario:** No patient can trigger both — age ranges do not overlap and mutually exclusive conditions.
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -1108,8 +1154,7 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 | **Excludes** | — | Ascvd Established |
 | **Actions** | Atorvastatin, Rosuvastatin | — |
 
-**Age overlap:** NO OVERLAP (18–75 vs ≥76)
- · **Conditions:** Rec A requires Ascvd Established which Rec B excludes
+> **No overlap:** age ranges do not overlap (18–75 vs ≥76); Rec A requires Ascvd Established which Rec B excludes
 
 ### Verdict
 
@@ -1124,8 +1169,6 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ## X5: High-intensity statin for secondary prevention in clinical ASCVD (age ≤75) ↔ Selectively offer statin based on shared decision-making (Grade C)
 
-> **Clinical scenario:** No patient can trigger both — mutually exclusive conditions.
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -1137,9 +1180,7 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 | **Excludes** | — | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Rosuvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-**Age overlap:** 40–75
- · **Conditions:** Rec A requires Ascvd Established which Rec B excludes
- · **Shared targets:** Atorvastatin, Rosuvastatin
+> **No overlap:** Rec A requires Ascvd Established which Rec B excludes
 
 ### Verdict
 
@@ -1155,8 +1196,6 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ## X6: High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75) ↔ Insufficient evidence to recommend for or against initiating statins (Grade I, >=76)
 
-> **Clinical scenario:** No patient can trigger both — age ranges do not overlap.
-
 | | Rec A | Rec B |
 |---|---|---|
 | **Guideline** | ACC/AHA | USPSTF |
@@ -1168,7 +1207,7 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 | **Excludes** | Ascvd Established | Ascvd Established |
 | **Actions** | Atorvastatin, Rosuvastatin | — |
 
-**Age overlap:** NO OVERLAP (20–75 vs ≥76)
+> **No overlap:** age ranges do not overlap (20–75 vs ≥76)
 
 ### Verdict
 

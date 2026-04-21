@@ -502,11 +502,6 @@ def _render_pair(
     lines.append(f"## {label}: {rec_a.title} ↔ {rec_b.title}")
     lines.append("")
 
-    # Clinical scenario
-    scenario = _build_clinical_scenario(rec_a, rec_b, ea, eb, overlap)
-    lines.append(f"> **Clinical scenario:** {scenario}")
-    lines.append("")
-
     # Side-by-side comparison table
     lines.append("| | Rec A | Rec B |")
     lines.append("|---|---|---|")
@@ -516,7 +511,6 @@ def _render_pair(
     lines.append(f"| **Intent** | {rec_a.intent} | {rec_b.intent} |")
     lines.append(f"| **Age** | {ea.age_range_str()} | {eb.age_range_str()} |")
 
-    # Eligibility rows — break out the key criteria
     a_requires = _eligibility_requires(ea)
     b_requires = _eligibility_requires(eb)
     a_excludes = _eligibility_excludes(ea)
@@ -525,19 +519,14 @@ def _render_pair(
     lines.append(f"| **Requires** | {a_requires} | {b_requires} |")
     lines.append(f"| **Excludes** | {a_excludes} | {b_excludes} |")
 
-    # Action targets
     a_actions = ", ".join(_display_code(e) for e in sorted(rec_a.action_entity_ids)) or "—"
     b_actions = ", ".join(_display_code(e) for e in sorted(rec_b.action_entity_ids)) or "—"
     lines.append(f"| **Actions** | {a_actions} | {b_actions} |")
     lines.append("")
 
-    # Overlap summary (compact)
-    lines.append(f"**Age overlap:** {overlap.age_overlap}")
-    if overlap.condition_notes != "Compatible":
-        lines.append(f" · **Conditions:** {overlap.condition_notes}")
-    if overlap.shared_therapeutic_targets:
-        targets = ", ".join(_display_code(t) for t in overlap.shared_therapeutic_targets)
-        lines.append(f" · **Shared targets:** {targets}")
+    # Overlap description — the key section
+    overlap_desc = _build_overlap_description(rec_a, rec_b, ea, eb, overlap)
+    lines.append(overlap_desc)
     lines.append("")
 
     # Pre-populated verdict
@@ -547,114 +536,138 @@ def _render_pair(
     lines.append("")
 
 
-def _build_clinical_scenario(
+def _build_overlap_description(
     rec_a: RecInfo,
     rec_b: RecInfo,
     ea: EligibilityCriteria,
     eb: EligibilityCriteria,
     overlap: OverlapAnalysis,
 ) -> str:
-    """Build a plain-English sentence describing the specific patient who triggers both recs.
+    """Build a structured overlap description with population, requirements, exclusions, and action comparison."""
 
-    The scenario must reflect the INTERSECTION of both recs' requirements AND
-    the UNION of both recs' exclusions — the narrowest population where both fire.
-    """
     if not overlap.age_overlaps or not overlap.condition_compatible:
         reasons: list[str] = []
         if not overlap.age_overlaps:
-            reasons.append("age ranges do not overlap")
+            reasons.append(
+                f"age ranges do not overlap ({ea.age_range_str()} vs {eb.age_range_str()})"
+            )
         if not overlap.condition_compatible:
-            reasons.append("mutually exclusive conditions")
-        return f"No patient can trigger both — {' and '.join(reasons)}."
+            reasons.append(overlap.condition_notes)
+        return f"> **No overlap:** {'; '.join(reasons)}"
 
-    # --- Build the positive requirements (intersection) ---
-
-    # Age overlap range
-    a_lo = ea.effective_age_min or 0
-    a_hi = ea.effective_age_max or 999
-    b_lo = eb.effective_age_min or 0
-    b_hi = eb.effective_age_max or 999
-    overlap_lo = max(a_lo, b_lo)
-    overlap_hi = min(a_hi, b_hi)
-    mid_age = (overlap_lo + overlap_hi) // 2
-
-    # Collect ALL positive requirements from both recs (deduplicated)
-    req_parts: list[str] = []
-    seen: set[str] = set()
-
-    def _add_req(text: str) -> None:
-        if text not in seen:
-            seen.add(text)
-            req_parts.append(text)
-
-    # Conjunctive conditions from both recs
-    for c in ea.required_conditions + eb.required_conditions:
-        _add_req(_display_code(c))
-
-    # Disjunctive groups — pick one satisfying branch per group
-    # Label which rec the requirement comes from when it's rec-specific
-    for label, elig in [("Rec A", ea), ("Rec B", eb)]:
-        for group in elig.disjunctive_groups:
-            if group.conditions:
-                _add_req(_display_code(group.conditions[0]))
-            elif group.observations:
-                obs = group.observations[0]
-                _add_req(_format_obs_short(obs))
-
-    # Required observations (conjunctive, non-disjunctive)
-    for label, elig in [("Rec A", ea), ("Rec B", eb)]:
-        for obs in elig.required_observations:
-            _add_req(_format_obs_short(obs))
-
-    # Risk scores
-    for rs in ea.risk_scores + eb.risk_scores:
-        comp = _comparator_symbol(rs.get("comparator", ""))
-        _add_req(f"{rs.get('name')} {comp} {rs.get('threshold')}%")
-
-    # Smoking
-    for label, elig in [("Rec A", ea), ("Rec B", eb)]:
-        if elig.smoking_status:
-            _add_req(f"smoking status: {elig.smoking_status[0]}")
-
-    # --- Build the exclusion constraints (union) ---
-    excl_parts: list[str] = []
-    excl_seen: set[str] = set()
-
-    def _add_excl(text: str) -> None:
-        if text not in excl_seen:
-            excl_seen.add(text)
-            excl_parts.append(text)
-
-    for c in ea.excluded_conditions + eb.excluded_conditions:
-        _add_excl(_display_code(c))
-
-    for obs in ea.excluded_observations + eb.excluded_observations:
-        _add_excl(_format_obs_short(obs))
-
-    for m in ea.excluded_medications + eb.excluded_medications:
-        _add_excl(f"active {_display_code(m)}")
-
-    # --- Assemble the sentence ---
-    scenario = f"A {mid_age}-year-old"
-
-    if req_parts:
-        scenario += f" with {', '.join(req_parts)}"
-
-    if excl_parts:
-        scenario += f" (without {', '.join(excl_parts[:3])}"
-        if len(excl_parts) > 3:
-            scenario += f", +{len(excl_parts) - 3} more"
-        scenario += ")"
-
+    lines: list[str] = []
     g_a = _short_guideline(rec_a.guideline_id)
     g_b = _short_guideline(rec_b.guideline_id)
-    scenario += (
-        f" would trigger both the {g_a} rec "
-        f"({_short_title(rec_a.title)}) and the "
-        f"{g_b} rec ({_short_title(rec_b.title)})."
-    )
 
-    return scenario
+    # --- Overlap population ---
+    pop_parts: list[str] = []
+    pop_parts.append(f"adults age {overlap.age_overlap}")
+
+    # Collect combined requirements in plain language
+    req_items: list[str] = []
+    seen: set[str] = set()
+
+    def _add(text: str, source: str) -> None:
+        if text not in seen:
+            seen.add(text)
+            req_items.append(f"{text} ({source})")
+
+    # Conjunctive conditions
+    for c in ea.required_conditions:
+        _add(_display_code(c), g_a)
+    for c in eb.required_conditions:
+        _add(_display_code(c), g_b)
+
+    # Disjunctive groups — pick one satisfying branch, note it's "any of"
+    for g_label, elig in [(g_a, ea), (g_b, eb)]:
+        for group in elig.disjunctive_groups:
+            branch_names: list[str] = []
+            for c in group.conditions:
+                branch_names.append(_display_code(c))
+            for obs in group.observations:
+                branch_names.append(_format_obs_short(obs))
+            for sv in group.smoking_values:
+                branch_names.append(f"smoking: {sv}")
+            if len(branch_names) == 1:
+                _add(branch_names[0], g_label)
+            elif branch_names:
+                _add(f"one of: {' / '.join(branch_names)}", g_label)
+
+    # Required observations (conjunctive)
+    for g_label, elig in [(g_a, ea), (g_b, eb)]:
+        for obs in elig.required_observations:
+            _add(_format_obs_short(obs), g_label)
+
+    # Risk scores
+    for g_label, elig in [(g_a, ea), (g_b, eb)]:
+        for rs in elig.risk_scores:
+            comp = _comparator_symbol(rs.get("comparator", ""))
+            _add(f"{rs.get('name')} {comp} {rs.get('threshold')}%", g_label)
+
+    if req_items:
+        pop_parts.append("with " + ", ".join(req_items))
+
+    lines.append(f"> **Overlap population:** {' '.join(pop_parts)}.")
+
+    # --- Exclusions (union of both) ---
+    excl_items: list[str] = []
+    excl_seen: set[str] = set()
+
+    def _add_excl(text: str, source: str) -> None:
+        key = text.lower()
+        if key not in excl_seen:
+            excl_seen.add(key)
+            excl_items.append(f"{text} ({source})")
+
+    for c in ea.excluded_conditions:
+        _add_excl(_display_code(c), g_a)
+    for c in eb.excluded_conditions:
+        _add_excl(_display_code(c), g_b)
+    for obs in ea.excluded_observations:
+        _add_excl(_format_obs_short(obs), g_a)
+    for obs in eb.excluded_observations:
+        _add_excl(_format_obs_short(obs), g_b)
+    for m in ea.excluded_medications:
+        _add_excl(f"active {_display_code(m)}", g_a)
+    for m in eb.excluded_medications:
+        _add_excl(f"active {_display_code(m)}", g_b)
+
+    if excl_items:
+        lines.append(f">")
+        lines.append(f"> **Must NOT have:** {', '.join(excl_items)}.")
+
+    # --- Action comparison ---
+    a_entities = set(rec_a.action_entity_ids)
+    b_entities = set(rec_b.action_entity_ids)
+    shared = sorted(a_entities & b_entities)
+    a_only = sorted(a_entities - b_entities)
+    b_only = sorted(b_entities - a_entities)
+
+    lines.append(f">")
+    if shared and not a_only and not b_only:
+        shared_names = ", ".join(_display_code(e) for e in shared)
+        lines.append(
+            f"> **Actions:** Both recs prescribe the same actions: {shared_names}. "
+            f"No conflict in agent selection."
+        )
+    elif shared:
+        shared_names = ", ".join(_display_code(e) for e in shared)
+        lines.append(f"> **Shared actions:** {shared_names}.")
+        if a_only:
+            a_names = ", ".join(_display_code(e) for e in a_only)
+            lines.append(f"> **{g_a} only:** {a_names}.")
+        if b_only:
+            b_names = ", ".join(_display_code(e) for e in b_only)
+            lines.append(f"> **{g_b} only:** {b_names}.")
+    else:
+        a_names = ", ".join(_display_code(e) for e in sorted(a_entities)) or "—"
+        b_names = ", ".join(_display_code(e) for e in sorted(b_entities)) or "—"
+        lines.append(
+            f"> **Actions:** No shared actions. "
+            f"{g_a} prescribes {a_names}; {g_b} prescribes {b_names}."
+        )
+
+    return "\n".join(lines)
 
 
 def _format_obs_short(obs: dict) -> str:

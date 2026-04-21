@@ -15,7 +15,7 @@ cd "$EVALS_DIR"
 
 # Default to --all if no --fixture is specified
 if [[ ! " $* " =~ " --fixture " ]]; then
-    exec uv run python -m harness.runner --all "$@"
+    exec uv run python -m harness --all "$@"
 else
-    exec uv run python -m harness.runner "$@"
+    exec uv run python -m harness "$@"
 fi

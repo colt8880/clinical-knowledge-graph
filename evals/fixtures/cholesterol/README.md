@@ -22,10 +22,10 @@ Each case directory contains:
 
 ```sh
 # Single-guideline eval gate (Arm C against ACC/AHA subgraph)
-cd evals && uv run python -m harness.runner --guideline cholesterol --arm c
+cd evals && uv run python -m harness --guideline cholesterol --arm c
 
 # Specific fixture
-cd evals && uv run python -m harness.runner --fixture cholesterol/case-01
+cd evals && uv run python -m harness --fixture cholesterol/case-01
 ```
 
 ## Deferred

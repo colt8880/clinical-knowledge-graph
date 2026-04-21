@@ -1,0 +1,43 @@
+{
+  "description": "58M, Black, primary prevention, HTN, smoker, CKD G3b (eGFR 38), ACR 65, LDL 152, ASCVD 9%. Both edge types fire on the same patient: ACC/AHA R4 preempts USPSTF Grade C (P4), then KDIGO R3 MODIFIES ACC/AHA to moderate intensity (M1 targets primary prevention, not secondary). Tests whether the LLM can chain preemption + modification interactions.",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "ACC/AHA R4 (COR I, LOE A): primary prevention, age 40-75, no diabetes, LDL 70-189 (LDL 152), ASCVD risk ≥7.5% (9%). USPSTF Grade C also matched (ASCVD 7.5-<10%, HTN as risk factor) but is preempted by ACC/AHA (P4, ADR 0018). ACC/AHA would recommend moderate-to-high-intensity. KDIGO R3 (1A) then MODIFIES ACC/AHA R4 intensity to moderate for CKD G3b (eGFR 38) — altered pharmacokinetics and myopathy risk preclude high-intensity (M1 edge). Net result: moderate-intensity statin.",
+      "source_rec_id": "rec:accaha-statin-primary-prevention",
+      "priority": 1
+    },
+    {
+      "id": "ckd-monitoring",
+      "label": "Monitor eGFR and urine ACR per KDIGO",
+      "rationale": "KDIGO R1 (1B): regular monitoring for CKD G3b (eGFR 38) with A2 albuminuria (ACR 65). High risk category — monitor at least every 6 months.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 2
+    },
+    {
+      "id": "smoking-cessation",
+      "label": "Counsel on smoking cessation",
+      "rationale": "Current smoker. Smoking is a major modifiable CVD risk factor and accelerates CKD progression. Cessation is the single most impactful risk reduction intervention.",
+      "priority": 3
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure to <130/80",
+      "rationale": "BP 144/90 well above target despite lisinopril. CKD G3b + albuminuria requires target <130/80 per KDIGO. HTN is also a CVD risk factor driving the ASCVD risk score. Consider uptitrating ACEi or adding a second agent.",
+      "priority": 4
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-high-intensity-statin",
+      "label": "Do not recommend high-intensity statin",
+      "rationale": "Despite ACC/AHA R4 allowing moderate-to-high-intensity, KDIGO R3 (1A) modifies the recommendation to moderate-intensity only for CKD G3b (eGFR 38). High-intensity doses have altered pharmacokinetics and increased myopathy risk in CKD. The KDIGO modifier takes precedence for dosing intensity (M1 edge, ADR 0018)."
+    },
+    {
+      "id": "no-uspstf-grade-c-sdm-framing",
+      "label": "Do not frame statin recommendation as shared decision-making (USPSTF Grade C)",
+      "rationale": "USPSTF Grade C is preempted by ACC/AHA R4 (P4, ADR 0018). The Grade C framing of 'selectively offer based on shared decision' underrepresents the strength of the ACC/AHA recommendation (COR I, definitive). The statin recommendation should be framed as a definitive clinical action, not a shared decision discussion."
+    }
+  ]
+}

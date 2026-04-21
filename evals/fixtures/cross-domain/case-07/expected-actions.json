@@ -1,0 +1,31 @@
+{
+  "description": "45M, LDL 210 (≥190), familial pattern dyslipidemia, HTN, ASCVD 9.5%. ACC/AHA severe hypercholesterolemia R2 (COR I, LOE B-NR) mandates HIGH-intensity statin. Preempts USPSTF Grade B (P5 — LDL ≥190 triggers USPSTF out-of-scope exit, but the ASCVD risk still qualifies for Grade B) and Grade C (P6). Expected action MUST specify high-intensity, not moderate.",
+  "actions": [
+    {
+      "id": "initiate-statin-high-intensity",
+      "label": "Initiate high-intensity statin therapy (atorvastatin 40-80mg or rosuvastatin 20-40mg)",
+      "rationale": "ACC/AHA R2 (COR I, LOE B-NR): adults 20-75 with LDL ≥190 mg/dL should receive maximally tolerated high-intensity statin without requiring ASCVD risk calculation. LDL 210 mg/dL qualifies. This is NOT moderate-intensity — severe hypercholesterolemia requires high-intensity for maximal LDL-C lowering. USPSTF would have triggered out-of-scope exit for LDL ≥190; P5 and P6 preemption edges document the precedence relationship (ADR 0018).",
+      "source_rec_id": "rec:accaha-statin-severe-hypercholesterolemia",
+      "priority": 1
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure management",
+      "rationale": "BP 138/86 on no antihypertensive despite confirmed HTN. Uncontrolled HTN compounds cardiovascular risk in severe hypercholesterolemia.",
+      "priority": 2
+    },
+    {
+      "id": "lipid-monitoring-aggressive",
+      "label": "Monitor lipid panel for LDL response to high-intensity statin",
+      "rationale": "ACC/AHA: if LDL remains ≥100 mg/dL on maximally tolerated high-intensity statin, adding ezetimibe is reasonable. Baseline LDL 210; even a 50% reduction yields ~105 mg/dL, near the ezetimibe consideration threshold.",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-moderate-intensity-statin",
+      "label": "Do not recommend moderate-intensity statin",
+      "rationale": "ACC/AHA R2 mandates high-intensity for LDL ≥190. Moderate-intensity is insufficient for severe hypercholesterolemia. USPSTF's moderate-intensity recommendation does not apply — LDL ≥190 triggers the USPSTF out-of-scope exit. The P5/P6 preemption edges reinforce that ACC/AHA's high-intensity guidance takes precedence."
+    }
+  ]
+}

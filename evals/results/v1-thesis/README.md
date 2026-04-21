@@ -15,8 +15,8 @@ The graph-context arm (Arm C) outperforms flat RAG (Arm B) on multi-guideline fi
 
 - **Fixtures:** 16 total (12 single-guideline, 4 multi-guideline)
 - **Arms:** A (vanilla LLM), B (flat RAG), C (graph context + convergence)
-- **Arm model:** claude-sonnet-4-6-20250514
-- **Judge model:** claude-opus-4-6-20250610
+- **Arm model:** claude-sonnet-4-20250514
+- **Judge model:** claude-opus-4-20250514
 - **Temperature:** 0 (all calls)
 - **Self-consistency:** 3 judge runs per fixture/arm
 

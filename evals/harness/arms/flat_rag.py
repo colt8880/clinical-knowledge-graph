@@ -87,11 +87,24 @@ def _chunk_text(text: str, chunk_size: int, overlap: int) -> list[str]:
     return chunks
 
 
+# Files that describe cross-guideline relationships (edges removed pending
+# clinician review). Excluding these keeps Arm B's source material aligned
+# with the actual graph state — no preemption/modifier prose that the graph
+# can't corroborate.
+_EXCLUDED_FILES = {"cross-guideline-map.md", "preemption-map.md"}
+
+
 def _load_guideline_texts() -> list[str]:
-    """Load all guideline markdown files from docs/reference/guidelines/."""
+    """Load guideline markdown files from docs/reference/guidelines/.
+
+    Excludes cross-guideline relationship docs whose corresponding graph
+    edges have been removed pending clinician review.
+    """
     texts: list[str] = []
     if GUIDELINES_ROOT.exists():
         for md_file in sorted(GUIDELINES_ROOT.glob("*.md")):
+            if md_file.name in _EXCLUDED_FILES:
+                continue
             texts.append(md_file.read_text())
     return texts
 

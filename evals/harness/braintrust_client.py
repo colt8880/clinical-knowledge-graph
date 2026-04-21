@@ -99,16 +99,21 @@ class BraintrustLogger:
         self._local_entries.append(entry)
 
         if self._enabled and self._experiment is not None:
+            # Braintrust requires scores in [0, 1]; our rubric is 1-5.
+            # Normalize: (score - 1) / 4 maps 1→0, 5→1.
+            def _norm(val: float) -> float:
+                return max(0.0, min(1.0, (val - 1) / 4))
+
             self._experiment.log(
                 input={"patient_context": patient_context, "fixture_id": fixture_id},
                 output=output.get("parsed", {}),
                 expected=expected_actions,
                 scores={
-                    "completeness": _extract_score(rubric_scores, "completeness"),
-                    "clinical_appropriateness": _extract_score(rubric_scores, "clinical_appropriateness"),
-                    "prioritization": _extract_score(rubric_scores, "prioritization"),
-                    "integration": _extract_score(rubric_scores, "integration"),
-                    "composite": rubric_scores.get("composite", 0),
+                    "completeness": _norm(_extract_score(rubric_scores, "completeness")),
+                    "clinical_appropriateness": _norm(_extract_score(rubric_scores, "clinical_appropriateness")),
+                    "prioritization": _norm(_extract_score(rubric_scores, "prioritization")),
+                    "integration": _norm(_extract_score(rubric_scores, "integration")),
+                    "composite": _norm(rubric_scores.get("composite", 0)),
                 },
                 metadata={
                     "arm_id": arm_id,

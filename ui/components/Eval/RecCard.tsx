@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import type { RecCardData, ConvergenceEntry } from "@/lib/recListBuilder";
+import type { RecCardData } from "@/lib/recListBuilder";
 
 // Domain badge colors — matches F28 palette.
 const DOMAIN_BADGE: Record<string, { bg: string; text: string; dot: string }> = {

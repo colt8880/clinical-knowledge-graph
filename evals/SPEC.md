@@ -228,24 +228,18 @@ The `rendered_prose` field is a natural-language summary so the LLM doesn't have
 
 The `convergence_summary` key surfaces clinical entities targeted by strategies from two or more guidelines. `shared_actions` is empty when only one guideline is traversed or no entities are shared. `convergence_type` is always `"reinforcing"` until clinician-reviewed cross-guideline edges return (at which point conflicting convergence may also be detected). `convergence_prose` is a human-readable paragraph when shared actions exist, empty string otherwise.
 
-### Cache rules
-
-Arm output cache key: `(fixture_path, arm_id, prompt_hash, context_hash, model_version)`. Changing any component invalidates.
-
-Score cache key: `(rubric_version, judge_model)`. Changing either invalidates. Score invalidation is transitive: if an arm output invalidates, its scores also invalidate.
-
-Cache storage: `evals/fixtures/<guideline>/<id>/arms/<arm>/meta.json` holds the hash inputs. `output.json` holds the arm output. `scores.json` holds the judge scores.
-
 ### Arm B chunking
 
-- Source: `docs/reference/guidelines/*.md` (prose sections with `{#prose-*}` anchors)
+- Source: `docs/reference/guidelines/*.md` (guideline prose; excludes `cross-guideline-map.md` and `preemption-map.md`)
 - Chunk size: ~500 tokens with ~50-token overlap
 - Embedding model: `text-embedding-3-small` (OpenAI)
 - Retrieval: top-k=5 chunks by cosine similarity against a query built from patient demographics and conditions
 
 ### Braintrust integration
 
-Optional at runtime. If `BRAINTRUST_API_KEY` is set, results are logged to Braintrust alongside local storage. If unset, harness runs fully locally with results in `evals/results/<timestamp>/`.
+The harness uses Braintrust's native `Eval()` framework. Each arm runs as a separate experiment (`{run-name}-arm-a`, `{run-name}-arm-b`, `{run-name}-arm-c`), enabling side-by-side comparison in the Braintrust UI. `BRAINTRUST_API_KEY` is required.
+
+Caching, experiment logging, and trial management are handled by Braintrust. The `trial_count` parameter controls self-consistency (number of times each input is scored).
 
 ## Related docs
 

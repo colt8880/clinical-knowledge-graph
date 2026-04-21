@@ -1,8 +1,8 @@
 """Scorecard aggregation: per-arm totals with breakdowns by dimension and fixture subset.
 
-Consumes the results list produced by runner.run_harness() (or loaded from
-evals/results/<timestamp>/results.json) and produces a structured scorecard
-suitable for report.py to render as markdown + JSON.
+Consumes results from Braintrust experiments (via fetch_from_braintrust())
+or a list of run results, and produces a structured scorecard suitable for
+report.py to render as markdown + JSON.
 
 Fixture subsets:
   - single-guideline: statins, cholesterol, kdigo (12 fixtures)
@@ -380,8 +380,54 @@ def _check_self_consistency(
     }
 
 
-# Allow `python -m harness.scorecard --run v1-thesis`
-if __name__ == "__main__":
-    from harness.scorecard_cli import main as _cli_main
+def _denormalize_score(val: float) -> float:
+    """Convert a Braintrust 0-1 score back to 1-5 rubric scale."""
+    return (val * 4) + 1
 
-    _cli_main()
+
+def fetch_from_braintrust(run_name: str) -> list[list[dict[str, Any]]]:
+    """Fetch results from Braintrust experiments and convert to run_results format.
+
+    Looks for experiments named '{run_name}-arm-{a,b,c}'. Each experiment
+    may have multiple trials (from trial_count). Returns one run_results list
+    per trial.
+    """
+    import braintrust
+
+    all_entries: list[dict[str, Any]] = []
+
+    for arm_id in ARM_IDS:
+        experiment_name = f"{run_name}-arm-{arm_id}"
+        try:
+            experiment = braintrust.load_experiment(
+                "clinical-knowledge-graph",
+                experiment_name,
+            )
+        except Exception as e:
+            print(f"Warning: could not load experiment '{experiment_name}': {e}")
+            continue
+
+        for row in experiment.fetch():
+            fixture_id = (row.get("metadata") or {}).get("fixture_id", "")
+            scores = row.get("scores", {})
+
+            # Denormalize from 0-1 back to 1-5
+            rubric_scores: dict[str, Any] = {}
+            for dim in DIMENSIONS:
+                raw = scores.get(dim, 0)
+                rubric_scores[dim] = {"score": _denormalize_score(raw), "rationale": ""}
+            composite_raw = scores.get("composite", 0)
+            rubric_scores["composite"] = _denormalize_score(composite_raw)
+
+            all_entries.append({
+                "fixture": fixture_id,
+                "arm": arm_id,
+                "composite": rubric_scores["composite"],
+                "scores": {"rubric_scores": rubric_scores},
+            })
+
+    if not all_entries:
+        return []
+
+    # For now, return as a single run (Braintrust averages trials internally)
+    return [all_entries]

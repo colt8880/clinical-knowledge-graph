@@ -21,10 +21,10 @@ Each case directory contains:
 
 ```sh
 # Single-guideline eval gate (Arm C against KDIGO subgraph)
-cd evals && uv run python -m harness.runner --guideline kdigo --arm c
+cd evals && uv run python -m harness --guideline kdigo --arm c
 
 # Specific fixture
-cd evals && uv run python -m harness.runner --fixture kdigo/case-01
+cd evals && uv run python -m harness --fixture kdigo/case-01
 ```
 
 ## Deferred

@@ -258,3 +258,66 @@ def score(
             "output_tokens": response.usage.output_tokens,
         },
     }
+
+
+def _normalize_score(val: float) -> float:
+    """Normalize a 1-5 rubric score to 0-1 for Braintrust."""
+    return max(0.0, min(1.0, (val - 1) / 4))
+
+
+def _extract_raw_score(rubric_entry: Any) -> float:
+    """Extract the numeric score from a rubric dimension entry."""
+    if isinstance(rubric_entry, dict):
+        return float(rubric_entry.get("score", 0))
+    if isinstance(rubric_entry, (int, float)):
+        return float(rubric_entry)
+    return 0.0
+
+
+def clinical_scorer(
+    input: dict[str, Any],
+    output: dict[str, Any],
+    expected: dict[str, Any],
+    metadata: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """Braintrust-compatible scorer wrapping the LLM judge + structural checks.
+
+    Returns a list of 5 score dicts (one per dimension + composite),
+    each normalized to [0, 1] for Braintrust.
+    """
+    metadata = metadata or {}
+    multi_guideline = metadata.get("subset") == "multi-guideline"
+
+    result = score(
+        patient_context=input,
+        arm_output=output,
+        expected_actions=expected,
+        multi_guideline=multi_guideline,
+    )
+
+    rubric = result["rubric_scores"]
+    structural = result["structural_checks"]
+
+    scores = []
+    for dim in ["completeness", "clinical_appropriateness", "prioritization", "integration"]:
+        raw = _extract_raw_score(rubric.get(dim, {}))
+        rationale = ""
+        if isinstance(rubric.get(dim), dict):
+            rationale = rubric[dim].get("rationale", "")
+        scores.append({
+            "name": dim,
+            "score": _normalize_score(raw),
+            "metadata": {"raw_1_5": raw, "rationale": rationale},
+        })
+
+    composite_raw = float(rubric.get("composite", 0))
+    scores.append({
+        "name": "composite",
+        "score": _normalize_score(composite_raw),
+        "metadata": {
+            "raw_1_5": composite_raw,
+            "structural_checks": structural,
+        },
+    })
+
+    return scores

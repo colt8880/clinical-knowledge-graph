@@ -405,14 +405,30 @@ def generate_review_document(
 
     # Group by candidate type
     convergence = [(a, b, o) for a, b, o in pairs if o.candidate_type == "convergence"]
-    modification = [(a, b, o) for a, b, o in pairs if o.candidate_type == "modification"]
     no_interaction = [(a, b, o) for a, b, o in pairs if o.candidate_type == "no_interaction"]
+
+    # Split modification candidates: same-domain (needs review) vs cross-domain (auto-reject)
+    mod_needs_review: list[tuple[RecInfo, RecInfo, OverlapAnalysis]] = []
+    mod_auto_reject: list[tuple[RecInfo, RecInfo, OverlapAnalysis]] = []
+    for a, b, o in pairs:
+        if o.candidate_type != "modification":
+            continue
+        a_domain = _therapeutic_domain(a)
+        b_domain = _therapeutic_domain(b)
+        if a_domain == b_domain:
+            mod_needs_review.append((a, b, o))
+        else:
+            mod_auto_reject.append((a, b, o))
 
     # Sort each group by guideline pair, then rec ID
     sort_key = lambda p: (p[0].guideline_id, p[1].guideline_id, p[0].id, p[1].id)
     convergence.sort(key=sort_key)
-    modification.sort(key=sort_key)
+    mod_needs_review.sort(key=sort_key)
+    mod_auto_reject.sort(key=sort_key)
     no_interaction.sort(key=sort_key)
+
+    needs_review_count = len(convergence) + len(mod_needs_review)
+    auto_reject_count = len(mod_auto_reject) + len(no_interaction)
 
     # Generate markdown
     lines: list[str] = []
@@ -425,12 +441,13 @@ def generate_review_document(
     lines.append("")
     lines.append("## Summary")
     lines.append("")
-    lines.append(f"| Category | Count |")
-    lines.append(f"|----------|-------|")
-    lines.append(f"| Convergence (shared therapeutic targets) | {len(convergence)} |")
-    lines.append(f"| Modification candidates (different actions, same patient) | {len(modification)} |")
-    lines.append(f"| No interaction (eligibility doesn't overlap) | {len(no_interaction)} |")
-    lines.append(f"| **Total** | **{len(pairs)}** |")
+    lines.append(f"| Category | Count | Review needed? |")
+    lines.append(f"|----------|-------|----------------|")
+    lines.append(f"| Convergence (shared therapeutic targets) | {len(convergence)} | Yes |")
+    lines.append(f"| Modification candidates (same domain) | {len(mod_needs_review)} | Yes |")
+    lines.append(f"| Auto-rejected (different domains, no shared targets) | {len(mod_auto_reject)} | No |")
+    lines.append(f"| Auto-rejected (no eligibility overlap) | {len(no_interaction)} | No |")
+    lines.append(f"| **Total** | **{len(pairs)}** | **{needs_review_count} to review** |")
     lines.append("")
 
     # --- Convergence section ---
@@ -449,36 +466,72 @@ def generate_review_document(
         for idx, (rec_a, rec_b, overlap) in enumerate(convergence, 1):
             _render_pair(lines, f"C{idx}", rec_a, rec_b, overlap)
 
-    # --- Modification section ---
-    if modification:
+    # --- Modification section (same domain only) ---
+    if mod_needs_review:
         lines.append("---")
         lines.append("")
         lines.append("# Modification candidates")
         lines.append("")
         lines.append(
-            "Both recs can fire for the same patient but target different "
-            "therapeutic actions. Likely outcome: one **modifies** the other "
-            "(adjusts intensity, adds monitoring, flags a contraindication), "
-            "or they are **unrelated** (different clinical domains, no interaction)."
+            "Both recs fire for the same patient and address the **same "
+            "therapeutic domain** but with different actions. One may "
+            "**modify** the other (adjust intensity, add monitoring, flag "
+            "a contraindication)."
         )
         lines.append("")
-        for idx, (rec_a, rec_b, overlap) in enumerate(modification, 1):
+        for idx, (rec_a, rec_b, overlap) in enumerate(mod_needs_review, 1):
             _render_pair(lines, f"M{idx}", rec_a, rec_b, overlap)
 
-    # --- No interaction section ---
+    # --- Auto-rejected: different domains ---
+    if mod_auto_reject:
+        lines.append("---")
+        lines.append("")
+        lines.append("# Auto-rejected: different therapeutic domains")
+        lines.append("")
+        lines.append(
+            "These pairs can co-fire for the same patient but address "
+            "**unrelated therapeutic domains** with no shared targets. "
+            "Auto-rejected — no clinician review needed unless you disagree "
+            "with a domain classification."
+        )
+        lines.append("")
+        lines.append("| # | Rec A | Rec B | Domain A | Domain B | Age overlap |")
+        lines.append("|---|-------|-------|----------|----------|-------------|")
+        for idx, (rec_a, rec_b, overlap) in enumerate(mod_auto_reject, 1):
+            g_a = _short_guideline(rec_a.guideline_id)
+            g_b = _short_guideline(rec_b.guideline_id)
+            d_a = _therapeutic_domain(rec_a)
+            d_b = _therapeutic_domain(rec_b)
+            lines.append(
+                f"| {idx} | {_short_title(rec_a.title)} ({g_a}) "
+                f"| {_short_title(rec_b.title)} ({g_b}) "
+                f"| {d_a} | {d_b} | {overlap.age_overlap} |"
+            )
+        lines.append("")
+
+    # --- Auto-rejected: no eligibility overlap ---
     if no_interaction:
         lines.append("---")
         lines.append("")
-        lines.append("# No interaction (obvious rejects)")
+        lines.append("# Auto-rejected: no eligibility overlap")
         lines.append("")
         lines.append(
             "These pairs cannot co-match the same patient — age ranges don't "
-            "overlap, or one rec requires a condition the other excludes. "
-            "Listed for completeness. Expected verdict: **reject**."
+            "overlap or conditions are mutually exclusive. Auto-rejected."
         )
         lines.append("")
+        lines.append("| # | Rec A | Rec B | Reason |")
+        lines.append("|---|-------|-------|--------|")
         for idx, (rec_a, rec_b, overlap) in enumerate(no_interaction, 1):
-            _render_pair(lines, f"X{idx}", rec_a, rec_b, overlap)
+            g_a = _short_guideline(rec_a.guideline_id)
+            g_b = _short_guideline(rec_b.guideline_id)
+            reason = overlap.age_overlap if "NO OVERLAP" in overlap.age_overlap else overlap.condition_notes
+            lines.append(
+                f"| {idx} | {_short_title(rec_a.title)} ({g_a}) "
+                f"| {_short_title(rec_b.title)} ({g_b}) "
+                f"| {reason} |"
+            )
+        lines.append("")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines))

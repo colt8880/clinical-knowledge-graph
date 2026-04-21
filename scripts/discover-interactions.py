@@ -293,16 +293,33 @@ def compute_overlap(rec_a: RecInfo, rec_b: RecInfo) -> OverlapAnalysis:
         )
 
     # Check disjunctive groups: if ALL branches of a disjunctive group
-    # are excluded by the other Rec, there's no way to satisfy both
+    # are excluded by the other Rec, there's no way to satisfy both.
+    # A group is only fully excluded when it has ONLY condition branches
+    # and all of them are excluded. Observation/medication branches
+    # provide alternative paths that condition exclusions don't block.
     for group in ea.disjunctive_groups:
-        if group.conditions and all(c in b_exc for c in group.conditions):
+        has_non_condition_branches = bool(
+            group.observations or group.medications or group.smoking_values
+        )
+        if (
+            group.conditions
+            and not has_non_condition_branches
+            and all(c in b_exc for c in group.conditions)
+        ):
             condition_compatible = False
             names = ", ".join(_display_code(c) for c in group.conditions)
             condition_notes_parts.append(
                 f"All branches of Rec A disjunction ({names}) excluded by Rec B"
             )
     for group in eb.disjunctive_groups:
-        if group.conditions and all(c in a_exc for c in group.conditions):
+        has_non_condition_branches = bool(
+            group.observations or group.medications or group.smoking_values
+        )
+        if (
+            group.conditions
+            and not has_non_condition_branches
+            and all(c in a_exc for c in group.conditions)
+        ):
             condition_compatible = False
             names = ", ".join(_display_code(c) for c in group.conditions)
             condition_notes_parts.append(

@@ -448,7 +448,7 @@ class TestOverlapComputation:
         assert result.condition_compatible is True
 
     def test_disjunctive_all_excluded(self):
-        """If ALL branches of an any_of are excluded, pair is incompatible."""
+        """If ALL branches of an any_of are excluded (condition-only), pair is incompatible."""
         a = self._make_rec(
             "a",
             "g1",
@@ -463,3 +463,37 @@ class TestOverlapComputation:
         )
         result = compute_overlap(a, b)
         assert result.condition_compatible is False
+
+    def test_disjunctive_with_obs_branch_not_excluded(self):
+        """If a disjunction has observation branches alongside excluded conditions,
+        the observation branches provide alternative paths — pair stays compatible."""
+        # Mimics KDIGO SGLT2: any_of [diabetes+eGFR<60, ACR>=200]
+        # Even if diabetes is excluded, ACR>=200 branch still works
+        a = self._make_rec(
+            "a",
+            "g1",
+            json.dumps(
+                {
+                    "any_of": [
+                        {"has_active_condition": {"codes": ["cond:diabetes"]}},
+                        {
+                            "most_recent_observation_value": {
+                                "code": "obs:urine-acr",
+                                "window": "P2Y",
+                                "comparator": "gte",
+                                "threshold": 200,
+                                "unit": "mg/g",
+                            }
+                        },
+                    ]
+                }
+            ),
+        )
+        b = self._make_rec(
+            "b",
+            "g2",
+            '{"none_of": [{"has_active_condition": {"codes": ["cond:diabetes"]}}]}',
+        )
+        result = compute_overlap(a, b)
+        # Patient with ACR>=200 (no diabetes) can satisfy both
+        assert result.condition_compatible is True

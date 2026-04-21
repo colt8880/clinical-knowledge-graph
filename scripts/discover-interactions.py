@@ -269,12 +269,13 @@ def compute_overlap(rec_a: RecInfo, rec_b: RecInfo) -> OverlapAnalysis:
     condition_compatible = True
     condition_notes_parts: list[str] = []
 
-    # Check if A requires a condition B excludes, or vice versa
+    # Conjunctive conditions: patient MUST have these
     a_req = set(ea.required_conditions)
     a_exc = set(ea.excluded_conditions)
     b_req = set(eb.required_conditions)
     b_exc = set(eb.excluded_conditions)
 
+    # Check conjunctive conflicts: A requires what B excludes
     conflict_ab = a_req & b_exc
     conflict_ba = b_req & a_exc
 
@@ -291,11 +292,41 @@ def compute_overlap(rec_a: RecInfo, rec_b: RecInfo) -> OverlapAnalysis:
             f"Rec B requires {names} which Rec A excludes"
         )
 
-    # Shared required conditions
+    # Check disjunctive groups: if ALL branches of a disjunctive group
+    # are excluded by the other Rec, there's no way to satisfy both
+    for group in ea.disjunctive_groups:
+        if group.conditions and all(c in b_exc for c in group.conditions):
+            condition_compatible = False
+            names = ", ".join(_display_code(c) for c in group.conditions)
+            condition_notes_parts.append(
+                f"All branches of Rec A disjunction ({names}) excluded by Rec B"
+            )
+    for group in eb.disjunctive_groups:
+        if group.conditions and all(c in a_exc for c in group.conditions):
+            condition_compatible = False
+            names = ", ".join(_display_code(c) for c in group.conditions)
+            condition_notes_parts.append(
+                f"All branches of Rec B disjunction ({names}) excluded by Rec A"
+            )
+
+    # Shared required conditions (conjunctive)
     shared_req = a_req & b_req
     if shared_req:
         names = ", ".join(_display_code(c) for c in shared_req)
         condition_notes_parts.append(f"Both require: {names}")
+
+    # Shared conditions across disjunctive groups
+    a_disj_conds = set()
+    for group in ea.disjunctive_groups:
+        a_disj_conds.update(group.conditions)
+    b_disj_conds = set()
+    for group in eb.disjunctive_groups:
+        b_disj_conds.update(group.conditions)
+
+    shared_disj = (a_disj_conds | a_req) & (b_disj_conds | b_req) - shared_req
+    if shared_disj:
+        names = ", ".join(_display_code(c) for c in shared_disj)
+        condition_notes_parts.append(f"Shared condition (some disjunctive): {names}")
 
     condition_notes_str = "; ".join(condition_notes_parts) if condition_notes_parts else "Compatible"
 
@@ -550,10 +581,11 @@ When a new guideline is added, re-run:
 python scripts/discover-interactions.py --from-seeds
 ```
 
-The tool regenerates the entire document but does NOT overwrite existing
-clinician verdicts. If you have already reviewed pairs, back up your verdicts
-before re-running, then merge them back in. (A future version may preserve
-existing verdicts automatically.)
+The tool regenerates the entire document from scratch, **overwriting** any
+existing content. If you have already filled in verdicts, back up
+`interaction-candidates.md` before re-running, then merge your verdicts
+back into the new output. (A future version may preserve existing verdicts
+automatically.)
 
 ### Examples
 

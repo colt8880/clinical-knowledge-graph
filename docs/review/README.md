@@ -81,10 +81,11 @@ When a new guideline is added, re-run:
 python scripts/discover-interactions.py --from-seeds
 ```
 
-The tool regenerates the entire document but does NOT overwrite existing
-clinician verdicts. If you have already reviewed pairs, back up your verdicts
-before re-running, then merge them back in. (A future version may preserve
-existing verdicts automatically.)
+The tool regenerates the entire document from scratch, **overwriting** any
+existing content. If you have already filled in verdicts, back up
+`interaction-candidates.md` before re-running, then merge your verdicts
+back into the new output. (A future version may preserve existing verdicts
+automatically.)
 
 ### Examples
 

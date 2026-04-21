@@ -9,14 +9,14 @@ from __future__ import annotations
 from pathlib import Path
 
 # Pinned model versions (must match evals/rubric.md)
-ARM_MODEL = "claude-sonnet-4-6-20250514"
-JUDGE_MODEL = "claude-opus-4-6-20250610"
+ARM_MODEL = "claude-sonnet-4-20250514"
+JUDGE_MODEL = "claude-opus-4-20250514"
 
 # Temperature for all LLM calls
 TEMPERATURE = 0
 
 # Rubric version — bump when rubric dimensions or scoring criteria change
-RUBRIC_VERSION = "v1"
+RUBRIC_VERSION = "v1.1"
 
 # Arm B chunking parameters
 CHUNK_SIZE_TOKENS = 500

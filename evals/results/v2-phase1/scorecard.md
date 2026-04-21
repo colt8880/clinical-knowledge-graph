@@ -1,4 +1,4 @@
-# v1 Thesis Scorecard — v2-phase1
+# v2 Phase 1 Scorecard — v2-phase1
 
 **Rubric version:** v1.1
 **Judge runs:** 1

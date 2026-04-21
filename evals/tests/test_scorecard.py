@@ -202,6 +202,24 @@ def test_thesis_gate_incomplete_without_multi_guideline():
 
 # --- multiple fixtures per subset ---
 
+def test_scorecard_skips_entries_with_no_scores():
+    """Entries with empty or None scores should be silently skipped."""
+    run = [
+        _make_entry("cross-domain/case-01", "b"),
+        _make_entry("cross-domain/case-01", "c"),
+        # Entry with no scores (e.g., errored run)
+        {
+            "fixture": "cross-domain/case-02",
+            "arm": "c",
+            "composite": 0,
+            "scores": {"rubric_scores": {}},
+        },
+    ]
+    sc = build_scorecard([run])
+    # Should still build without crashing
+    assert sc["n_fixtures"] >= 1
+
+
 def test_multiple_fixtures_aggregated():
     run = [
         _make_entry("cross-domain/case-01", "b", integration=3.0),

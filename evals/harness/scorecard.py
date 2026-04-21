@@ -399,17 +399,24 @@ def fetch_from_braintrust(run_name: str) -> list[list[dict[str, Any]]]:
     for arm_id in ARM_IDS:
         experiment_name = f"{run_name}-arm-{arm_id}"
         try:
-            experiment = braintrust.load_experiment(
+            experiment = braintrust.init_experiment(
                 "clinical-knowledge-graph",
-                experiment_name,
+                experiment=experiment_name,
+                open=True,
             )
         except Exception as e:
             print(f"Warning: could not load experiment '{experiment_name}': {e}")
             continue
 
         for row in experiment.fetch():
+            # fixture_id may be in top-level metadata or nested in input.metadata
             fixture_id = (row.get("metadata") or {}).get("fixture_id", "")
-            scores = row.get("scores", {})
+            if not fixture_id:
+                inp = row.get("input") or {}
+                fixture_id = (inp.get("metadata") or {}).get("fixture_id", "")
+            scores = row.get("scores") or {}
+            if not scores:
+                continue  # Skip rows with no scores (errors, etc.)
 
             # Denormalize from 0-1 back to 1-5
             rubric_scores: dict[str, Any] = {}

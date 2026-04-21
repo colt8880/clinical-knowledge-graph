@@ -72,7 +72,7 @@ def serialize_trace_summary(trace: dict[str, Any]) -> dict[str, Any]:
             modifier_events.append({
                 "source_guideline_id": event["source_guideline_id"],
                 "target_guideline_id": event["target_guideline_id"],
-                "match_type": event["match_type"],
+                "match_type": event.get("match_type") or event.get("nature", "unknown"),
             })
 
     return {

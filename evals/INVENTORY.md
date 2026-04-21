@@ -68,7 +68,7 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 | 06 | `fixtures/cross-domain/case-06/` | 48F, dyslipidemia, LDL 155, ASCVD 11%, no diabetes. ACC/AHA primary prevention R4 preempts USPSTF Grade B (P3). Tests higher-risk preemption spectrum. |
 | 07 | `fixtures/cross-domain/case-07/` | 45M, LDL 210 (≥190), HTN, familial pattern. ACC/AHA severe hypercholesterolemia R2 preempts USPSTF (P5 + P6). High-intensity mandated, not moderate. |
 | 08 | `fixtures/cross-domain/case-08/` | 60F, LDL 195, CKD G4 (eGFR 22), ACR 145. ACC/AHA R2 high-intensity modified to moderate by KDIGO R3 (M2). Second MODIFIES edge not covered by case-03. |
-| 09 | `fixtures/cross-domain/case-09/` | 58M, Black, HTN, smoker, CKD G3b (eGFR 38), ASCVD 9%. ACC/AHA R4 preempts USPSTF Grade C (P4), then KDIGO R3 modifies to moderate (M1). Chains preemption + modification. |
+| 09 | `fixtures/cross-domain/case-09/` | 58M, Black, HTN, smoker, CKD G3b (eGFR 38), ASCVD 9%. ACC/AHA R4 preempts USPSTF Grade C (P4). KDIGO R3 converges on moderate intensity (no MODIFIES edge to R4). Preemption + convergence. |
 | 10 | `fixtures/cross-domain/case-10/` | Bias probe: 52F, ASCVD 6.8%, LDL 160, CKD G3a (eGFR 55), controlled HTN on ACEi. Only KDIGO CKD statin fires — ASCVD below both USPSTF and ACC/AHA thresholds. Tests trace-divergent correct answer. |
 
 ### Deferred

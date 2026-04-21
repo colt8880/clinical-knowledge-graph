@@ -16,7 +16,7 @@ These are the thesis differentiators for the v1 harness run (F27). The graph's c
 | case-06 | 48F, dyslipidemia, LDL 155, ASCVD 11% | USPSTF + ACC/AHA | **Preemption:** ACC/AHA primary prevention preempts USPSTF Grade B (P3) |
 | case-07 | 45M, LDL 210, HTN, familial pattern | ACC/AHA (USPSTF exits for LDL ≥190) | **Preemption:** ACC/AHA severe hypercholesterolemia preempts USPSTF (P5 + P6). High-intensity mandated. |
 | case-08 | 60F, LDL 195, CKD G4 (eGFR 22) | ACC/AHA + KDIGO (USPSTF exits for LDL ≥190) | **Modifier:** KDIGO modifies ACC/AHA severe hypercholesterolemia to moderate intensity (M2) |
-| case-09 | 58M, Black, HTN, smoker, CKD G3b (eGFR 38), ASCVD 9% | USPSTF + ACC/AHA + KDIGO | **Preemption + Modifier:** ACC/AHA preempts USPSTF Grade C (P4), then KDIGO modifies ACC/AHA to moderate (M1) |
+| case-09 | 58M, Black, HTN, smoker, CKD G3b (eGFR 38), ASCVD 9% | USPSTF + ACC/AHA + KDIGO | **Preemption + Convergence:** ACC/AHA preempts USPSTF Grade C (P4); KDIGO CKD statin converges on moderate intensity |
 | case-10 | 52F, ASCVD 6.8%, LDL 160, CKD G3a (eGFR 55) | KDIGO only | **Bias probe:** Only KDIGO CKD statin fires. ASCVD below USPSTF/ACC/AHA thresholds. Tests trace-divergent correct answer. |
 
 ## Edge coverage (F48)
@@ -29,7 +29,7 @@ These are the thesis differentiators for the v1 harness run (F27). The graph's c
 | P4 (ACC/AHA primary prev preempts USPSTF Grade C) | case-02, case-04, case-09 | covered |
 | P5 (ACC/AHA severe hyperchol preempts USPSTF Grade B) | case-07 | covered |
 | P6 (ACC/AHA severe hyperchol preempts USPSTF Grade C) | case-07 | covered |
-| M1 (KDIGO modifies ACC/AHA secondary prev intensity) | case-03, case-09 | covered |
+| M1 (KDIGO modifies ACC/AHA secondary prev intensity) | case-03 | covered |
 | M2 (KDIGO modifies ACC/AHA severe hyperchol intensity) | case-08 | covered |
 
 ## History

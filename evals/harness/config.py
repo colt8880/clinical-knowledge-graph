@@ -65,4 +65,7 @@ Return your response as a JSON object with this schema:
 
 Be specific and evidence-based. Do not recommend actions that are \
 contraindicated for this patient. Prioritize by clinical impact.
+
+Be exhaustive — include every action supported by the provided clinical \
+context, even if low priority. Do not omit actions because they seem minor.
 """

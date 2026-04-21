@@ -66,6 +66,10 @@ def serialize_trace_summary(trace: dict[str, Any]) -> dict[str, Any]:
             preemption_events.append({
                 "preempted_recommendation_id": event["preempted_recommendation_id"],
                 "preempting_recommendation_id": event["preempting_recommendation_id"],
+                "preempted_guideline": _guideline_label(event.get("guideline_id", "")),
+                "preempting_guideline": _guideline_label(
+                    _rec_to_guideline(event["preempting_recommendation_id"], events)
+                ),
             })
 
         elif event_type == "cross_guideline_match":
@@ -73,6 +77,7 @@ def serialize_trace_summary(trace: dict[str, Any]) -> dict[str, Any]:
                 "source_guideline_id": event["source_guideline_id"],
                 "target_guideline_id": event["target_guideline_id"],
                 "match_type": event.get("nature", "unknown"),
+                "note": event.get("note", ""),
             })
 
     return {
@@ -80,7 +85,53 @@ def serialize_trace_summary(trace: dict[str, Any]) -> dict[str, Any]:
         "exit_conditions": exit_conditions,
         "preemption_events": preemption_events,
         "modifier_events": modifier_events,
+        "preemption_prose": _render_preemption_prose(preemption_events),
+        "modifier_prose": _render_modifier_prose(modifier_events),
     }
+
+
+def _rec_to_guideline(rec_id: str, events: list[dict[str, Any]]) -> str:
+    """Find the guideline_id for a recommendation from trace events."""
+    for event in events:
+        if (
+            event.get("type") in ("recommendation_emitted", "recommendation_considered")
+            and event.get("recommendation_id") == rec_id
+        ):
+            return event.get("guideline_id", "")
+    return ""
+
+
+def _render_preemption_prose(preemption_events: list[dict[str, Any]]) -> str:
+    """Render preemption events as prose sentences."""
+    if not preemption_events:
+        return ""
+    lines = []
+    for pe in preemption_events:
+        preempted = pe.get("preempted_guideline") or pe["preempted_recommendation_id"]
+        preempting = pe.get("preempting_guideline") or pe["preempting_recommendation_id"]
+        lines.append(
+            f"{preempting} preempts {preempted} for this patient — "
+            f"follow {preempting} recommendation instead."
+        )
+    return " ".join(lines)
+
+
+def _render_modifier_prose(modifier_events: list[dict[str, Any]]) -> str:
+    """Render modifier events as prose sentences."""
+    if not modifier_events:
+        return ""
+    lines = []
+    for me in modifier_events:
+        source = _guideline_label(me["source_guideline_id"])
+        target = _guideline_label(me["target_guideline_id"])
+        match_type = me["match_type"].replace("_", " ")
+        note = me.get("note", "")
+        base = f"{source} modifies {target} ({match_type})"
+        if note:
+            lines.append(f"{base} — {note}.")
+        else:
+            lines.append(f"{base}.")
+    return " ".join(lines)
 
 
 def serialize_subgraph(trace: dict[str, Any]) -> dict[str, Any]:
@@ -232,12 +283,17 @@ def serialize_convergence_summary(
     and surfaces entities where strategies from multiple guidelines converge
     on the same Medication/Condition/Observation/Procedure node.
 
+    v2: Groups convergent entities by therapeutic class (derived from the
+    strategy label) instead of listing each medication individually. This
+    reduces noise (7 statins × 3 guidelines = 21 rows → 1 row per class).
+
     Args:
         trace: The full EvalTrace dict.
         subgraph: The already-serialized subgraph (from serialize_subgraph).
 
     Returns:
-        A convergence_summary dict with shared_actions and convergence_prose.
+        A convergence_summary dict with shared_actions, grouped_convergence,
+        and convergence_prose.
     """
     events = trace.get("events", [])
 
@@ -247,6 +303,12 @@ def serialize_convergence_summary(
     for node in subgraph.get("nodes", []):
         node_labels[node["id"]] = node.get("label", node["id"])
         node_types[node["id"]] = node.get("type", "Entity")
+
+    # Build lookup: strategy_id -> strategy_name from trace events
+    strategy_names: dict[str, str] = {}
+    for event in events:
+        if event.get("type") == "strategy_considered":
+            strategy_names[event["strategy_id"]] = event.get("strategy_name", event["strategy_id"])
 
     # Build lookup: rec_id -> emitted rec details
     rec_details: dict[str, dict[str, Any]] = {}
@@ -296,7 +358,6 @@ def serialize_convergence_summary(
         recommended_by = []
         for source in sorted(sources, key=lambda s: (s["guideline_id"], s["rec_id"])):
             rec = rec_details.get(source["rec_id"], {})
-            # Derive a short guideline label from the guideline_id
             guideline_label = _guideline_label(source["guideline_id"])
             recommended_by.append({
                 "rec_id": source["rec_id"],
@@ -315,12 +376,112 @@ def serialize_convergence_summary(
             "convergence_type": "reinforcing",
         })
 
-    convergence_prose = _render_convergence_prose(shared_actions)
+    # v2: Group shared actions by therapeutic class (strategy label)
+    grouped = _group_by_therapeutic_class(shared_actions, strategy_names)
+    convergence_prose = _render_convergence_prose_v2(grouped)
 
     return {
         "shared_actions": shared_actions,
+        "grouped_convergence": grouped,
         "convergence_prose": convergence_prose,
     }
+
+
+def _derive_therapeutic_class(strategy_name: str, entity_type: str) -> str:
+    """Derive a therapeutic class label from a strategy name.
+
+    Uses the strategy name as the primary signal for grouping.
+    Falls back to entity_type if no meaningful class can be derived.
+    """
+    name_lower = strategy_name.lower()
+    # Extract intensity + therapy type from strategy names
+    if "statin" in name_lower:
+        if "high" in name_lower:
+            return "High-intensity statin therapy"
+        elif "moderate" in name_lower:
+            return "Moderate-intensity statin therapy"
+        elif "low" in name_lower:
+            return "Low-intensity statin therapy"
+        else:
+            return "Statin therapy"
+    return strategy_name or entity_type
+
+
+def _group_by_therapeutic_class(
+    shared_actions: list[dict[str, Any]],
+    strategy_names: dict[str, str],
+) -> list[dict[str, Any]]:
+    """Group convergent shared_actions by therapeutic class.
+
+    Instead of one row per medication, produces one row per therapeutic
+    class (e.g. "Moderate-intensity statin therapy") with all the
+    individual medications listed as members.
+    """
+    # Group: (therapeutic_class, entity_type) -> list of shared_actions
+    class_groups: dict[tuple[str, str], list[dict[str, Any]]] = {}
+
+    for action in shared_actions:
+        # Collect unique strategy names across all recommending guidelines
+        strat_ids = {rb["via_strategy"] for rb in action["recommended_by"]}
+        strat_name_set = {strategy_names.get(sid, sid) for sid in strat_ids}
+
+        # Use the most common strategy name for class derivation
+        # (they typically share a class — "moderate-intensity statin therapy")
+        representative_name = sorted(strat_name_set)[0] if strat_name_set else ""
+        therapeutic_class = _derive_therapeutic_class(
+            representative_name, action["entity_type"]
+        )
+
+        key = (therapeutic_class, action["entity_type"])
+        if key not in class_groups:
+            class_groups[key] = []
+        class_groups[key].append(action)
+
+    grouped: list[dict[str, Any]] = []
+    for (tc, etype), actions in sorted(class_groups.items()):
+        # Collect unique guideline recommendations across all members
+        guidelines_seen: dict[str, dict[str, str]] = {}
+        for action in actions:
+            for rb in action["recommended_by"]:
+                gl_key = rb["guideline"]
+                if gl_key not in guidelines_seen:
+                    guidelines_seen[gl_key] = {
+                        "guideline": rb["guideline"],
+                        "evidence_grade": rb["evidence_grade"],
+                        "via_strategy": rb["via_strategy"],
+                    }
+
+        # Collect strategy-level intensity context
+        intensity_details = []
+        seen_strats: set[str] = set()
+        for action in actions:
+            for rb in action["recommended_by"]:
+                sid = rb["via_strategy"]
+                if sid not in seen_strats:
+                    seen_strats.add(sid)
+                    sname = strategy_names.get(sid, sid)
+                    intensity_details.append({
+                        "strategy_id": sid,
+                        "strategy_name": sname,
+                        "guideline": rb["guideline"],
+                    })
+
+        member_labels = sorted(a["entity_label"] for a in actions)
+        grouped.append({
+            "therapeutic_class": tc,
+            "entity_type": etype,
+            "members": member_labels,
+            "member_count": len(member_labels),
+            "recommended_by": sorted(
+                guidelines_seen.values(), key=lambda g: g["guideline"]
+            ),
+            "guideline_count": len(guidelines_seen),
+            "intensity_details": sorted(
+                intensity_details, key=lambda d: d["guideline"]
+            ),
+        })
+
+    return grouped
 
 
 def _guideline_label(guideline_id: str) -> str:
@@ -333,60 +494,62 @@ def _guideline_label(guideline_id: str) -> str:
     return labels.get(guideline_id, guideline_id)
 
 
-def _render_convergence_prose(shared_actions: list[dict[str, Any]]) -> str:
-    """Render a natural-language paragraph summarising cross-guideline convergence."""
-    if not shared_actions:
+def _render_convergence_prose_v2(grouped: list[dict[str, Any]]) -> str:
+    """Render grouped convergence as concise prose.
+
+    v2: One line per therapeutic class instead of one per medication.
+    Includes intensity context from strategy labels.
+    """
+    if not grouped:
         return ""
 
     lines: list[str] = []
-    # Group shared actions by entity type for readability
-    by_type: dict[str, list[dict[str, Any]]] = {}
-    for action in shared_actions:
-        etype = action["entity_type"]
-        if etype not in by_type:
-            by_type[etype] = []
-        by_type[etype].append(action)
 
-    total = len(shared_actions)
-    guideline_names = set()
-    for action in shared_actions:
-        for rb in action["recommended_by"]:
-            guideline_names.add(rb["guideline"])
+    # Collect all guideline names across groups
+    all_guidelines: set[str] = set()
+    for group in grouped:
+        for rb in group["recommended_by"]:
+            all_guidelines.add(rb["guideline"])
 
     lines.append(
-        f"{total} clinical entit{'y' if total == 1 else 'ies'} "
-        f"{'is' if total == 1 else 'are'} independently recommended by "
-        f"{len(guideline_names)} guidelines ({', '.join(sorted(guideline_names))})."
+        f"{len(grouped)} therapeutic convergence point{'s' if len(grouped) != 1 else ''} "
+        f"across {len(all_guidelines)} guidelines "
+        f"({', '.join(sorted(all_guidelines))})."
     )
 
-    for etype, actions in sorted(by_type.items()):
-        entity_labels = [a["entity_label"] for a in actions]
-        if len(entity_labels) <= 3:
-            label_str = ", ".join(entity_labels)
-        else:
-            label_str = f"{', '.join(entity_labels[:3])}, and {len(entity_labels) - 3} more"
+    for group in grouped:
+        tc = group["therapeutic_class"]
+        members = group["members"]
+        recs = group["recommended_by"]
 
-        # Collect the unique guideline+grade combos for this type
-        grade_parts: list[str] = []
-        seen_guidelines: set[str] = set()
-        for action in actions:
-            for rb in action["recommended_by"]:
-                key = rb["guideline"]
-                if key not in seen_guidelines:
-                    seen_guidelines.add(key)
-                    grade_parts.append(f"{rb['guideline']} (Grade {rb['evidence_grade']})")
+        # Build guideline attribution: "USPSTF (Grade C), ACC/AHA (COR I, LOE A)"
+        gl_parts = [
+            f"{rb['guideline']} (Grade {rb['evidence_grade']})"
+            for rb in recs
+        ]
+
+        # Member list
+        if len(members) <= 5:
+            member_str = ", ".join(members)
+        else:
+            member_str = f"{', '.join(members[:4])}, and {len(members) - 4} more"
 
         lines.append(
-            f"{etype} convergence: {label_str}. "
-            f"Recommended by: {'; '.join(sorted(grade_parts))}."
+            f"{tc}: recommended by {'; '.join(gl_parts)}. "
+            f"Any of: {member_str}."
         )
 
-    lines.append(
-        "Where multiple guidelines converge on the same therapeutic action, "
-        "this represents independent clinical agreement."
-    )
+        # Intensity details if strategies differ across guidelines
+        if len(group["intensity_details"]) > 1:
+            unique_names = {d["strategy_name"] for d in group["intensity_details"]}
+            if len(unique_names) > 1:
+                intensity_parts = [
+                    f"{d['guideline']}: {d['strategy_name']}"
+                    for d in group["intensity_details"]
+                ]
+                lines.append(f"  Intensity context: {'; '.join(intensity_parts)}.")
 
-    return " ".join(lines)
+    return "\n".join(lines)
 
 
 def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:

@@ -550,7 +550,8 @@ class TestSerializeConvergenceSummary:
         conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
 
         assert len(conv["convergence_prose"]) > 0
-        assert "independently recommended" in conv["convergence_prose"]
+        # v2 prose uses "convergence point" rather than "independently recommended"
+        assert "convergence point" in conv["convergence_prose"]
 
     def test_single_guideline_trace_no_convergence(self):
         """A trace with only one guideline should produce no shared_actions."""
@@ -577,3 +578,166 @@ class TestSerializeConvergenceSummary:
         conv1 = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
         conv2 = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
         assert conv1 == conv2
+
+
+class TestGroupedConvergence:
+    """Tests for v2 grouped convergence output."""
+
+    def test_grouped_convergence_key_exists(self):
+        """serialize_convergence_summary should return a grouped_convergence key."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+        assert "grouped_convergence" in conv
+
+    def test_grouped_by_therapeutic_class(self):
+        """Multiple statin medications should be grouped into one therapeutic class."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+        grouped = conv["grouped_convergence"]
+
+        # All strategies in MULTI_GUIDELINE_TRACE are moderate-intensity,
+        # so atorvastatin and rosuvastatin should be in one group
+        assert len(grouped) >= 1
+        statin_group = next(
+            (g for g in grouped if "statin" in g["therapeutic_class"].lower()), None
+        )
+        assert statin_group is not None
+        assert "Moderate" in statin_group["therapeutic_class"]
+        # Both atorvastatin and rosuvastatin should be members
+        assert "med:atorvastatin" in statin_group["members"]
+        assert "med:rosuvastatin" in statin_group["members"]
+
+    def test_grouped_has_guideline_count(self):
+        """Each grouped convergence entry should track guideline count."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+        grouped = conv["grouped_convergence"]
+
+        for group in grouped:
+            assert group["guideline_count"] >= 2
+            assert len(group["recommended_by"]) == group["guideline_count"]
+
+    def test_grouped_has_intensity_details(self):
+        """Each group should have intensity_details with strategy names."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+        grouped = conv["grouped_convergence"]
+
+        for group in grouped:
+            assert "intensity_details" in group
+            for detail in group["intensity_details"]:
+                assert "strategy_id" in detail
+                assert "strategy_name" in detail
+                assert "guideline" in detail
+
+    def test_prose_mentions_therapeutic_class(self):
+        """v2 convergence prose should reference the therapeutic class, not individual meds."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+        prose = conv["convergence_prose"]
+
+        assert "statin therapy" in prose.lower()
+        # Should list members with "Any of:"
+        assert "Any of:" in prose
+
+    def test_empty_trace_no_grouped_convergence(self):
+        """Empty trace should produce empty grouped_convergence."""
+        empty_trace = {"events": []}
+        subgraph = serialize_subgraph(empty_trace)
+        conv = serialize_convergence_summary(empty_trace, subgraph)
+        assert conv["grouped_convergence"] == []
+
+    def test_fewer_rows_than_shared_actions(self):
+        """Grouped output should have fewer entries than raw shared_actions."""
+        subgraph = serialize_subgraph(MULTI_GUIDELINE_TRACE)
+        conv = serialize_convergence_summary(MULTI_GUIDELINE_TRACE, subgraph)
+
+        # 2 shared actions (atorvastatin, rosuvastatin) should group into 1 class
+        assert len(conv["shared_actions"]) == 2
+        assert len(conv["grouped_convergence"]) == 1
+
+
+class TestPreemptionModifierProse:
+    """Tests for v2 preemption/modifier prose rendering."""
+
+    def test_preemption_prose_rendered(self):
+        """Preemption events should produce prose, not raw JSON."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "preemption_resolved",
+                    "guideline_id": "guideline:uspstf-statin-2022",
+                    "preempted_recommendation_id": "rec:statin-initiate-grade-b",
+                    "preempting_recommendation_id": "rec:accaha-statin-primary-prevention",
+                    "edge_priority": 200,
+                    "reason": "ACC/AHA more specific",
+                },
+                {
+                    "seq": 2,
+                    "type": "recommendation_emitted",
+                    "guideline_id": "guideline:acc-aha-cholesterol-2018",
+                    "recommendation_id": "rec:accaha-statin-primary-prevention",
+                    "status": "due",
+                    "evidence_grade": "COR I, LOE A",
+                    "reason": "Patient eligible",
+                    "offered_strategies": [],
+                },
+            ]
+        }
+        summary = serialize_trace_summary(trace)
+        assert summary["preemption_prose"] != ""
+        assert "preempts" in summary["preemption_prose"]
+        # Should contain guideline labels, not raw rec IDs
+        assert "ACC/AHA 2018 Cholesterol" in summary["preemption_prose"]
+
+    def test_modifier_prose_rendered(self):
+        """Modifier events should produce prose, not raw JSON."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "cross_guideline_match",
+                    "guideline_id": "guideline:kdigo-ckd-2024",
+                    "source_guideline_id": "guideline:kdigo-ckd-2024",
+                    "target_guideline_id": "guideline:acc-aha-cholesterol-2018",
+                    "nature": "intensity_reduction",
+                    "note": "KDIGO recommends moderate-intensity for eGFR < 30",
+                },
+            ]
+        }
+        summary = serialize_trace_summary(trace)
+        assert summary["modifier_prose"] != ""
+        assert "modifies" in summary["modifier_prose"]
+        assert "KDIGO 2024 CKD" in summary["modifier_prose"]
+        assert "intensity reduction" in summary["modifier_prose"]
+
+    def test_empty_events_no_prose(self):
+        """No preemption/modifier events should produce empty prose strings."""
+        summary = serialize_trace_summary(SAMPLE_TRACE)
+        assert summary["preemption_prose"] == ""
+        assert summary["modifier_prose"] == ""
+
+    def test_modifier_note_included(self):
+        """Modifier prose should include the note when present."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "cross_guideline_match",
+                    "guideline_id": "guideline:kdigo-ckd-2024",
+                    "source_guideline_id": "guideline:kdigo-ckd-2024",
+                    "target_guideline_id": "guideline:acc-aha-cholesterol-2018",
+                    "nature": "intensity_reduction",
+                    "note": "consider dose reduction for eGFR < 30",
+                },
+            ]
+        }
+        summary = serialize_trace_summary(trace)
+        assert "dose reduction" in summary["modifier_prose"]
+
+    def test_preemption_prose_keys_in_summary(self):
+        """serialize_trace_summary should always include prose keys."""
+        summary = serialize_trace_summary({"events": []})
+        assert "preemption_prose" in summary
+        assert "modifier_prose" in summary

@@ -1,6 +1,6 @@
 # 46: Serialization v2 thesis run
 
-**Status**: pending
+**Status**: shipped
 **Depends on**: 45
 **Components touched**: evals / docs
 **Branch**: `feat/serialization-thesis-run`
@@ -23,7 +23,7 @@ This answers: **does better serialization improve Completeness scores?**
 
 ## Constraints
 
-- Same 16 fixtures, same rubric v1.1, same models, 1 trial.
+- Same 22 fixtures (expanded from 16 in F48), same rubric v1.1, same models, 1 trial.
 - Note: the system prompt change (exhaustiveness instruction) affects all arms equally, so Arm A and Arm B may also improve. This is intentional and should be documented.
 - Braintrust experiments: `v2-serial-arm-a`, `v2-serial-arm-b`, `v2-serial-arm-c`.
 
@@ -31,11 +31,13 @@ This answers: **does better serialization improve Completeness scores?**
 
 | Metric | v1 | F44 (edges + RAG) | F46 (+ serialization) | Delta (F46 vs F44) |
 |--------|-----|--------------------|-----------------------|--------------------|
-| Arm C Completeness | 3.50 | ? | ? | ? |
-| Arm C composite (all) | 4.14 | ? | ? | ? |
-| Arm A composite (all) | 2.98 | ? | ? | ? (prompt helps all arms) |
+| Arm C Completeness (multi-gl) | 3.75 | 3.50 | 3.40 | -0.10 |
+| Arm C composite (multi-gl) | 4.31 | 3.65 | 3.78 | +0.13 |
+| Arm B composite (multi-gl) | 3.72 | 3.45 | 3.65 | +0.20 |
+| C - B gap (multi-gl) | +0.59 | +0.20 | +0.13 | -0.08 |
+| Arm A composite (multi-gl) | 3.22 | 2.73 | 2.70 | -0.03 |
 
-Key question: **Did the serialization and prompt changes improve Completeness?** Target: Arm C Completeness ≥ 4.0 (up from 3.50). Secondary: did the exhaustiveness prompt help all arms equally, or did Arm C benefit disproportionately?
+**Answer:** Serialization v2 did NOT improve Completeness (3.40, missed the 4.0 target). The exhaustiveness prompt helped Arm B (+0.20) more than Arm C (+0.13), narrowing the gap further. Integration was the one dimension that improved (+0.1 → +0.4 gap). See `evals/results/v2-serialization/README.md` for full analysis.
 
 ## Verification targets
 

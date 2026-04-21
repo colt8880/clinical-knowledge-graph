@@ -499,7 +499,9 @@ def _render_pair(
     g_a = _short_guideline(rec_a.guideline_id)
     g_b = _short_guideline(rec_b.guideline_id)
 
-    lines.append(f"## {label}: {rec_a.title} ↔ {rec_b.title}")
+    lines.append(f"## {label}")
+    lines.append(f"**Rec A:** {rec_a.title} ({g_a})")
+    lines.append(f"**Rec B:** {rec_b.title} ({g_b})")
     lines.append("")
 
     # Side-by-side comparison table

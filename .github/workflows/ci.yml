@@ -88,7 +88,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher", "graph/seeds/cross-edges-uspstf-accaha.cypher", "graph/seeds/cross-edges-kdigo.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons
@@ -268,7 +268,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher", "graph/seeds/cross-edges-uspstf-accaha.cypher", "graph/seeds/cross-edges-kdigo.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons

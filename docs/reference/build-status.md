@@ -73,7 +73,7 @@ Each improvement is measured in isolation before the combined run. ~$2 per run, 
 | # | Feature | Components | Status | Depends on | Spec | PR |
 |---|---------|------------|--------|------------|------|----|
 | 40 | Cross-guideline edge review tool | docs, scripts | shipped | v1 shipped | [40](../../docs/build/40-cross-edge-review-tool.md) | [#37](../../pull/37) |
-| 41 | Re-add clinician-validated cross edges | graph, api, evals, docs | pending | 40 + clinician review | [41](../../docs/build/41-validated-cross-edges.md) | — |
+| 41 | Re-add clinician-validated cross edges | graph, api, evals, docs | shipped | 40 + clinician review | [41](../../docs/build/41-validated-cross-edges.md) | [#38](../../pull/38) |
 | 42 | Edge-value thesis run | evals, docs | pending | 41 | [42](../../docs/build/42-edge-value-thesis-run.md) | — |
 | 43 | Arm B retrieval upgrade (section + multi-query) | evals, docs | pending | v1 shipped | [43](../../docs/build/43-arm-b-retrieval-upgrade.md) | — |
 | 44 | Arm B upgrade thesis run | evals, docs | pending | 43 | [44](../../docs/build/44-arm-b-upgrade-thesis-run.md) | — |

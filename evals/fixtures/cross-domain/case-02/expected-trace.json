@@ -1,11 +1,12 @@
 {
-  "description": "55M, HTN, LDL 165, ASCVD risk 8.5%, non-smoker, no diabetes, no ASCVD. Both USPSTF Grade C (7.5-<10%) and ACC/AHA R4 (primary prevention, LDL 70-189, risk ≥7.5%) match. Multi-guideline convergence: both guidelines independently recommend statin therapy for this patient via shared statin medication entities.",
+  "description": "55M, HTN, LDL 165, ASCVD risk 8.5%, non-smoker, no diabetes, no ASCVD. Both USPSTF Grade C (7.5-<10%) and ACC/AHA R4 (primary prevention, LDL 70-189, risk ≥7.5%) match. ACC/AHA preempts USPSTF Grade C (P4, ADR 0018). ACC/AHA provides definitive COR I guidance; USPSTF Grade C is superseded.",
   "expected_recommendations": [
     {
       "recommendation_id": "rec:statin-selective-grade-c",
       "status": "due",
       "evidence_grade": "C",
-      "guideline_id": "guideline:uspstf-statin-2022"
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "preempted_by": "rec:accaha-statin-primary-prevention"
     },
     {
       "recommendation_id": "rec:accaha-statin-primary-prevention",
@@ -30,6 +31,12 @@
       "recommendation_id": "rec:accaha-statin-primary-prevention",
       "status": "due",
       "guideline_id": "guideline:acc-aha-cholesterol-2018"
+    },
+    {
+      "type": "preemption_resolved",
+      "preempted_recommendation_id": "rec:statin-selective-grade-c",
+      "preempting_recommendation_id": "rec:accaha-statin-primary-prevention",
+      "edge_priority": 200
     }
   ],
   "must_not_contain": [

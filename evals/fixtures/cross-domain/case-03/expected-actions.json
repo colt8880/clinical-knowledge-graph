@@ -1,10 +1,10 @@
 {
-  "description": "65M post-MI with CKD 3b (eGFR 35). ACC/AHA secondary prevention and KDIGO statin-for-CKD both independently recommend statin therapy — convergence on statin medications via shared clinical entities. Both guidelines recommend moderate-intensity given CKD context. Multiple KDIGO Recs also fire for CKD management.",
+  "description": "65M post-MI with CKD 3b (eGFR 35). ACC/AHA secondary prevention recommends high-intensity statin, but KDIGO MODIFIES intensity to moderate (M1) due to CKD G3-G5 pharmacokinetics and myopathy risk. Multiple KDIGO Recs also fire for CKD management.",
   "actions": [
     {
       "id": "initiate-statin-moderate-intensity",
       "label": "Initiate moderate-intensity statin therapy",
-      "rationale": "ACC/AHA COR I, LOE A: high-intensity statin for clinical ASCVD (post-MI). KDIGO 1A also recommends moderate-intensity statin in CKD G3b (eGFR 35). Both guidelines converge on statin therapy via shared medication entities; CKD context favors moderate intensity. Consider atorvastatin 20mg or rosuvastatin 10mg.",
+      "rationale": "ACC/AHA COR I, LOE A: high-intensity statin for clinical ASCVD (post-MI). KDIGO 1A modifies intensity to moderate in CKD G3b (eGFR 35) due to altered pharmacokinetics and increased myopathy risk. Consider atorvastatin 20mg or rosuvastatin 10mg.",
       "source_rec_id": "rec:accaha-statin-secondary-prevention",
       "priority": 1
     },

@@ -2,19 +2,11 @@
 
 Snapshot of spec gaps, open questions, and intentional deferrals. Move items to GitHub issues once the build starts; keep this file as a summary and link out.
 
-## Cross-guideline edges removed — clinician review required
+## Cross-guideline edges — resolved
 
-All 15 cross-guideline edges (9 `PREEMPTED_BY`, 6 `MODIFIES`) have been removed from the graph seeds. The LLM-authored edges contained modeling errors — for example, a preemption between USPSTF Grade I (age ≥76) and ACC/AHA secondary prevention (age ≤75), where the age ranges don't overlap and the edge can never fire.
+~~All 15 cross-guideline edges removed pending clinician review.~~
 
-**What's needed:** A clinician-in-the-loop review process where each proposed cross-guideline edge is:
-1. Presented with both source and target Rec eligibility criteria side by side.
-2. Validated that the two Recs can actually co-match the same patient (overlapping eligibility).
-3. Classified as preemption, modifier, or no interaction.
-4. Signed off with rationale before being added to the graph.
-
-**Current state:** Seed files `cross-edges-uspstf-accaha.cypher` and `cross-edges-kdigo.cypher` are empty stubs. Original content is in git history. The `/interactions` UI view is functional but will show no edges until clinician-reviewed edges are re-added.
-
-**Blocked on:** Designing the review workflow (UI or spreadsheet) and scheduling clinician time.
+**Resolved in F40 + F41.** F40 built the interaction discovery tool (`scripts/discover-interactions.py`) which identified 12 convergence candidates from the three guideline subgraphs. Clinician review (2026-04-21, documented in `docs/review/cross-edges.md`) approved 8 edges: 6 PREEMPTED_BY (ACC/AHA preempts USPSTF) and 2 MODIFIES (KDIGO intensity reduction on ACC/AHA high-intensity recs). 4 candidates were convergence-only (shared entity layer handles deduplication, no edge needed). F41 re-added the approved edges with clinician provenance.
 
 ## v0 (statins) open questions
 

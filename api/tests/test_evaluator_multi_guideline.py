@@ -173,9 +173,14 @@ class TestGuidelineIdOnV0Fixtures:
             assert "guideline_id" in event, (
                 f"Event seq={event['seq']} type={event['type']} missing guideline_id"
             )
-            if event["type"] in ("evaluation_started", "evaluation_completed"):
+            # Envelope events and cross-guideline events have guideline_id=null.
+            cross_guideline_types = (
+                "evaluation_started", "evaluation_completed",
+                "preemption_resolved", "cross_guideline_match",
+            )
+            if event["type"] in cross_guideline_types:
                 assert event["guideline_id"] is None, (
-                    f"Envelope event {event['type']} should have guideline_id=null"
+                    f"Cross-guideline event {event['type']} should have guideline_id=null"
                 )
             else:
                 assert event["guideline_id"] in KNOWN_GUIDELINE_IDS, (

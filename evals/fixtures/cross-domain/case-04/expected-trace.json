@@ -1,11 +1,12 @@
 {
-  "description": "55M, HTN, CKD 3a (eGFR 52), ACR 18 (A1), LDL 145, ASCVD risk 8.5%, no diabetes. Multi-guideline convergence: USPSTF Grade C, ACC/AHA R4, and KDIGO statin-for-CKD all fire for this patient — all three target statin medications via shared clinical entities. KDIGO monitoring also fires; SGLT2 and ACEi/ARB do not (no diabetes, ACR < 30).",
+  "description": "55M, HTN, CKD 3a (eGFR 52), ACR 18 (A1), LDL 145, ASCVD risk 8.5%, no diabetes. USPSTF Grade C, ACC/AHA R4, and KDIGO statin-for-CKD all fire. ACC/AHA preempts USPSTF Grade C (P4, ADR 0018). KDIGO statin-for-CKD and monitoring also fire. No MODIFIES edges target ACC/AHA primary prevention (moderate-intensity already). SGLT2 and ACEi/ARB do not fire (no diabetes, ACR < 30).",
   "expected_recommendations": [
     {
       "recommendation_id": "rec:statin-selective-grade-c",
       "status": "due",
       "evidence_grade": "C",
-      "guideline_id": "guideline:uspstf-statin-2022"
+      "guideline_id": "guideline:uspstf-statin-2022",
+      "preempted_by": "rec:accaha-statin-primary-prevention"
     },
     {
       "recommendation_id": "rec:accaha-statin-primary-prevention",
@@ -48,6 +49,12 @@
       "recommendation_id": "rec:kdigo-statin-for-ckd",
       "status": "due",
       "guideline_id": "guideline:kdigo-ckd-2024"
+    },
+    {
+      "type": "preemption_resolved",
+      "preempted_recommendation_id": "rec:statin-selective-grade-c",
+      "preempting_recommendation_id": "rec:accaha-statin-primary-prevention",
+      "edge_priority": 200
     }
   ],
   "must_not_contain": [

@@ -56,10 +56,10 @@ echo "==> Verifying edge count..."
 EDGE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH ()-[r]->() RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
-# 33 (statins+ACC/AHA) + 29 KDIGO = 62 (cross-edges removed pending clinician review)
-echo "    Edge count: $EDGE_COUNT (expected 62)"
-if [ "$EDGE_COUNT" -ne 62 ]; then
-  echo "ERROR: Expected 62 edges, got $EDGE_COUNT"
+# 33 (statins+ACC/AHA) + 29 KDIGO + 6 PREEMPTED_BY + 2 MODIFIES = 70 (clinician-reviewed cross-edges)
+echo "    Edge count: $EDGE_COUNT (expected 70)"
+if [ "$EDGE_COUNT" -ne 70 ]; then
+  echo "ERROR: Expected 70 edges, got $EDGE_COUNT"
   exit 1
 fi
 
@@ -133,4 +133,4 @@ if [ "$ORPHAN_MEDS" -ne 0 ]; then
   exit 1
 fi
 
-echo "==> Seed complete. 50 nodes, 62 edges. All checks passed."
+echo "==> Seed complete. 50 nodes, 70 edges. All checks passed."

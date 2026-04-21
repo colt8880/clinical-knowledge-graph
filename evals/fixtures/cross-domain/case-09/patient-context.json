@@ -15,6 +15,16 @@
       "clinical_status": "active",
       "verification_status": "confirmed",
       "onset_date": "2018-05-20"
+    },
+    {
+      "id": "cond-ckd",
+      "codes": [
+        { "system": "snomed", "code": "709044004", "display": "Chronic kidney disease" },
+        { "system": "icd10", "code": "N18.3", "display": "Chronic kidney disease, stage 3" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2023-04-10"
     }
   ],
   "observations": [

@@ -80,7 +80,7 @@ Each improvement is measured in isolation before the combined run. ~$2 per run, 
 | 45  | Arm C serialization v2 (concise + intensity)    | evals, docs             | shipped | v1 shipped            | [45](../../docs/build/45-arm-c-serialization-v2.md)          | [#43](../../pull/43) |
 | 46  | Serialization v2 thesis run                     | evals, docs             | shipped | 45                    | [46](../../docs/build/46-serialization-thesis-run.md)        | [#44](../../pull/44) |
 | 48  | Expand multi-guideline fixtures                 | evals, docs             | shipped | 42                    | [48](../../docs/build/48-expand-multi-guideline-fixtures.md) | [#40](../../pull/40) |
-| 47  | v2 Phase 1 combined thesis run                  | evals, docs             | pending | 42, 44, 46, 48        | [47](../../docs/build/47-v2-phase1-combined-run.md)          | —                    |
+| 47  | v2 Phase 1 combined thesis run                  | evals, docs             | shipped | 42, 44, 46, 48        | [47](../../docs/build/47-v2-phase1-combined-run.md)          | —                    |
 
 ## Archived
 

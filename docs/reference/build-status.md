@@ -68,13 +68,18 @@ Macro spec: [`docs/build/v2-spec.md`](../../docs/build/v2-spec.md). Validates cr
 
 ### Phase 1: validated interactions + stronger baseline
 
+Each improvement is measured in isolation before the combined run. ~$2 per run, 10 min each.
+
 | # | Feature | Components | Status | Depends on | Spec | PR |
 |---|---------|------------|--------|------------|------|----|
 | 40 | Cross-guideline edge review tool | docs, scripts | pending | v1 shipped | [40](../../docs/build/40-cross-edge-review-tool.md) | — |
 | 41 | Re-add clinician-validated cross edges | graph, api, evals, docs | pending | 40 + clinician review | [41](../../docs/build/41-validated-cross-edges.md) | — |
-| 42 | Arm B retrieval upgrade (section + multi-query) | evals, docs | pending | v1 shipped | [42](../../docs/build/42-arm-b-retrieval-upgrade.md) | — |
-| 43 | Arm C serialization v2 (concise + intensity) | evals, docs | pending | v1 shipped | [43](../../docs/build/43-arm-c-serialization-v2.md) | — |
-| 44 | v2 Phase 1 thesis run | evals, docs | pending | 41, 42, 43 | [44](../../docs/build/44-v2-phase1-thesis-run.md) | — |
+| 42 | Edge-value thesis run | evals, docs | pending | 41 | [42](../../docs/build/42-edge-value-thesis-run.md) | — |
+| 43 | Arm B retrieval upgrade (section + multi-query) | evals, docs | pending | v1 shipped | [43](../../docs/build/43-arm-b-retrieval-upgrade.md) | — |
+| 44 | Arm B upgrade thesis run | evals, docs | pending | 43 | [44](../../docs/build/44-arm-b-upgrade-thesis-run.md) | — |
+| 45 | Arm C serialization v2 (concise + intensity) | evals, docs | pending | v1 shipped | [45](../../docs/build/45-arm-c-serialization-v2.md) | — |
+| 46 | Serialization v2 thesis run | evals, docs | pending | 45 | [46](../../docs/build/46-serialization-thesis-run.md) | — |
+| 47 | v2 Phase 1 combined thesis run | evals, docs | pending | 42, 44, 46 | [47](../../docs/build/47-v2-phase1-combined-run.md) | — |
 
 ## Archived
 

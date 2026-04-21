@@ -1,4 +1,4 @@
-# 43: Arm C serialization v2 (concise + intensity-aware)
+# 45: Arm C serialization v2 (concise + intensity-aware)
 
 **Status**: pending
 **Depends on**: v1 shipped

@@ -1,19 +1,15 @@
-# 44: v2 Phase 1 thesis run
+# 47: v2 Phase 1 combined thesis run
 
 **Status**: pending
-**Depends on**: 41, 42, 43
+**Depends on**: 42, 44, 46
 **Components touched**: evals / docs
-**Branch**: `feat/v2-phase1-thesis-run`
+**Branch**: `feat/v2-phase1-combined-run`
 
 ## Context
 
-The capstone feature of v2 Phase 1. Runs the full harness with all Phase 1 improvements — validated cross-guideline edges (F41), stronger Arm B retrieval (F42), and improved Arm C serialization + prompt (F43) — and measures the impact.
+The capstone feature of v2 Phase 1. All Phase 1 improvements — validated cross-guideline edges (F41), stronger Arm B retrieval (F43), and improved Arm C serialization + prompt (F45) — have been individually measured in isolation runs (F42, F44, F46). This run measures their combined effect and produces the definitive v2 Phase 1 scorecard.
 
-Three questions to answer:
-
-1. **Does Arm C still beat the improved Arm B?** If the gap closed significantly, the v1 advantage was partly due to weak RAG. If it held or widened, the structural advantage is real.
-2. **Do cross-guideline edges improve Integration scores?** Compare Arm C composite with edges vs v1 Arm C composite without edges. If edges help, curated reasoning adds value on top of convergence.
-3. **Did the prompt/serialization tuning improve Completeness?** Compare Arm C Completeness v2 vs v1. Target: ≥ 4.0 (up from 3.50).
+By this point, the isolation runs (F42, F44, F46) have answered each question individually. This run answers: **do the improvements compound, or do they interfere?** The combined effect could be greater than the sum (synergy) or less (e.g., better RAG + better serialization compete for the same points).
 
 ## Required reading
 
@@ -51,17 +47,17 @@ Same 16 fixtures as v1. No new fixtures in Phase 1 — isolate the variable to e
 
 ## Analysis
 
-The scorecard README must include a comparison table:
+The scorecard README must include a full comparison table across all runs:
 
-| Metric | v1 | v2 Phase 1 | Delta |
-|--------|-----|------------|-------|
-| Arm C composite (all) | 4.14 | ? | ? |
-| Arm B composite (all) | 3.38 | ? | ? |
-| C - B gap (multi-gl) | +1.00 | ? | ? |
-| Arm C Completeness | 3.50 | ? | ? |
-| Arm C Integration (multi-gl) | 4.75 | ? | ? |
+| Metric | v1 | F42 (edges) | F44 (RAG) | F46 (serial.) | F47 (combined) |
+|--------|-----|-------------|-----------|---------------|----------------|
+| Arm C composite (all) | 4.14 | ? | ? | ? | ? |
+| Arm B composite (all) | 3.38 | ? | ? | ? | ? |
+| C - B gap (multi-gl) | +1.00 | ? | ? | ? | ? |
+| Arm C Completeness | 3.50 | ? | ? | ? | ? |
+| Arm C Integration (multi-gl) | 4.75 | ? | ? | ? | ? |
 
-And answer the three questions from the Context section.
+Key question: **do the improvements compound or interfere?**
 
 ## Verification targets
 
@@ -75,8 +71,7 @@ And answer the three questions from the Context section.
 
 - Full harness run completed.
 - Scorecard committed to `evals/results/v2-phase1/`.
-- v1 → v2 comparison documented.
-- Three questions answered in the README.
+- Full comparison table (v1 + all isolation runs + combined) in README.
 - `docs/reference/build-status.md` updated.
 - PR opened, reviewed, merged.
 

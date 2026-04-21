@@ -1,4 +1,4 @@
-# 42: Arm B retrieval upgrade (section-level + multi-query)
+# 43: Arm B retrieval upgrade (section-level + multi-query)
 
 **Status**: pending
 **Depends on**: v1 shipped

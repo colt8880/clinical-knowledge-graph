@@ -398,6 +398,110 @@ MULTI_GUIDELINE_TRACE = {
 }
 
 
+class TestCrossGuidelineEvents:
+    """Tests for cross-guideline event handling in serialize_trace_summary."""
+
+    def test_preemption_resolved_extracted(self):
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "preemption_resolved",
+                    "guideline_id": "guideline:uspstf-statin-2022",
+                    "preempted_recommendation_id": "rec:statin-initiate-grade-b",
+                    "preempting_recommendation_id": "rec:accaha-statin-primary-prevention",
+                    "edge_priority": 200,
+                    "reason": "ACC/AHA more specific",
+                },
+            ]
+        }
+        summary = serialize_trace_summary(trace)
+        assert len(summary["preemption_events"]) == 1
+        pe = summary["preemption_events"][0]
+        assert pe["preempted_recommendation_id"] == "rec:statin-initiate-grade-b"
+        assert pe["preempting_recommendation_id"] == "rec:accaha-statin-primary-prevention"
+
+    def test_cross_guideline_match_uses_nature_field(self):
+        """The evaluator sends 'nature', not 'match_type'. Serialization must handle this."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "cross_guideline_match",
+                    "guideline_id": "guideline:kdigo-ckd-2024",
+                    "source_rec_id": "rec:kdigo-statin-for-ckd",
+                    "target_rec_id": "rec:accaha-statin-secondary-prevention",
+                    "nature": "intensity_reduction",
+                    "note": "KDIGO recommends moderate-intensity",
+                    "source_guideline_id": "guideline:kdigo-ckd-2024",
+                    "target_guideline_id": "guideline:acc-aha-cholesterol-2018",
+                },
+            ]
+        }
+        summary = serialize_trace_summary(trace)
+        assert len(summary["modifier_events"]) == 1
+        me = summary["modifier_events"][0]
+        assert me["match_type"] == "intensity_reduction"
+        assert me["source_guideline_id"] == "guideline:kdigo-ckd-2024"
+        assert me["target_guideline_id"] == "guideline:acc-aha-cholesterol-2018"
+
+    def test_cross_guideline_match_defaults_to_unknown(self):
+        """If neither match_type nor nature is present, defaults to 'unknown'."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "cross_guideline_match",
+                    "guideline_id": "test",
+                    "source_guideline_id": "a",
+                    "target_guideline_id": "b",
+                },
+            ]
+        }
+        summary = serialize_trace_summary(trace)
+        assert summary["modifier_events"][0]["match_type"] == "unknown"
+
+    def test_build_arm_c_context_with_cross_guideline_events(self):
+        """build_arm_c_context should not crash when trace has cross-guideline events."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "evaluation_started",
+                    "guideline_id": None,
+                },
+                {
+                    "seq": 2,
+                    "type": "cross_guideline_match",
+                    "guideline_id": "guideline:kdigo-ckd-2024",
+                    "source_rec_id": "rec:kdigo-statin-for-ckd",
+                    "target_rec_id": "rec:accaha-statin-secondary-prevention",
+                    "nature": "intensity_reduction",
+                    "note": "test",
+                    "source_guideline_id": "guideline:kdigo-ckd-2024",
+                    "target_guideline_id": "guideline:acc-aha-cholesterol-2018",
+                },
+                {
+                    "seq": 3,
+                    "type": "preemption_resolved",
+                    "guideline_id": "guideline:uspstf-statin-2022",
+                    "preempted_recommendation_id": "rec:statin-initiate-grade-b",
+                    "preempting_recommendation_id": "rec:accaha-statin-primary-prevention",
+                    "edge_priority": 200,
+                    "reason": "ACC/AHA more specific",
+                },
+                {
+                    "seq": 4,
+                    "type": "evaluation_completed",
+                    "guideline_id": None,
+                },
+            ]
+        }
+        ctx = build_arm_c_context(trace)
+        assert len(ctx["trace_summary"]["modifier_events"]) == 1
+        assert len(ctx["trace_summary"]["preemption_events"]) == 1
+
+
 class TestSerializeConvergenceSummary:
     """Tests for serialize_convergence_summary."""
 

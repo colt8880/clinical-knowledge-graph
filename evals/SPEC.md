@@ -231,9 +231,10 @@ The `convergence_summary` key surfaces clinical entities targeted by strategies 
 ### Arm B chunking
 
 - Source: `docs/reference/guidelines/*.md` (guideline prose; excludes `cross-guideline-map.md` and `preemption-map.md`)
-- Chunk size: ~500 tokens with ~50-token overlap
+- Chunk strategy: section-level (`##` header boundaries). Sections exceeding 1000 tokens fall back to ~500-token overlapping splits with the header prepended.
 - Embedding model: `text-embedding-3-small` (OpenAI)
-- Retrieval: top-k=5 chunks by cosine similarity against a query built from patient demographics and conditions
+- Retrieval: multi-query. One embedding query per active condition, one per medication class, one for risk scores, plus a clinically-framed catch-all. Top-3 per query, deduplicated by chunk ID, up to 8 unique chunks returned.
+- Query construction: natural-language clinical framing (e.g. "55-year-old male with hypertension, ASCVD risk 8.5%. What are the guideline recommendations for…") instead of flat demographic lists.
 
 ### Braintrust integration
 

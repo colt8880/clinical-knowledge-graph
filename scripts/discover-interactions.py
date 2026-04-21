@@ -281,13 +281,13 @@ def compute_overlap(rec_a: RecInfo, rec_b: RecInfo) -> OverlapAnalysis:
 
     if conflict_ab:
         condition_compatible = False
-        names = ", ".join(_display_code(c) for c in conflict_ab)
+        names = ", ".join(_display_code(c) for c in sorted(conflict_ab))
         condition_notes_parts.append(
             f"Rec A requires {names} which Rec B excludes"
         )
     if conflict_ba:
         condition_compatible = False
-        names = ", ".join(_display_code(c) for c in conflict_ba)
+        names = ", ".join(_display_code(c) for c in sorted(conflict_ba))
         condition_notes_parts.append(
             f"Rec B requires {names} which Rec A excludes"
         )
@@ -329,7 +329,7 @@ def compute_overlap(rec_a: RecInfo, rec_b: RecInfo) -> OverlapAnalysis:
     # Shared required conditions (conjunctive)
     shared_req = a_req & b_req
     if shared_req:
-        names = ", ".join(_display_code(c) for c in shared_req)
+        names = ", ".join(_display_code(c) for c in sorted(shared_req))
         condition_notes_parts.append(f"Both require: {names}")
 
     # Shared conditions across disjunctive groups
@@ -342,7 +342,7 @@ def compute_overlap(rec_a: RecInfo, rec_b: RecInfo) -> OverlapAnalysis:
 
     shared_disj = (a_disj_conds | a_req) & (b_disj_conds | b_req) - shared_req
     if shared_disj:
-        names = ", ".join(_display_code(c) for c in shared_disj)
+        names = ", ".join(_display_code(c) for c in sorted(shared_disj))
         condition_notes_parts.append(f"Shared condition (some disjunctive): {names}")
 
     condition_notes_str = "; ".join(condition_notes_parts) if condition_notes_parts else "Compatible"

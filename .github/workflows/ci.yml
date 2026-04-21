@@ -292,9 +292,9 @@ jobs:
 
           # Expected counts from all seeds (statins + cholesterol + KDIGO CKD):
           # Nodes: 3 Guideline + 11 Recommendation + 8 Strategy + 6 Condition + 6 Observation + 15 Medication + 1 Procedure = 50
-          # Edges: 11 FROM_GUIDELINE + 13 OFFERS_STRATEGY + 26 INCLUDES_ACTION + 4 FOR_CONDITION + 8 EXCLUDED_BY = 62
+          # Edges: 11 FROM_GUIDELINE + 13 OFFERS_STRATEGY + 26 INCLUDES_ACTION + 4 FOR_CONDITION + 8 EXCLUDED_BY + 6 PREEMPTED_BY + 2 MODIFIES = 70
           EXPECTED_NODES = 50
-          EXPECTED_EDGES = 62
+          EXPECTED_EDGES = 70
 
           with driver.session() as session:
               actual_nodes = session.run("MATCH (n) RETURN count(n) AS c").single()["c"]

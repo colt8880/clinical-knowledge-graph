@@ -666,6 +666,212 @@ def _format_obs_short(obs: dict) -> str:
     return f"{code} {comp} {threshold} {unit}".strip()
 
 
+_STATIN_IDS = {
+    "med:atorvastatin", "med:rosuvastatin", "med:simvastatin",
+    "med:pravastatin", "med:lovastatin", "med:fluvastatin", "med:pitavastatin",
+}
+
+
+@dataclass
+class VerdictGuess:
+    """Pre-populated verdict and rationale for a pair."""
+    verdict: str  # preempted_by, modifies, convergence, reject
+    rationale: str
+    # For preempted_by: (winner, loser)
+    winner: RecInfo | None = None
+    loser: RecInfo | None = None
+    # For modifies: (modifier, target, nature)
+    modifier: RecInfo | None = None
+    target: RecInfo | None = None
+    nature: str | None = None
+
+
+def _classify_verdict(
+    rec_a: RecInfo,
+    rec_b: RecInfo,
+    overlap: OverlapAnalysis,
+) -> VerdictGuess:
+    """Determine the most likely verdict based on pair characteristics."""
+
+    # --- No interaction ---
+    if overlap.candidate_type == "no_interaction":
+        return VerdictGuess(
+            verdict="reject",
+            rationale="Eligibility criteria do not overlap — no patient can trigger both recs.",
+        )
+
+    a_entities = set(rec_a.action_entity_ids)
+    b_entities = set(rec_b.action_entity_ids)
+    shared = a_entities & b_entities
+
+    a_statins = a_entities & _STATIN_IDS
+    b_statins = b_entities & _STATIN_IDS
+    shared_statins = a_statins & b_statins
+
+    a_is_statin_rec = len(a_statins) > 0 and len(a_statins) >= len(a_entities) / 2
+    b_is_statin_rec = len(b_statins) > 0 and len(b_statins) >= len(b_entities) / 2
+
+    g_a = _short_guideline(rec_a.guideline_id)
+    g_b = _short_guideline(rec_b.guideline_id)
+
+    ea = rec_a.eligibility or EligibilityCriteria()
+    eb = rec_b.eligibility or EligibilityCriteria()
+
+    # --- Both are statin recs with shared statin targets ---
+    if a_is_statin_rec and b_is_statin_rec and shared_statins:
+
+        # KDIGO statin-for-CKD vs ACC/AHA high-intensity strategies:
+        # KDIGO explicitly recommends moderate-intensity in CKD. If ACC/AHA
+        # offers high-intensity (atorvastatin + rosuvastatin only), KDIGO
+        # modifies to moderate.
+        kdigo_rec = None
+        other_rec = None
+        if "kdigo" in rec_a.guideline_id:
+            kdigo_rec, other_rec = rec_a, rec_b
+        elif "kdigo" in rec_b.guideline_id:
+            kdigo_rec, other_rec = rec_b, rec_a
+
+        if kdigo_rec and "statin-for-ckd" in kdigo_rec.id:
+            other_statins = set(other_rec.action_entity_ids) & _STATIN_IDS
+            # ACC/AHA high-intensity strategies have only atorvastatin + rosuvastatin
+            if other_statins == {"med:atorvastatin", "med:rosuvastatin"}:
+                return VerdictGuess(
+                    verdict="modifies",
+                    modifier=kdigo_rec,
+                    target=other_rec,
+                    nature="intensity_reduction",
+                    rationale=(
+                        f"KDIGO recommends moderate-intensity statin in CKD G3-G5 "
+                        f"due to altered pharmacokinetics and increased myopathy risk. "
+                        f"The {_short_guideline(other_rec.guideline_id)} rec offers high-intensity; "
+                        f"KDIGO adjusts to moderate for the CKD overlap population."
+                    ),
+                )
+            # Both are moderate-intensity statin recs → convergence
+            if other_statins == _STATIN_IDS or len(other_statins) == 7:
+                return VerdictGuess(
+                    verdict="convergence",
+                    rationale=(
+                        f"Both recs recommend moderate-intensity statin therapy for the "
+                        f"overlap population. No conflict — the shared entity layer "
+                        f"deduplicates. No cross-edge needed."
+                    ),
+                )
+
+        # USPSTF vs ACC/AHA statin recs: both are statin recommendations.
+        # ACC/AHA provides more granular guidance (specific benefit groups,
+        # intensity tiers). For the overlap population, ACC/AHA preempts USPSTF.
+        uspstf_rec = None
+        accaha_rec = None
+        if "uspstf" in rec_a.guideline_id and "acc-aha" in rec_b.guideline_id:
+            uspstf_rec, accaha_rec = rec_a, rec_b
+        elif "acc-aha" in rec_a.guideline_id and "uspstf" in rec_b.guideline_id:
+            accaha_rec, uspstf_rec = rec_a, rec_b
+
+        if uspstf_rec and accaha_rec:
+            return VerdictGuess(
+                verdict="preempted_by",
+                winner=accaha_rec,
+                loser=uspstf_rec,
+                rationale=(
+                    f"ACC/AHA provides more granular, domain-specific guidance "
+                    f"(specific statin benefit groups with intensity tiers) than "
+                    f"the USPSTF population-level screening recommendation. "
+                    f"Per ADR 0018, specialty society guideline (priority 200) "
+                    f"preempts federal task force (priority 100) within the "
+                    f"cardiovascular domain."
+                ),
+            )
+
+        # KDIGO statin-for-CKD vs USPSTF: both moderate-intensity → convergence
+        if kdigo_rec and "uspstf" in (other_rec or rec_a).guideline_id:
+            return VerdictGuess(
+                verdict="convergence",
+                rationale=(
+                    f"Both recs recommend moderate-intensity statin therapy. "
+                    f"KDIGO is CKD-specific; USPSTF is population-level. "
+                    f"For the overlap population they agree — no conflict, "
+                    f"no cross-edge needed."
+                ),
+            )
+
+        # Generic statin convergence fallback
+        return VerdictGuess(
+            verdict="convergence",
+            rationale=(
+                f"Both recs prescribe overlapping statin medications for the "
+                f"overlap population. No intensity conflict detected. "
+                f"Shared entity layer handles deduplication."
+            ),
+        )
+
+    # --- Shared non-statin targets ---
+    if shared and not shared_statins:
+        # Shared observations (e.g., both require eGFR monitoring)
+        winner, loser = _guess_preemption_direction(rec_a, rec_b)
+        return VerdictGuess(
+            verdict="convergence",
+            rationale=(
+                f"Both recs target shared entities but in different clinical "
+                f"contexts. The shared entity layer handles deduplication."
+            ),
+        )
+
+    # --- No shared targets: different therapeutic domains ---
+    if not shared:
+        # Check if the domains are truly unrelated
+        a_domain = _therapeutic_domain(rec_a)
+        b_domain = _therapeutic_domain(rec_b)
+
+        if a_domain != b_domain:
+            return VerdictGuess(
+                verdict="reject",
+                rationale=(
+                    f"Different therapeutic domains ({a_domain} vs {b_domain}). "
+                    f"Both recs can co-fire for the overlap population but address "
+                    f"independent clinical concerns. No interaction edge needed."
+                ),
+            )
+
+        # Same domain but no shared entities — unusual, flag for review
+        modifier, target = _guess_modification_direction(rec_a, rec_b)
+        return VerdictGuess(
+            verdict="reject",
+            rationale=(
+                f"Both recs address the {a_domain} domain but prescribe "
+                f"different actions with no shared therapeutic targets. "
+                f"Likely independent — review if a MODIFIES relationship applies."
+            ),
+        )
+
+    # --- Fallback: mixed shared targets ---
+    modifier, target = _guess_modification_direction(rec_a, rec_b)
+    return VerdictGuess(
+        verdict="convergence",
+        rationale=(
+            f"Shared therapeutic targets detected. Review whether one rec "
+            f"preempts the other or if the shared entity layer handles this."
+        ),
+    )
+
+
+def _therapeutic_domain(rec: RecInfo) -> str:
+    """Classify a rec into a broad therapeutic domain for reject rationale."""
+    entities = set(rec.action_entity_ids)
+    if entities & _STATIN_IDS:
+        return "lipid management"
+    if entities & {"med:empagliflozin", "med:dapagliflozin"}:
+        return "SGLT2i / renal protection"
+    if entities & {"med:lisinopril", "med:enalapril", "med:ramipril",
+                   "med:losartan", "med:valsartan", "med:irbesartan"}:
+        return "RAS blockade / renal protection"
+    if entities & {"obs:egfr", "obs:urine-acr"}:
+        return "CKD monitoring"
+    if entities & {"proc:sdm-statin-discussion"}:
+        return "shared decision-making"
+    return rec.intent or "unclassified"
+
+
 def _render_verdict(
     lines: list[str],
     rec_a: RecInfo,
@@ -674,49 +880,70 @@ def _render_verdict(
     g_a: str,
     g_b: str,
 ) -> None:
-    """Render the pre-populated verdict section."""
+    """Render the pre-populated verdict section with checked option and rationale."""
+    guess = _classify_verdict(rec_a, rec_b, overlap)
+
     lines.append("### Verdict")
     lines.append("")
 
-    if overlap.candidate_type == "no_interaction":
-        lines.append("- [x] **Reject** — no eligibility overlap")
-        lines.append("- [ ] Override: approve as PREEMPTED_BY")
-        lines.append("- [ ] Override: approve as MODIFIES")
+    if guess.verdict == "reject":
+        lines.append("- [x] **Reject**")
+        _render_other_options(lines, rec_a, rec_b, overlap, checked=None)
         lines.append("")
-        lines.append("**Rationale:** ")
+        lines.append(f"**Rationale:** {guess.rationale}")
         lines.append("")
         return
 
-    if overlap.candidate_type == "convergence":
-        # Pre-populate: specialty society (higher priority) preempts USPSTF
-        winner, loser = _guess_preemption_direction(rec_a, rec_b)
-        w_short = _short_title(winner.title)
-        l_short = _short_title(loser.title)
+    if guess.verdict == "preempted_by":
+        winner = guess.winner or rec_a
+        loser = guess.loser or rec_b
         w_g = _short_guideline(winner.guideline_id)
         l_g = _short_guideline(loser.guideline_id)
-
-        lines.append(f"- [ ] **PREEMPTED_BY:** {w_g} ({w_short}) preempts {l_g} ({l_short})")
+        lines.append(f"- [x] **PREEMPTED_BY:** {w_g} ({_short_title(winner.title)}) preempts {l_g} ({_short_title(loser.title)})")
         lines.append(f"  - Edge: `({loser.id})-[:PREEMPTED_BY]->({winner.id})`")
-        lines.append(f"- [ ] **Convergence only** — no edge needed, shared entity layer handles it")
-        lines.append(f"- [ ] **MODIFIES:** ___ modifies ___; nature: ___")
-        lines.append(f"- [ ] **Reject** — no clinically meaningful interaction")
-    else:
-        # Modification candidate — guess direction based on which is more specific
-        modifier, target = _guess_modification_direction(rec_a, rec_b)
-        m_short = _short_title(modifier.title)
-        t_short = _short_title(target.title)
+        _render_other_options(lines, rec_a, rec_b, overlap, checked="preempted_by")
+
+    elif guess.verdict == "modifies":
+        modifier = guess.modifier or rec_a
+        target = guess.target or rec_b
         m_g = _short_guideline(modifier.guideline_id)
         t_g = _short_guideline(target.guideline_id)
-
-        lines.append(f"- [ ] **MODIFIES:** {m_g} ({m_short}) modifies {t_g} ({t_short}); nature: ___")
+        nature = guess.nature or "___"
+        lines.append(f"- [x] **MODIFIES:** {m_g} ({_short_title(modifier.title)}) modifies {t_g} ({_short_title(target.title)}); nature: `{nature}`")
         lines.append(f"  - Edge: `({modifier.id})-[:MODIFIES]->({target.id})`")
-        lines.append(f"  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`")
-        lines.append(f"- [ ] **Reject** — unrelated clinical domains, no interaction")
-        lines.append(f"- [ ] **PREEMPTED_BY:** ___ preempts ___")
+        _render_other_options(lines, rec_a, rec_b, overlap, checked="modifies")
+
+    elif guess.verdict == "convergence":
+        lines.append("- [x] **Convergence only** — no edge needed, shared entity layer handles it")
+        _render_other_options(lines, rec_a, rec_b, overlap, checked="convergence")
 
     lines.append("")
-    lines.append("**Rationale:** ")
+    lines.append(f"**Rationale:** {guess.rationale}")
     lines.append("")
+
+
+def _render_other_options(
+    lines: list[str],
+    rec_a: RecInfo,
+    rec_b: RecInfo,
+    overlap: OverlapAnalysis,
+    checked: str | None,
+) -> None:
+    """Render the unchecked alternative verdict options."""
+    if checked != "preempted_by":
+        winner, loser = _guess_preemption_direction(rec_a, rec_b)
+        w_g = _short_guideline(winner.guideline_id)
+        l_g = _short_guideline(loser.guideline_id)
+        lines.append(f"- [ ] **PREEMPTED_BY:** {w_g} ({_short_title(winner.title)}) preempts {l_g} ({_short_title(loser.title)})")
+    if checked != "modifies":
+        modifier, target = _guess_modification_direction(rec_a, rec_b)
+        m_g = _short_guideline(modifier.guideline_id)
+        t_g = _short_guideline(target.guideline_id)
+        lines.append(f"- [ ] **MODIFIES:** {m_g} ({_short_title(modifier.title)}) modifies {t_g} ({_short_title(target.title)}); nature: ___")
+    if checked != "convergence" and overlap.shared_therapeutic_targets:
+        lines.append("- [ ] **Convergence only** — no edge needed")
+    if checked != "reject":
+        lines.append("- [ ] **Reject** — no clinically meaningful interaction")
 
 
 def _eligibility_requires(ec: EligibilityCriteria) -> str:

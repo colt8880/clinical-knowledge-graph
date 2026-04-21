@@ -37,13 +37,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
+- [x] **Convergence only** — no edge needed, shared entity layer handles it
 - [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...)
-  - Edge: `(rec:kdigo-statin-for-ckd)-[:PREEMPTED_BY]->(rec:accaha-statin-diabetes)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Both recs recommend moderate-intensity statin therapy for the overlap population. No conflict — the shared entity layer deduplicates. No cross-edge needed.
 
 ---
 
@@ -67,13 +66,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
+- [x] **Convergence only** — no edge needed, shared entity layer handles it
 - [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...)
-  - Edge: `(rec:kdigo-statin-for-ckd)-[:PREEMPTED_BY]->(rec:accaha-statin-primary-prevention)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Both recs recommend moderate-intensity statin therapy for the overlap population. No conflict — the shared entity layer deduplicates. No cross-edge needed.
 
 ---
 
@@ -97,13 +95,13 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
+- [x] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies ACC/AHA (High-intensity statin for secondary prevention in clinica...); nature: `intensity_reduction`
+  - Edge: `(rec:kdigo-statin-for-ckd)-[:MODIFIES]->(rec:accaha-statin-secondary-prevention)`
 - [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) preempts KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...)
-  - Edge: `(rec:kdigo-statin-for-ckd)-[:PREEMPTED_BY]->(rec:accaha-statin-secondary-prevention)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **Convergence only** — no edge needed
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** KDIGO recommends moderate-intensity statin in CKD G3-G5 due to altered pharmacokinetics and increased myopathy risk. The ACC/AHA rec offers high-intensity; KDIGO adjusts to moderate for the CKD overlap population.
 
 ---
 
@@ -127,13 +125,13 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
+- [x] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...); nature: `intensity_reduction`
+  - Edge: `(rec:kdigo-statin-for-ckd)-[:MODIFIES]->(rec:accaha-statin-severe-hypercholesterolemia)`
 - [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...)
-  - Edge: `(rec:kdigo-statin-for-ckd)-[:PREEMPTED_BY]->(rec:accaha-statin-severe-hypercholesterolemia)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **Convergence only** — no edge needed
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** KDIGO recommends moderate-intensity statin in CKD G3-G5 due to altered pharmacokinetics and increased myopathy risk. The ACC/AHA rec offers high-intensity; KDIGO adjusts to moderate for the CKD overlap population.
 
 ---
 
@@ -158,13 +156,13 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
-- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
+- [x] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
   - Edge: `(rec:statin-initiate-grade-b)-[:PREEMPTED_BY]->(rec:accaha-statin-diabetes)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
+- [ ] **Convergence only** — no edge needed
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** ACC/AHA provides more granular, domain-specific guidance (specific statin benefit groups with intensity tiers) than the USPSTF population-level screening recommendation. Per ADR 0018, specialty society guideline (priority 200) preempts federal task force (priority 100) within the cardiovascular domain.
 
 ---
 
@@ -189,13 +187,13 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
-- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
+- [x] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
   - Edge: `(rec:statin-selective-grade-c)-[:PREEMPTED_BY]->(rec:accaha-statin-diabetes)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
+- [ ] **Convergence only** — no edge needed
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** ACC/AHA provides more granular, domain-specific guidance (specific statin benefit groups with intensity tiers) than the USPSTF population-level screening recommendation. Per ADR 0018, specialty society guideline (priority 200) preempts federal task force (priority 100) within the cardiovascular domain.
 
 ---
 
@@ -219,13 +217,13 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
-- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
+- [x] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
   - Edge: `(rec:statin-initiate-grade-b)-[:PREEMPTED_BY]->(rec:accaha-statin-primary-prevention)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
+- [ ] **Convergence only** — no edge needed
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** ACC/AHA provides more granular, domain-specific guidance (specific statin benefit groups with intensity tiers) than the USPSTF population-level screening recommendation. Per ADR 0018, specialty society guideline (priority 200) preempts federal task force (priority 100) within the cardiovascular domain.
 
 ---
 
@@ -249,13 +247,13 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
-- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
+- [x] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
   - Edge: `(rec:statin-selective-grade-c)-[:PREEMPTED_BY]->(rec:accaha-statin-primary-prevention)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
+- [ ] **Convergence only** — no edge needed
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** ACC/AHA provides more granular, domain-specific guidance (specific statin benefit groups with intensity tiers) than the USPSTF population-level screening recommendation. Per ADR 0018, specialty society guideline (priority 200) preempts federal task force (priority 100) within the cardiovascular domain.
 
 ---
 
@@ -279,13 +277,13 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
-- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
+- [x] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
   - Edge: `(rec:statin-initiate-grade-b)-[:PREEMPTED_BY]->(rec:accaha-statin-severe-hypercholesterolemia)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
+- [ ] **Convergence only** — no edge needed
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** ACC/AHA provides more granular, domain-specific guidance (specific statin benefit groups with intensity tiers) than the USPSTF population-level screening recommendation. Per ADR 0018, specialty society guideline (priority 200) preempts federal task force (priority 100) within the cardiovascular domain.
 
 ---
 
@@ -309,13 +307,13 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
-- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
+- [x] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
   - Edge: `(rec:statin-selective-grade-c)-[:PREEMPTED_BY]->(rec:accaha-statin-severe-hypercholesterolemia)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
+- [ ] **Convergence only** — no edge needed
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** ACC/AHA provides more granular, domain-specific guidance (specific statin benefit groups with intensity tiers) than the USPSTF population-level screening recommendation. Per ADR 0018, specialty society guideline (priority 200) preempts federal task force (priority 100) within the cardiovascular domain.
 
 ---
 
@@ -339,13 +337,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
+- [x] **Convergence only** — no edge needed, shared entity layer handles it
 - [ ] **PREEMPTED_BY:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
-  - Edge: `(rec:statin-initiate-grade-b)-[:PREEMPTED_BY]->(rec:kdigo-statin-for-ckd)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Both recs recommend moderate-intensity statin therapy for the overlap population. No conflict — the shared entity layer deduplicates. No cross-edge needed.
 
 ---
 
@@ -369,13 +366,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 
 ### Verdict
 
+- [x] **Convergence only** — no edge needed, shared entity layer handles it
 - [ ] **PREEMPTED_BY:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
-  - Edge: `(rec:statin-selective-grade-c)-[:PREEMPTED_BY]->(rec:kdigo-statin-for-ckd)`
-- [ ] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **MODIFIES:** ___ modifies ___; nature: ___
+- [ ] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Both recs recommend moderate-intensity statin therapy for the overlap population. No conflict — the shared entity layer deduplicates. No cross-edge needed.
 
 ---
 
@@ -404,13 +400,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30))
 - [ ] **MODIFIES:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) modifies ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75); nature: ___
-  - Edge: `(rec:kdigo-acei-arb-for-ckd)-[:MODIFIES]->(rec:accaha-statin-diabetes)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs RAS blockade / renal protection). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -433,13 +428,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts KDIGO (Monitor eGFR and urine ACR in patients with CKD)
 - [ ] **MODIFIES:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) modifies ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75); nature: ___
-  - Edge: `(rec:kdigo-ckd-monitoring)-[:MODIFIES]->(rec:accaha-statin-diabetes)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs CKD monitoring). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -463,13 +457,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria)
 - [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75); nature: ___
-  - Edge: `(rec:kdigo-sglt2-for-ckd)-[:MODIFIES]->(rec:accaha-statin-diabetes)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs SGLT2i / renal protection). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -492,13 +485,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30))
 - [ ] **MODIFIES:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) modifies ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...); nature: ___
-  - Edge: `(rec:kdigo-acei-arb-for-ckd)-[:MODIFIES]->(rec:accaha-statin-primary-prevention)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs RAS blockade / renal protection). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -521,13 +513,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts KDIGO (Monitor eGFR and urine ACR in patients with CKD)
 - [ ] **MODIFIES:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) modifies ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...); nature: ___
-  - Edge: `(rec:kdigo-ckd-monitoring)-[:MODIFIES]->(rec:accaha-statin-primary-prevention)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs CKD monitoring). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -550,13 +541,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria)
 - [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...); nature: ___
-  - Edge: `(rec:kdigo-sglt2-for-ckd)-[:MODIFIES]->(rec:accaha-statin-primary-prevention)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs SGLT2i / renal protection). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -579,13 +569,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) preempts KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30))
 - [ ] **MODIFIES:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) modifies ACC/AHA (High-intensity statin for secondary prevention in clinica...); nature: ___
-  - Edge: `(rec:kdigo-acei-arb-for-ckd)-[:MODIFIES]->(rec:accaha-statin-secondary-prevention)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs RAS blockade / renal protection). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -608,13 +597,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) preempts KDIGO (Monitor eGFR and urine ACR in patients with CKD)
 - [ ] **MODIFIES:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) modifies ACC/AHA (High-intensity statin for secondary prevention in clinica...); nature: ___
-  - Edge: `(rec:kdigo-ckd-monitoring)-[:MODIFIES]->(rec:accaha-statin-secondary-prevention)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs CKD monitoring). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -637,13 +625,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) preempts KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria)
 - [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies ACC/AHA (High-intensity statin for secondary prevention in clinica...); nature: ___
-  - Edge: `(rec:kdigo-sglt2-for-ckd)-[:MODIFIES]->(rec:accaha-statin-secondary-prevention)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs SGLT2i / renal protection). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -666,13 +653,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30))
 - [ ] **MODIFIES:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) modifies ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...); nature: ___
-  - Edge: `(rec:kdigo-acei-arb-for-ckd)-[:MODIFIES]->(rec:accaha-statin-severe-hypercholesterolemia)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs RAS blockade / renal protection). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -695,13 +681,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts KDIGO (Monitor eGFR and urine ACR in patients with CKD)
 - [ ] **MODIFIES:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) modifies ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...); nature: ___
-  - Edge: `(rec:kdigo-ckd-monitoring)-[:MODIFIES]->(rec:accaha-statin-severe-hypercholesterolemia)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs CKD monitoring). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -724,13 +709,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria)
 - [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...); nature: ___
-  - Edge: `(rec:kdigo-sglt2-for-ckd)-[:MODIFIES]->(rec:accaha-statin-severe-hypercholesterolemia)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs SGLT2i / renal protection). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -753,13 +737,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
 - [ ] **MODIFIES:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
-  - Edge: `(rec:kdigo-acei-arb-for-ckd)-[:MODIFIES]->(rec:statin-initiate-grade-b)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (RAS blockade / renal protection vs lipid management). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -782,13 +765,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) preempts USPSTF (Insufficient evidence to recommend for or against initiat...)
 - [ ] **MODIFIES:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) modifies USPSTF (Insufficient evidence to recommend for or against initiat...); nature: ___
-  - Edge: `(rec:kdigo-acei-arb-for-ckd)-[:MODIFIES]->(rec:statin-insufficient-evidence-grade-i)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (RAS blockade / renal protection vs primary_prevention). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -811,13 +793,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
 - [ ] **MODIFIES:** KDIGO (ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30)) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
-  - Edge: `(rec:kdigo-acei-arb-for-ckd)-[:MODIFIES]->(rec:statin-selective-grade-c)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (RAS blockade / renal protection vs lipid management). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -840,13 +821,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
 - [ ] **MODIFIES:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
-  - Edge: `(rec:kdigo-ckd-monitoring)-[:MODIFIES]->(rec:statin-initiate-grade-b)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (CKD monitoring vs lipid management). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -869,13 +849,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) preempts USPSTF (Insufficient evidence to recommend for or against initiat...)
 - [ ] **MODIFIES:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) modifies USPSTF (Insufficient evidence to recommend for or against initiat...); nature: ___
-  - Edge: `(rec:kdigo-ckd-monitoring)-[:MODIFIES]->(rec:statin-insufficient-evidence-grade-i)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (CKD monitoring vs primary_prevention). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -898,13 +877,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
 - [ ] **MODIFIES:** KDIGO (Monitor eGFR and urine ACR in patients with CKD) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
-  - Edge: `(rec:kdigo-ckd-monitoring)-[:MODIFIES]->(rec:statin-selective-grade-c)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (CKD monitoring vs lipid management). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -928,13 +906,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
 - [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
-  - Edge: `(rec:kdigo-sglt2-for-ckd)-[:MODIFIES]->(rec:statin-initiate-grade-b)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (SGLT2i / renal protection vs lipid management). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -957,13 +934,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) preempts USPSTF (Insufficient evidence to recommend for or against initiat...)
 - [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies USPSTF (Insufficient evidence to recommend for or against initiat...); nature: ___
-  - Edge: `(rec:kdigo-sglt2-for-ckd)-[:MODIFIES]->(rec:statin-insufficient-evidence-grade-i)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (SGLT2i / renal protection vs primary_prevention). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -987,13 +963,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
 - [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
-  - Edge: `(rec:kdigo-sglt2-for-ckd)-[:MODIFIES]->(rec:statin-selective-grade-c)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (SGLT2i / renal protection vs lipid management). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -1016,13 +991,12 @@ Both recs can fire for the same patient but target different therapeutic actions
 
 ### Verdict
 
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) preempts USPSTF (Insufficient evidence to recommend for or against initiat...)
 - [ ] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies USPSTF (Insufficient evidence to recommend for or against initiat...); nature: ___
-  - Edge: `(rec:kdigo-statin-for-ckd)-[:MODIFIES]->(rec:statin-insufficient-evidence-grade-i)`
-  - Nature options: `intensity_reduction` · `dose_adjustment` · `monitoring` · `contraindication_warning`
-- [ ] **Reject** — unrelated clinical domains, no interaction
-- [ ] **PREEMPTED_BY:** ___ preempts ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Different therapeutic domains (lipid management vs primary_prevention). Both recs can co-fire for the overlap population but address independent clinical concerns. No interaction edge needed.
 
 ---
 
@@ -1051,11 +1025,12 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ### Verdict
 
-- [x] **Reject** — no eligibility overlap
-- [ ] Override: approve as PREEMPTED_BY
-- [ ] Override: approve as MODIFIES
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts USPSTF (Insufficient evidence to recommend for or against initiat...)
+- [ ] **MODIFIES:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) modifies USPSTF (Insufficient evidence to recommend for or against initiat...); nature: ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Eligibility criteria do not overlap — no patient can trigger both recs.
 
 ---
 
@@ -1078,11 +1053,12 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ### Verdict
 
-- [x] **Reject** — no eligibility overlap
-- [ ] Override: approve as PREEMPTED_BY
-- [ ] Override: approve as MODIFIES
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) preempts USPSTF (Insufficient evidence to recommend for or against initiat...)
+- [ ] **MODIFIES:** ACC/AHA (Moderate-to-high-intensity statin for primary prevention ...) modifies USPSTF (Insufficient evidence to recommend for or against initiat...); nature: ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Eligibility criteria do not overlap — no patient can trigger both recs.
 
 ---
 
@@ -1107,11 +1083,13 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ### Verdict
 
-- [x] **Reject** — no eligibility overlap
-- [ ] Override: approve as PREEMPTED_BY
-- [ ] Override: approve as MODIFIES
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
+- [ ] **MODIFIES:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
+- [ ] **Convergence only** — no edge needed
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Eligibility criteria do not overlap — no patient can trigger both recs.
 
 ---
 
@@ -1135,11 +1113,12 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ### Verdict
 
-- [x] **Reject** — no eligibility overlap
-- [ ] Override: approve as PREEMPTED_BY
-- [ ] Override: approve as MODIFIES
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) preempts USPSTF (Insufficient evidence to recommend for or against initiat...)
+- [ ] **MODIFIES:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) modifies USPSTF (Insufficient evidence to recommend for or against initiat...); nature: ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Eligibility criteria do not overlap — no patient can trigger both recs.
 
 ---
 
@@ -1164,11 +1143,13 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ### Verdict
 
-- [x] **Reject** — no eligibility overlap
-- [ ] Override: approve as PREEMPTED_BY
-- [ ] Override: approve as MODIFIES
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
+- [ ] **MODIFIES:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
+- [ ] **Convergence only** — no edge needed
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Eligibility criteria do not overlap — no patient can trigger both recs.
 
 ---
 
@@ -1191,10 +1172,11 @@ These pairs cannot co-match the same patient — age ranges don't overlap, or on
 
 ### Verdict
 
-- [x] **Reject** — no eligibility overlap
-- [ ] Override: approve as PREEMPTED_BY
-- [ ] Override: approve as MODIFIES
+- [x] **Reject**
+- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts USPSTF (Insufficient evidence to recommend for or against initiat...)
+- [ ] **MODIFIES:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) modifies USPSTF (Insufficient evidence to recommend for or against initiat...); nature: ___
+- [ ] **Reject** — no clinically meaningful interaction
 
-**Rationale:** 
+**Rationale:** Eligibility criteria do not overlap — no patient can trigger both recs.
 
 ---

@@ -1,6 +1,6 @@
 # 46: Serialization v2 thesis run
 
-**Status**: in-progress
+**Status**: shipped
 **Depends on**: 45
 **Components touched**: evals / docs
 **Branch**: `feat/serialization-thesis-run`
@@ -23,7 +23,7 @@ This answers: **does better serialization improve Completeness scores?**
 
 ## Constraints
 
-- Same 16 fixtures, same rubric v1.1, same models, 1 trial.
+- Same 22 fixtures (expanded from 16 in F48), same rubric v1.1, same models, 1 trial.
 - Note: the system prompt change (exhaustiveness instruction) affects all arms equally, so Arm A and Arm B may also improve. This is intentional and should be documented.
 - Braintrust experiments: `v2-serial-arm-a`, `v2-serial-arm-b`, `v2-serial-arm-c`.
 

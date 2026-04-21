@@ -554,16 +554,22 @@ def _build_clinical_scenario(
     eb: EligibilityCriteria,
     overlap: OverlapAnalysis,
 ) -> str:
-    """Build a plain-English sentence describing a patient who triggers both recs."""
+    """Build a plain-English sentence describing the specific patient who triggers both recs.
+
+    The scenario must reflect the INTERSECTION of both recs' requirements AND
+    the UNION of both recs' exclusions — the narrowest population where both fire.
+    """
     if not overlap.age_overlaps or not overlap.condition_compatible:
-        return (
-            f"No patient can trigger both — "
-            f"{'age ranges do not overlap' if not overlap.age_overlaps else 'mutually exclusive conditions'}."
-        )
+        reasons: list[str] = []
+        if not overlap.age_overlaps:
+            reasons.append("age ranges do not overlap")
+        if not overlap.condition_compatible:
+            reasons.append("mutually exclusive conditions")
+        return f"No patient can trigger both — {' and '.join(reasons)}."
 
-    parts: list[str] = []
+    # --- Build the positive requirements (intersection) ---
 
-    # Age
+    # Age overlap range
     a_lo = ea.effective_age_min or 0
     a_hi = ea.effective_age_max or 999
     b_lo = eb.effective_age_min or 0
@@ -571,70 +577,93 @@ def _build_clinical_scenario(
     overlap_lo = max(a_lo, b_lo)
     overlap_hi = min(a_hi, b_hi)
     mid_age = (overlap_lo + overlap_hi) // 2
-    parts.append(f"A {mid_age}-year-old")
 
-    # Conditions — gather what both require
-    shared_conds: list[str] = []
-    # Conjunctive conditions from both
-    for c in ea.required_conditions:
-        shared_conds.append(_display_code(c))
-    for c in eb.required_conditions:
-        name = _display_code(c)
-        if name not in shared_conds:
-            shared_conds.append(name)
-    # Pick one from each disjunctive group
-    for group in ea.disjunctive_groups:
-        if group.conditions:
-            shared_conds.append(_display_code(group.conditions[0]))
-        elif group.observations:
-            obs = group.observations[0]
-            shared_conds.append(
-                f"{_display_code(obs['code'])} "
-                f"{_comparator_symbol(obs.get('comparator', ''))} "
-                f"{obs.get('threshold')} {obs.get('unit', '')}"
-            )
-    for group in eb.disjunctive_groups:
-        if group.conditions:
-            name = _display_code(group.conditions[0])
-            if name not in shared_conds:
-                shared_conds.append(name)
-        elif group.observations:
-            obs = group.observations[0]
-            desc = (
-                f"{_display_code(obs['code'])} "
-                f"{_comparator_symbol(obs.get('comparator', ''))} "
-                f"{obs.get('threshold')} {obs.get('unit', '')}"
-            )
-            if desc not in shared_conds:
-                shared_conds.append(desc)
+    # Collect ALL positive requirements from both recs (deduplicated)
+    req_parts: list[str] = []
+    seen: set[str] = set()
 
-    if shared_conds:
-        parts.append(f"with {', '.join(shared_conds[:4])}")
+    def _add_req(text: str) -> None:
+        if text not in seen:
+            seen.add(text)
+            req_parts.append(text)
+
+    # Conjunctive conditions from both recs
+    for c in ea.required_conditions + eb.required_conditions:
+        _add_req(_display_code(c))
+
+    # Disjunctive groups — pick one satisfying branch per group
+    # Label which rec the requirement comes from when it's rec-specific
+    for label, elig in [("Rec A", ea), ("Rec B", eb)]:
+        for group in elig.disjunctive_groups:
+            if group.conditions:
+                _add_req(_display_code(group.conditions[0]))
+            elif group.observations:
+                obs = group.observations[0]
+                _add_req(_format_obs_short(obs))
+
+    # Required observations (conjunctive, non-disjunctive)
+    for label, elig in [("Rec A", ea), ("Rec B", eb)]:
+        for obs in elig.required_observations:
+            _add_req(_format_obs_short(obs))
 
     # Risk scores
     for rs in ea.risk_scores + eb.risk_scores:
-        parts.append(
-            f"{rs.get('name')} {_comparator_symbol(rs.get('comparator', ''))} "
-            f"{rs.get('threshold')}%"
-        )
-        break  # just one for brevity
+        comp = _comparator_symbol(rs.get("comparator", ""))
+        _add_req(f"{rs.get('name')} {comp} {rs.get('threshold')}%")
 
-    # Observations from required (non-disjunctive)
-    for obs in ea.required_observations[:1]:
-        parts.append(
-            f"{_display_code(obs['code'])} "
-            f"{_comparator_symbol(obs.get('comparator', ''))} "
-            f"{obs.get('threshold')} {obs.get('unit', '')}"
-        )
+    # Smoking
+    for label, elig in [("Rec A", ea), ("Rec B", eb)]:
+        if elig.smoking_status:
+            _add_req(f"smoking status: {elig.smoking_status[0]}")
 
-    scenario = " ".join(parts)
+    # --- Build the exclusion constraints (union) ---
+    excl_parts: list[str] = []
+    excl_seen: set[str] = set()
 
-    # What happens
+    def _add_excl(text: str) -> None:
+        if text not in excl_seen:
+            excl_seen.add(text)
+            excl_parts.append(text)
+
+    for c in ea.excluded_conditions + eb.excluded_conditions:
+        _add_excl(_display_code(c))
+
+    for obs in ea.excluded_observations + eb.excluded_observations:
+        _add_excl(_format_obs_short(obs))
+
+    for m in ea.excluded_medications + eb.excluded_medications:
+        _add_excl(f"active {_display_code(m)}")
+
+    # --- Assemble the sentence ---
+    scenario = f"A {mid_age}-year-old"
+
+    if req_parts:
+        scenario += f" with {', '.join(req_parts)}"
+
+    if excl_parts:
+        scenario += f" (without {', '.join(excl_parts[:3])}"
+        if len(excl_parts) > 3:
+            scenario += f", +{len(excl_parts) - 3} more"
+        scenario += ")"
+
     g_a = _short_guideline(rec_a.guideline_id)
     g_b = _short_guideline(rec_b.guideline_id)
-    scenario += f" would trigger both the {g_a} rec ({_short_title(rec_a.title)}) and the {g_b} rec ({_short_title(rec_b.title)})."
+    scenario += (
+        f" would trigger both the {g_a} rec "
+        f"({_short_title(rec_a.title)}) and the "
+        f"{g_b} rec ({_short_title(rec_b.title)})."
+    )
 
     return scenario
+
+
+def _format_obs_short(obs: dict) -> str:
+    """Format an observation requirement as a compact string."""
+    comp = _comparator_symbol(obs.get("comparator", ""))
+    code = _display_code(obs.get("code", ""))
+    threshold = obs.get("threshold", "")
+    unit = obs.get("unit", "")
+    return f"{code} {comp} {threshold} {unit}".strip()
 
 
 def _render_verdict(

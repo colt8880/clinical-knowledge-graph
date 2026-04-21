@@ -48,7 +48,7 @@ Required ADRs (draft alongside Phase 1; merge before the corresponding feature):
 | 25  | Preemption, USPSTF ↔ ACC/AHA   | graph, api, docs, evals | shipped | 23                 | [25](../../docs/build/25-preemption-uspstf-accaha.md) | [#24](../../pull/24) |
 | 26  | MODIFIES edges from KDIGO      | graph, api, docs, evals | shipped | 24, 25             | [26](../../docs/build/26-modifies-edges-kdigo.md)     | [#25](../../pull/25) |
 | 33  | Arm C convergence serialization | evals, docs           | shipped | 22                 | [33](../../docs/build/33-arm-c-convergence-serialization.md) | [#32](../../pull/32) |
-| 27  | Full harness run + thesis test | evals, docs             | in-progress | 22, 23, 24, 33 | [27](../../docs/build/27-full-harness-thesis-test.md) | [#34](../../pull/34) |
+| 27  | Full harness run + thesis test | evals, docs             | shipped | 22, 23, 24, 33 | [27](../../docs/build/27-full-harness-thesis-test.md) | [#34](../../pull/34), [#35](../../pull/35) |
 
 ### Phase 4: UI polish
 

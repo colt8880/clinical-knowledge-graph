@@ -277,8 +277,9 @@ def _render_readme(
     lines.append("")
     lines.append(f"- **Fixtures:** {scorecard['n_fixtures']} total (12 single-guideline, 4 multi-guideline)")
     lines.append("- **Arms:** A (vanilla LLM), B (flat RAG), C (graph context + convergence)")
-    lines.append("- **Arm model:** claude-sonnet-4-6-20250514")
-    lines.append("- **Judge model:** claude-opus-4-6-20250610")
+    from harness.config import ARM_MODEL, JUDGE_MODEL
+    lines.append(f"- **Arm model:** {ARM_MODEL}")
+    lines.append(f"- **Judge model:** {JUDGE_MODEL}")
     lines.append("- **Temperature:** 0 (all calls)")
     lines.append("- **Self-consistency:** 3 judge runs per fixture/arm")
     lines.append("")

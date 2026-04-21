@@ -101,7 +101,7 @@ class TestScorecardShape:
             assert results_file.exists()
 
             results = json.loads(results_file.read_text())
-            assert results["rubric_version"] == "v1"
+            assert results["rubric_version"] == "v1.1"
             assert len(results["entries"]) == 3
             assert "summary" in results
 

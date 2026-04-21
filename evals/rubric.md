@@ -1,7 +1,7 @@
 # Eval Rubric v1
 
-**Rubric version**: `v1`
-**Last updated**: 2026-04-17
+**Rubric version**: `v1.1`
+**Last updated**: 2026-04-20
 
 Rubric changes trigger re-scoring. Do not compare scores across rubric versions.
 
@@ -9,8 +9,8 @@ Rubric changes trigger re-scoring. Do not compare scores across rubric versions.
 
 | Role | Model | Version string |
 |------|-------|----------------|
-| Arms (A, B, C) | Claude Sonnet 4.6 | `claude-sonnet-4-6-20250514` |
-| Judge | Claude Opus 4.6 | `claude-opus-4-6-20250610` |
+| Arms (A, B, C) | Claude Sonnet 4 | `claude-sonnet-4-20250514` |
+| Judge | Claude Opus 4 | `claude-opus-4-20250514` |
 
 Changing a model forces a re-score under a new rubric version.
 

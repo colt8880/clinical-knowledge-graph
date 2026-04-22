@@ -5,6 +5,7 @@ import pytest
 from harness.serialization import (
     build_arm_c_context,
     serialize_convergence_summary,
+    serialize_satisfied_strategies,
     serialize_subgraph,
     serialize_trace_summary,
 )
@@ -741,3 +742,147 @@ class TestPreemptionModifierProse:
         summary = serialize_trace_summary({"events": []})
         assert "preemption_prose" in summary
         assert "modifier_prose" in summary
+
+
+# --- Satisfied strategies trace for continue-action tests ---
+
+SATISFIED_STRATEGY_TRACE = {
+    "envelope": {"spec_tag": "test", "graph_version": "test", "evaluator_version": "test"},
+    "events": [
+        {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+        {
+            "seq": 2,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "guideline_title": "KDIGO 2024 CKD",
+        },
+        {
+            "seq": 3,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+            "recommendation_title": "ACEi/ARB for CKD",
+            "evidence_grade": "1B",
+            "intent": "treatment",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 4,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+            "strategy_id": "strategy:kdigo-acei-arb",
+            "strategy_name": "ACEi or ARB therapy",
+        },
+        {
+            "seq": 5,
+            "type": "action_checked",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+            "strategy_id": "strategy:kdigo-acei-arb",
+            "action_node_id": "med:losartan",
+            "action_entity_type": "Medication",
+            "satisfied": True,
+        },
+        {
+            "seq": 6,
+            "type": "strategy_resolved",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+            "strategy_id": "strategy:kdigo-acei-arb",
+            "satisfied": True,
+        },
+        {
+            "seq": 7,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-acei-arb-for-ckd",
+            "status": "up_to_date",
+            "evidence_grade": "1B",
+            "reason": "Patient already on losartan (ARB)",
+            "satisfying_strategy": "strategy:kdigo-acei-arb",
+        },
+        # A "due" rec — should NOT appear in satisfied strategies
+        {
+            "seq": 8,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "recommendation_title": "Statin for CKD",
+            "evidence_grade": "1A",
+            "intent": "treatment",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 9,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "strategy_id": "strategy:kdigo-statin",
+            "strategy_name": "Statin therapy for CKD",
+        },
+        {
+            "seq": 10,
+            "type": "action_checked",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "strategy_id": "strategy:kdigo-statin",
+            "action_node_id": "med:atorvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 11,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "status": "due",
+            "evidence_grade": "1A",
+            "reason": "No statin on med list",
+            "offered_strategies": ["strategy:kdigo-statin"],
+        },
+        {"seq": 12, "type": "evaluation_completed", "guideline_id": None},
+    ],
+}
+
+
+class TestSerializeSatisfiedStrategies:
+    """Tests for serialize_satisfied_strategies (F49)."""
+
+    def test_extracts_up_to_date_recs(self):
+        """Only up_to_date recs should appear in satisfied strategies."""
+        satisfied = serialize_satisfied_strategies(SATISFIED_STRATEGY_TRACE)
+        assert len(satisfied) == 1
+        assert satisfied[0]["recommendation_id"] == "rec:kdigo-acei-arb-for-ckd"
+
+    def test_includes_strategy_details(self):
+        satisfied = serialize_satisfied_strategies(SATISFIED_STRATEGY_TRACE)
+        s = satisfied[0]
+        assert s["strategy_id"] == "strategy:kdigo-acei-arb"
+        assert s["strategy_name"] == "ACEi or ARB therapy"
+        assert s["evidence_grade"] == "1B"
+
+    def test_includes_satisfied_actions(self):
+        """Should list the specific actions that satisfied the strategy."""
+        satisfied = serialize_satisfied_strategies(SATISFIED_STRATEGY_TRACE)
+        assert "med:losartan" in satisfied[0]["satisfied_by"]
+
+    def test_includes_guideline_label(self):
+        satisfied = serialize_satisfied_strategies(SATISFIED_STRATEGY_TRACE)
+        assert satisfied[0]["guideline_label"] == "KDIGO 2024 CKD"
+
+    def test_due_recs_excluded(self):
+        """Recs with status 'due' should not appear."""
+        satisfied = serialize_satisfied_strategies(SATISFIED_STRATEGY_TRACE)
+        rec_ids = {s["recommendation_id"] for s in satisfied}
+        assert "rec:kdigo-statin-for-ckd" not in rec_ids
+
+    def test_empty_trace(self):
+        satisfied = serialize_satisfied_strategies({"events": []})
+        assert satisfied == []
+
+    def test_build_arm_c_context_includes_satisfied_strategies(self):
+        """build_arm_c_context should include the satisfied_strategies key."""
+        ctx = build_arm_c_context(SATISFIED_STRATEGY_TRACE)
+        assert "satisfied_strategies" in ctx
+        assert len(ctx["satisfied_strategies"]) == 1

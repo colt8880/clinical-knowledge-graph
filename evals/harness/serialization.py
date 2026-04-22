@@ -552,6 +552,56 @@ def _render_convergence_prose_v2(grouped: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+def serialize_satisfied_strategies(trace: dict[str, Any]) -> list[dict[str, Any]]:
+    """Extract strategies with status up_to_date from the trace.
+
+    These represent therapies the patient is already receiving that satisfy
+    guideline recommendations. Surfacing them explicitly tells the LLM to
+    recommend continuation rather than staying silent on satisfied recs.
+    """
+    events = trace.get("events", [])
+
+    # Build lookup: strategy_id -> strategy_name
+    strategy_names: dict[str, str] = {}
+    for event in events:
+        if event.get("type") == "strategy_considered":
+            strategy_names[event["strategy_id"]] = event.get(
+                "strategy_name", event["strategy_id"]
+            )
+
+    # Build lookup: strategy_id -> satisfied actions (from action_checked)
+    strategy_actions: dict[str, list[str]] = {}
+    for event in events:
+        if event.get("type") == "action_checked" and event.get("satisfied"):
+            sid = event["strategy_id"]
+            if sid not in strategy_actions:
+                strategy_actions[sid] = []
+            strategy_actions[sid].append(event["action_node_id"])
+
+    # Collect recs with status up_to_date and their satisfying strategy
+    satisfied: list[dict[str, Any]] = []
+    for event in events:
+        if (
+            event.get("type") == "recommendation_emitted"
+            and event.get("status") == "up_to_date"
+        ):
+            sat_strategy = event.get("satisfying_strategy")
+            if not sat_strategy:
+                continue
+            guideline_id = event.get("guideline_id", "")
+            satisfied.append({
+                "recommendation_id": event["recommendation_id"],
+                "guideline_id": guideline_id,
+                "guideline_label": _guideline_label(guideline_id),
+                "evidence_grade": event["evidence_grade"],
+                "strategy_id": sat_strategy,
+                "strategy_name": strategy_names.get(sat_strategy, sat_strategy),
+                "satisfied_by": strategy_actions.get(sat_strategy, []),
+            })
+
+    return satisfied
+
+
 def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
     """Build the full Arm C context object from an EvalTrace.
 
@@ -563,4 +613,5 @@ def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
         "trace_summary": serialize_trace_summary(trace),
         "subgraph": subgraph,
         "convergence_summary": serialize_convergence_summary(trace, subgraph),
+        "satisfied_strategies": serialize_satisfied_strategies(trace),
     }

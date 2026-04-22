@@ -9,26 +9,25 @@
       "priority": 1
     },
     {
-      "id": "initiate-sglt2-inhibitor",
-      "label": "Initiate SGLT2 inhibitor for CKD with albuminuria",
-      "rationale": "KDIGO 1A: SGLT2 inhibitor recommended for CKD with eGFR ≥20 and albuminuria (ACR 180 mg/g, A2 category). Empagliflozin or dapagliflozin. Provides cardiorenal protection in setting of ASCVD + CKD.",
-      "source_rec_id": "rec:kdigo-sglt2-for-ckd",
-      "priority": 2
-    },
-    {
       "id": "initiate-acei-arb",
       "label": "Initiate ACEi or ARB for albuminuric CKD",
       "rationale": "KDIGO 1B: ACEi or ARB recommended for CKD with albuminuria (ACR ≥30 mg/g). Patient ACR 180 mg/g qualifies. First-line renoprotective therapy.",
       "source_rec_id": "rec:kdigo-acei-arb-for-ckd",
-      "priority": 3
+      "priority": 2
     },
     {
       "id": "ckd-monitoring",
       "label": "Monitor eGFR and urine ACR per KDIGO",
       "rationale": "KDIGO 1B: regular monitoring of eGFR and urine ACR for CKD staging and progression tracking. CKD G3b with A2 albuminuria indicates high risk.",
       "source_rec_id": "rec:kdigo-ckd-monitoring",
-      "priority": 4
+      "priority": 3
     }
   ],
-  "contraindications": []
+  "contraindications": [
+    {
+      "id": "no-sglt2-inhibitor",
+      "label": "Do not recommend SGLT2 inhibitor",
+      "rationale": "ACR 180 mg/g is below the 200 mg/g threshold for non-diabetic SGLT2 eligibility per KDIGO 3.8.1. Patient has no diabetes. The graph correctly does not fire the SGLT2 recommendation."
+    }
+  ]
 }

@@ -2,29 +2,9 @@
   "run_name": "v2-f50",
   "rubric_version": "v1.1",
   "n_runs": 1,
-  "n_fixtures": 23,
+  "n_fixtures": 22,
   "n_arms": 3,
   "fixture_scores": [
-    {
-      "fixture": "",
-      "arm": "b",
-      "subset": "single-guideline",
-      "n_runs": 1,
-      "dimensions": {
-        "completeness": 4.0,
-        "clinical_appropriateness": 3.0,
-        "prioritization": 2.0,
-        "integration": 5.0
-      },
-      "dimensions_sd": {
-        "completeness": 0.0,
-        "clinical_appropriateness": 0.0,
-        "prioritization": 0.0,
-        "integration": 0.0
-      },
-      "composite_mean": 3.5,
-      "composite_sd": 0.0
-    },
     {
       "fixture": "cholesterol/case-01",
       "arm": "a",
@@ -223,6 +203,26 @@
         "integration": 0.0
       },
       "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-04",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
       "composite_sd": 0.0
     },
     {
@@ -1392,19 +1392,19 @@
       "subset": "single-guideline",
       "n_fixtures": 12,
       "dimensions": {
-        "completeness": 3.333,
-        "clinical_appropriateness": 3.583,
+        "completeness": 3.25,
+        "clinical_appropriateness": 3.5,
         "prioritization": 3.333,
         "integration": 5.0
       },
       "dimensions_fixture_sd": {
-        "completeness": 1.231,
-        "clinical_appropriateness": 1.505,
+        "completeness": 1.215,
+        "clinical_appropriateness": 1.567,
         "prioritization": 1.557,
         "integration": 0.0
       },
-      "composite_mean": 3.812,
-      "composite_fixture_sd": 0.972,
+      "composite_mean": 3.771,
+      "composite_fixture_sd": 0.997,
       "composite_self_consistency_sd": 0.0
     },
     {

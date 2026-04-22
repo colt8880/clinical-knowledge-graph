@@ -2,7 +2,7 @@
 
 **Rubric version:** v1.1
 **Judge runs:** 1
-**Fixtures:** 23
+**Fixtures:** 22
 **Arms:** 3
 
 ## THESIS GATE: PASS
@@ -39,7 +39,7 @@ All arm/subset combinations have self-consistency SD ≤ 0.3. Scores are stable.
 | A | multi-guideline | 10 | 2.625 | 0.835 | 0.000 |
 | A | single-guideline | 12 | 3.125 | 0.538 | 0.000 |
 | B | multi-guideline | 10 | 3.500 | 0.808 | 0.000 |
-| B | single-guideline | 12 | 3.812 | 0.972 | 0.000 |
+| B | single-guideline | 12 | 3.771 | 0.997 | 0.000 |
 | C | multi-guideline | 10 | 4.275 | 0.671 | 0.000 |
 | C | single-guideline | 12 | 4.042 | 0.681 | 0.000 |
 
@@ -50,7 +50,7 @@ All arm/subset combinations have self-consistency SD ≤ 0.3. Scores are stable.
 | A | multi-guideline | 2.700 | 3.200 | 2.800 | 1.800 |
 | A | single-guideline | 2.333 | 2.500 | 2.667 | 5.000 |
 | B | multi-guideline | 3.400 | 3.600 | 4.100 | 2.900 |
-| B | single-guideline | 3.333 | 3.583 | 3.333 | 5.000 |
+| B | single-guideline | 3.250 | 3.500 | 3.333 | 5.000 |
 | C | multi-guideline | 3.900 | 4.300 | 4.700 | 4.200 |
 | C | single-guideline | 3.250 | 3.667 | 4.250 | 5.000 |
 
@@ -58,7 +58,6 @@ All arm/subset combinations have self-consistency SD ≤ 0.3. Scores are stable.
 
 | Fixture | Arm | Subset | Composite | SD |
 |---------|-----|--------|-----------|-----|
-|  | B | single-guideline | 3.500 | 0.000 |
 | cholesterol/case-01 | A | single-guideline | 3.000 | 0.000 |
 | cholesterol/case-01 | B | single-guideline | 5.000 | 0.000 |
 | cholesterol/case-01 | C | single-guideline | 4.750 | 0.000 |
@@ -69,6 +68,7 @@ All arm/subset combinations have self-consistency SD ≤ 0.3. Scores are stable.
 | cholesterol/case-03 | B | single-guideline | 4.750 | 0.000 |
 | cholesterol/case-03 | C | single-guideline | 4.750 | 0.000 |
 | cholesterol/case-04 | A | single-guideline | 2.750 | 0.000 |
+| cholesterol/case-04 | B | single-guideline | 3.000 | 0.000 |
 | cholesterol/case-04 | C | single-guideline | 3.500 | 0.000 |
 | cross-domain/case-01 | A | multi-guideline | 4.000 | 0.000 |
 | cross-domain/case-01 | B | multi-guideline | 4.500 | 0.000 |

@@ -38,12 +38,25 @@ strategies as structured nodes and edges.
 ### Matched Recommendations
 
 {matched_recs}
-{cross_guideline_interactions}
+{satisfied_strategies_section}\
+{cross_guideline_interactions}\
 ### Cross-Guideline Convergence
 
 {convergence_section}
 
-Use the graph evaluation results to inform and validate your recommendations. \
+**Instructions:**
+
+1. For therapies the patient is already receiving that align with guideline \
+recommendations (listed under "Currently Satisfied Strategies" above), \
+explicitly recommend continuation. Do not stay silent on satisfied \
+recommendations — "Continue [therapy]" is a clinically important action.
+
+2. When multiple guidelines apply, explicitly state which guideline takes \
+precedence and why. If one guideline preempts another, name both guidelines \
+and explain the hierarchy. If one guideline modifies another (e.g., reducing \
+statin intensity due to CKD), state the modification and cite both guidelines.
+
+3. Use the graph evaluation results to inform and validate your recommendations. \
 The graph provides deterministic, guideline-based reasoning that should \
 anchor your clinical recommendations.
 
@@ -82,6 +95,10 @@ def get_prompt(
 
     matched_recs_text = json.dumps(trace_summary.get("matched_recs", []), indent=2)
 
+    # Build satisfied strategies section
+    satisfied_strategies = graph_context.get("satisfied_strategies", [])
+    satisfied_strategies_section = _build_satisfied_strategies_section(satisfied_strategies)
+
     # Build cross-guideline interactions section (preemption + modifier prose)
     cross_guideline_interactions = _build_interactions_section(trace_summary)
 
@@ -103,15 +120,56 @@ def get_prompt(
         patient_context=pc_text,
         rendered_prose=rendered_prose,
         matched_recs=matched_recs_text,
+        satisfied_strategies_section=satisfied_strategies_section,
         cross_guideline_interactions=cross_guideline_interactions,
         convergence_section=convergence_section,
     )
 
 
+def _build_satisfied_strategies_section(
+    satisfied_strategies: list[dict[str, Any]],
+) -> str:
+    """Build the Currently Satisfied Strategies section.
+
+    Surfaces strategies with status up_to_date so the LLM knows to
+    recommend continuing these therapies rather than staying silent.
+    Returns an empty string when no strategies are satisfied.
+    """
+    if not satisfied_strategies:
+        return ""
+
+    lines = ["### Currently Satisfied Strategies", ""]
+    lines.append(
+        "The following guideline recommendations are **already satisfied** by the "
+        "patient's current therapies. These are clinically important maintenance "
+        "actions — recommend continuing them."
+    )
+    lines.append("")
+
+    for ss in satisfied_strategies:
+        guideline = ss.get("guideline_label") or ss.get("guideline_id", "")
+        grade = ss["evidence_grade"]
+        strategy_name = ss["strategy_name"]
+        satisfied_by = ss.get("satisfied_by", [])
+
+        lines.append(
+            f"- **{strategy_name}** ({guideline}, Grade {grade}): "
+            f"satisfied by current therapy"
+        )
+        if satisfied_by:
+            med_list = ", ".join(satisfied_by)
+            lines.append(f"  - Active: {med_list}")
+        lines.append("")
+
+    return "\n".join(lines) + "\n"
+
+
 def _build_interactions_section(trace_summary: dict[str, Any]) -> str:
     """Build the Cross-Guideline Interactions section.
 
-    Only rendered when preemption or modifier events exist.
+    Only rendered when preemption or modifier events exist. Uses directive
+    language so the LLM articulates the reasoning about guideline hierarchy,
+    not just the resulting action.
     Returns an empty string when there are no events (the template
     will just produce a blank line between sections).
     """
@@ -122,11 +180,26 @@ def _build_interactions_section(trace_summary: dict[str, Any]) -> str:
         return ""
 
     lines = ["### Cross-Guideline Interactions", ""]
+    lines.append(
+        "**IMPORTANT:** When recommending actions below, you MUST explicitly "
+        "state the guideline hierarchy reasoning — name both guidelines and "
+        "explain which takes precedence and why."
+    )
+    lines.append("")
     if preemption_prose:
         lines.append(f"**Preemption:** {preemption_prose}")
+        lines.append(
+            "→ In your output, explicitly state that this preemption applies "
+            "and cite both the preempted and preempting guidelines."
+        )
         lines.append("")
     if modifier_prose:
         lines.append(f"**Modifier:** {modifier_prose}")
+        lines.append(
+            "→ In your output, explicitly explain this modification — state "
+            "what the original guideline recommends, what the modifying "
+            "guideline changes, and why (e.g., altered pharmacokinetics in CKD)."
+        )
         lines.append("")
 
     return "\n".join(lines) + "\n"

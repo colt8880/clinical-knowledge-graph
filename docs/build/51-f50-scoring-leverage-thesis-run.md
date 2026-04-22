@@ -1,6 +1,6 @@
 # 51: F50 scoring leverage thesis run
 
-**Status**: pending
+**Status**: shipped
 **Depends on**: 50
 **Components touched**: evals / docs
 **Branch**: `feat/f50-scoring-leverage-run`

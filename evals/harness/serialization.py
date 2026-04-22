@@ -588,10 +588,11 @@ def serialize_satisfied_strategies(trace: dict[str, Any]) -> list[dict[str, Any]
             sat_strategy = event.get("satisfying_strategy")
             if not sat_strategy:
                 continue
+            guideline_id = event.get("guideline_id", "")
             satisfied.append({
                 "recommendation_id": event["recommendation_id"],
-                "guideline_id": event.get("guideline_id", ""),
-                "guideline_label": _guideline_label(event.get("guideline_id", "")),
+                "guideline_id": guideline_id,
+                "guideline_label": _guideline_label(guideline_id),
                 "evidence_grade": event["evidence_grade"],
                 "strategy_id": sat_strategy,
                 "strategy_name": strategy_names.get(sat_strategy, sat_strategy),

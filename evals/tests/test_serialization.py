@@ -2,6 +2,10 @@
 
 import pytest
 
+from harness.arms.graph_context import (
+    _build_interactions_section,
+    _build_satisfied_strategies_section,
+)
 from harness.serialization import (
     build_arm_c_context,
     serialize_convergence_summary,
@@ -886,3 +890,77 @@ class TestSerializeSatisfiedStrategies:
         ctx = build_arm_c_context(SATISFIED_STRATEGY_TRACE)
         assert "satisfied_strategies" in ctx
         assert len(ctx["satisfied_strategies"]) == 1
+
+
+class TestBuildSatisfiedStrategiesSection:
+    """Tests for _build_satisfied_strategies_section rendering (F49)."""
+
+    def test_renders_section_header(self):
+        satisfied = [{
+            "guideline_label": "KDIGO 2024 CKD",
+            "evidence_grade": "1B",
+            "strategy_name": "ACEi or ARB therapy",
+            "satisfied_by": ["med:losartan"],
+        }]
+        text = _build_satisfied_strategies_section(satisfied)
+        assert "### Currently Satisfied Strategies" in text
+
+    def test_renders_strategy_name_and_guideline(self):
+        satisfied = [{
+            "guideline_label": "KDIGO 2024 CKD",
+            "evidence_grade": "1B",
+            "strategy_name": "ACEi or ARB therapy",
+            "satisfied_by": ["med:losartan"],
+        }]
+        text = _build_satisfied_strategies_section(satisfied)
+        assert "ACEi or ARB therapy" in text
+        assert "KDIGO 2024 CKD" in text
+        assert "med:losartan" in text
+
+    def test_empty_list_returns_empty_string(self):
+        assert _build_satisfied_strategies_section([]) == ""
+
+    def test_multiple_strategies(self):
+        satisfied = [
+            {"guideline_label": "G1", "evidence_grade": "A", "strategy_name": "S1", "satisfied_by": ["med:a"]},
+            {"guideline_label": "G2", "evidence_grade": "B", "strategy_name": "S2", "satisfied_by": ["med:b"]},
+        ]
+        text = _build_satisfied_strategies_section(satisfied)
+        assert "S1" in text
+        assert "S2" in text
+
+
+class TestBuildInteractionsSection:
+    """Tests for _build_interactions_section rendering (F49)."""
+
+    def test_directive_language_present(self):
+        summary = {
+            "preemption_prose": "ACC/AHA preempts USPSTF",
+            "modifier_prose": "",
+        }
+        text = _build_interactions_section(summary)
+        assert "IMPORTANT" in text
+        assert "explicitly state" in text.lower()
+
+    def test_preemption_with_follow_up_instruction(self):
+        summary = {"preemption_prose": "ACC/AHA preempts USPSTF", "modifier_prose": ""}
+        text = _build_interactions_section(summary)
+        assert "preempted and preempting guidelines" in text
+
+    def test_modifier_with_follow_up_instruction(self):
+        summary = {"preemption_prose": "", "modifier_prose": "KDIGO modifies ACC/AHA"}
+        text = _build_interactions_section(summary)
+        assert "explain this modification" in text
+
+    def test_empty_events_returns_empty(self):
+        summary = {"preemption_prose": "", "modifier_prose": ""}
+        assert _build_interactions_section(summary) == ""
+
+    def test_both_preemption_and_modifier(self):
+        summary = {
+            "preemption_prose": "ACC/AHA preempts USPSTF",
+            "modifier_prose": "KDIGO modifies ACC/AHA",
+        }
+        text = _build_interactions_section(summary)
+        assert "Preemption" in text
+        assert "Modifier" in text

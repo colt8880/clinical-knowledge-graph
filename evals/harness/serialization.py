@@ -616,12 +616,9 @@ def serialize_negative_evidence(trace: dict[str, Any]) -> list[dict[str, Any]]:
 
     # Track guideline enter/exit pairs
     guideline_ids_entered: list[str] = []
-    guideline_titles: dict[str, str] = {}
     for event in events:
         if event.get("type") == "guideline_entered":
-            gid = event["guideline_id"]
-            guideline_ids_entered.append(gid)
-            guideline_titles[gid] = event.get("guideline_title", gid)
+            guideline_ids_entered.append(event["guideline_id"])
 
     # Collect recs emitted per guideline
     recs_by_guideline: dict[str, list[str]] = {}

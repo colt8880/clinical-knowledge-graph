@@ -1,6 +1,6 @@
 # 49: Arm C completeness fixes
 
-**Status**: in-progress
+**Status**: shipped
 **Depends on**: 47
 **Components touched**: evals / graph / docs
 **Branch**: `feat/arm-c-completeness-fixes`

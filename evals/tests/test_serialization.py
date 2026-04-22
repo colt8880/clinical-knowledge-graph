@@ -4,11 +4,15 @@ import pytest
 
 from harness.arms.graph_context import (
     _build_interactions_section,
+    _build_negative_evidence_section,
+    _build_output_format_instruction,
     _build_satisfied_strategies_section,
+    get_prompt,
 )
 from harness.serialization import (
     build_arm_c_context,
     serialize_convergence_summary,
+    serialize_negative_evidence,
     serialize_satisfied_strategies,
     serialize_subgraph,
     serialize_trace_summary,
@@ -964,3 +968,258 @@ class TestBuildInteractionsSection:
         text = _build_interactions_section(summary)
         assert "Preemption" in text
         assert "Modifier" in text
+
+
+# --- Negative evidence traces ---
+
+NEGATIVE_EVIDENCE_TRACE_ZERO_RECS = {
+    "events": [
+        {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+        {
+            "seq": 2,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "guideline_title": "USPSTF 2022 Statin Primary Prevention",
+        },
+        {
+            "seq": 3,
+            "type": "exit_condition_triggered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "exit": "out_of_scope_age_below_range",
+            "rationale": "Patient age 35 below minimum 40",
+        },
+        {
+            "seq": 4,
+            "type": "guideline_exited",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendations_emitted": 0,
+        },
+        # ACC/AHA fires normally
+        {
+            "seq": 5,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "guideline_title": "ACC/AHA 2018 Cholesterol",
+        },
+        {
+            "seq": 6,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "status": "due",
+            "evidence_grade": "COR I, LOE A",
+            "reason": "Patient eligible",
+            "offered_strategies": [],
+        },
+        {
+            "seq": 7,
+            "type": "guideline_exited",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendations_emitted": 1,
+        },
+        {"seq": 8, "type": "evaluation_completed", "guideline_id": None},
+    ],
+}
+
+NEGATIVE_EVIDENCE_TRACE_ALL_PREEMPTED = {
+    "events": [
+        {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+        {
+            "seq": 2,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "guideline_title": "USPSTF 2022 Statin Primary Prevention",
+        },
+        {
+            "seq": 3,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "status": "due",
+            "evidence_grade": "B",
+            "reason": "Patient eligible",
+            "offered_strategies": [],
+        },
+        {
+            "seq": 4,
+            "type": "guideline_exited",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendations_emitted": 1,
+        },
+        {
+            "seq": 5,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "guideline_title": "ACC/AHA 2018 Cholesterol",
+        },
+        {
+            "seq": 6,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "status": "due",
+            "evidence_grade": "COR I, LOE A",
+            "reason": "Patient eligible",
+            "offered_strategies": [],
+        },
+        {
+            "seq": 7,
+            "type": "guideline_exited",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendations_emitted": 1,
+        },
+        # USPSTF rec preempted by ACC/AHA
+        {
+            "seq": 8,
+            "type": "preemption_resolved",
+            "guideline_id": None,
+            "preempted_recommendation_id": "rec:statin-initiate-grade-b",
+            "preempting_recommendation_id": "rec:accaha-statin-primary-prevention",
+            "edge_priority": 200,
+            "reason": "ACC/AHA more specific",
+        },
+        {"seq": 9, "type": "evaluation_completed", "guideline_id": None},
+    ],
+}
+
+
+class TestSerializeNegativeEvidence:
+    """Tests for serialize_negative_evidence (F50)."""
+
+    def test_guideline_entered_zero_recs(self):
+        """A guideline that entered but emitted zero recs → one entry."""
+        result = serialize_negative_evidence(NEGATIVE_EVIDENCE_TRACE_ZERO_RECS)
+        assert len(result) == 1
+        assert result[0]["guideline_id"] == "guideline:uspstf-statin-2022"
+        assert result[0]["guideline_label"] == "USPSTF 2022 Statin"
+        assert "out_of_scope_age_below_range" in result[0]["reason"]
+
+    def test_all_recs_preempted(self):
+        """A guideline whose recs were all preempted → one entry."""
+        result = serialize_negative_evidence(NEGATIVE_EVIDENCE_TRACE_ALL_PREEMPTED)
+        assert len(result) == 1
+        assert result[0]["guideline_id"] == "guideline:uspstf-statin-2022"
+        assert "preempted" in result[0]["reason"].lower()
+        assert "ACC/AHA 2018 Cholesterol" in result[0]["reason"]
+
+    def test_all_guidelines_produced_recs(self):
+        """When all guidelines produce non-preempted recs → empty list."""
+        result = serialize_negative_evidence(MULTI_GUIDELINE_TRACE)
+        assert result == []
+
+    def test_single_guideline_trace(self):
+        """Single-guideline trace where USPSTF fires → empty list."""
+        result = serialize_negative_evidence(SAMPLE_TRACE)
+        assert result == []
+
+    def test_empty_trace(self):
+        result = serialize_negative_evidence({"events": []})
+        assert result == []
+
+    def test_guideline_entered_no_exits_no_recs(self):
+        """Guideline entered with no exits and no recs → 'No eligible recommendations'."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "guideline_entered",
+                    "guideline_id": "guideline:test",
+                    "guideline_title": "Test Guideline",
+                },
+                {
+                    "seq": 2,
+                    "type": "guideline_exited",
+                    "guideline_id": "guideline:test",
+                    "recommendations_emitted": 0,
+                },
+            ],
+        }
+        result = serialize_negative_evidence(trace)
+        assert len(result) == 1
+        assert result[0]["reason"] == "No eligible recommendations"
+
+    def test_build_arm_c_context_includes_negative_evidence(self):
+        """build_arm_c_context should include the negative_evidence key."""
+        ctx = build_arm_c_context(NEGATIVE_EVIDENCE_TRACE_ZERO_RECS)
+        assert "negative_evidence" in ctx
+        assert len(ctx["negative_evidence"]) == 1
+
+
+class TestBuildNegativeEvidenceSection:
+    """Tests for _build_negative_evidence_section rendering (F50)."""
+
+    def test_renders_section_when_present(self):
+        ne = [{"guideline_label": "USPSTF 2022 Statin", "reason": "ASCVD 6.8% below threshold"}]
+        text = _build_negative_evidence_section(ne)
+        assert "### Guidelines Evaluated Without Recommendations" in text
+        assert "USPSTF 2022 Statin" in text
+        assert "ASCVD 6.8% below threshold" in text
+        assert "clinically significant" in text
+
+    def test_empty_returns_empty_string(self):
+        assert _build_negative_evidence_section([]) == ""
+
+
+class TestBuildOutputFormatInstruction:
+    """Tests for _build_output_format_instruction (F50)."""
+
+    def test_no_interactions_no_negative(self):
+        """Without interactions or negative evidence, use simple format."""
+        text = _build_output_format_instruction(False, False)
+        assert "Respond with a JSON object containing your recommended actions" in text
+        assert "cross_guideline_resolutions" not in text
+
+    def test_with_interactions(self):
+        text = _build_output_format_instruction(True, False)
+        assert "cross_guideline_resolutions" in text
+        assert "guidelines_without_recommendations" not in text
+
+    def test_with_negative_evidence(self):
+        text = _build_output_format_instruction(False, True)
+        assert "guidelines_without_recommendations" in text
+        assert "cross_guideline_resolutions" not in text
+
+    def test_with_both(self):
+        text = _build_output_format_instruction(True, True)
+        assert "cross_guideline_resolutions" in text
+        assert "guidelines_without_recommendations" in text
+
+
+class TestPromptIntegration:
+    """Integration tests verifying the full prompt renders correctly (F50)."""
+
+    def test_multi_guideline_with_negative_evidence(self):
+        """Negative evidence section renders in multi-guideline trace."""
+        ctx = build_arm_c_context(NEGATIVE_EVIDENCE_TRACE_ZERO_RECS)
+        prompt = get_prompt({"demographics": {"age": 35}}, ctx)
+        assert "Guidelines Evaluated Without Recommendations" in prompt
+        assert "USPSTF 2022 Statin" in prompt
+        assert "guidelines_without_recommendations" in prompt
+
+    def test_single_guideline_no_negative_section(self):
+        """Single-guideline trace should NOT have negative evidence section."""
+        ctx = build_arm_c_context(SAMPLE_TRACE)
+        prompt = get_prompt({"demographics": {"age": 55}}, ctx)
+        assert "Guidelines Evaluated Without Recommendations" not in prompt
+        assert "cross_guideline_resolutions" not in prompt
+
+    def test_completeness_licensing_present(self):
+        """Completeness licensing paragraph present in all prompts."""
+        ctx = build_arm_c_context(SAMPLE_TRACE)
+        prompt = get_prompt({"demographics": {"age": 55}}, ctx)
+        assert "lifestyle modifications" in prompt.lower()
+        assert "smoking cessation" in prompt.lower()
+        assert "Do not limit your recommendations to only what the graph covers" in prompt
+
+    def test_preemption_triggers_extended_schema(self):
+        """Trace with preemption events should request cross_guideline_resolutions."""
+        ctx = build_arm_c_context(NEGATIVE_EVIDENCE_TRACE_ALL_PREEMPTED)
+        prompt = get_prompt({"demographics": {"age": 55}}, ctx)
+        assert "cross_guideline_resolutions" in prompt
+
+    def test_satisfied_strategies_still_renders(self):
+        """F49 satisfied strategies section should still render."""
+        ctx = build_arm_c_context(SATISFIED_STRATEGY_TRACE)
+        prompt = get_prompt({"demographics": {"age": 60}}, ctx)
+        assert "Currently Satisfied Strategies" in prompt

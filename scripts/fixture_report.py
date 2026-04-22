@@ -89,7 +89,7 @@ def _fetch_experiment_spans(run_name: str, arm_id: str) -> dict:
     task_spans = {}
     scorer_spans = {}
     for ev in events:
-        sa = ev.get("span_attributes", {})
+        sa = ev.get("span_attributes") or {}
         rid = ev.get("root_span_id", "")
         if sa.get("type") == "eval" and ev.get("is_root"):
             eval_spans[rid] = ev

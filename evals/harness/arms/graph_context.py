@@ -40,6 +40,7 @@ strategies as structured nodes and edges.
 {matched_recs}
 {satisfied_strategies_section}\
 {cross_guideline_interactions}\
+{negative_evidence_section}\
 ### Cross-Guideline Convergence
 
 {convergence_section}
@@ -60,7 +61,14 @@ statin intensity due to CKD), state the modification and cite both guidelines.
 The graph provides deterministic, guideline-based reasoning that should \
 anchor your clinical recommendations.
 
-Respond with a JSON object containing your recommended actions.
+4. The knowledge graph covers guideline-specific pharmacotherapy recommendations. \
+For clinically relevant actions not encoded in the graph — including lifestyle \
+modifications (smoking cessation, diet, exercise), monitoring follow-ups \
+conditional on treatment response, and blood pressure optimization — apply \
+your clinical knowledge based on the patient context. Do not limit your \
+recommendations to only what the graph covers.
+
+{output_format_instruction}
 """
 
 # Default API base URL for the evaluator
@@ -102,6 +110,10 @@ def get_prompt(
     # Build cross-guideline interactions section (preemption + modifier prose)
     cross_guideline_interactions = _build_interactions_section(trace_summary)
 
+    # Build negative evidence section
+    negative_evidence = graph_context.get("negative_evidence", [])
+    negative_evidence_section = _build_negative_evidence_section(negative_evidence)
+
     # Build convergence section — v2 uses grouped therapeutic classes
     convergence = graph_context.get("convergence_summary", {})
     convergence_prose = convergence.get("convergence_prose", "")
@@ -116,13 +128,26 @@ def get_prompt(
     else:
         convergence_section = "No cross-guideline convergence detected (single guideline or no shared actions)."
 
+    # Build output format instruction — extended schema when cross-guideline
+    # interactions or negative evidence are present
+    has_interactions = bool(
+        trace_summary.get("preemption_events")
+        or trace_summary.get("modifier_events")
+    )
+    has_negative = bool(negative_evidence)
+    output_format_instruction = _build_output_format_instruction(
+        has_interactions, has_negative
+    )
+
     return PROMPT_TEMPLATE.format(
         patient_context=pc_text,
         rendered_prose=rendered_prose,
         matched_recs=matched_recs_text,
         satisfied_strategies_section=satisfied_strategies_section,
         cross_guideline_interactions=cross_guideline_interactions,
+        negative_evidence_section=negative_evidence_section,
         convergence_section=convergence_section,
+        output_format_instruction=output_format_instruction,
     )
 
 
@@ -162,6 +187,92 @@ def _build_satisfied_strategies_section(
         lines.append("")
 
     return "\n".join(lines) + "\n"
+
+
+def _build_negative_evidence_section(
+    negative_evidence: list[dict[str, Any]],
+) -> str:
+    """Build the Guidelines Evaluated Without Recommendations section.
+
+    Surfaces guidelines the graph evaluated but that produced no actionable
+    recs for this patient. This is negative evidence: clinically significant
+    because it tells the LLM what *didn't* apply.
+    Returns an empty string when no negative evidence exists.
+    """
+    if not negative_evidence:
+        return ""
+
+    lines = ["### Guidelines Evaluated Without Recommendations", ""]
+    lines.append(
+        "The following guidelines were evaluated for this patient but produced "
+        "no applicable recommendations:"
+    )
+    lines.append("")
+
+    for ne in negative_evidence:
+        label = ne.get("guideline_label") or ne.get("guideline_id", "")
+        reason = ne.get("reason", "")
+        lines.append(f"- **{label}**: {reason}")
+
+    lines.append("")
+    lines.append(
+        "When a guideline was evaluated and did not fire, this is clinically "
+        "significant. Do not attribute actions to guidelines that did not "
+        "produce recommendations for this patient."
+    )
+    lines.append("")
+
+    return "\n".join(lines) + "\n"
+
+
+def _build_output_format_instruction(
+    has_interactions: bool,
+    has_negative_evidence: bool,
+) -> str:
+    """Build the output format instruction for Arm C.
+
+    When cross-guideline interactions or negative evidence are present,
+    requests an extended schema with cross_guideline_resolutions and/or
+    guidelines_without_recommendations sections. Otherwise, requests
+    the standard actions-only JSON.
+    """
+    if not has_interactions and not has_negative_evidence:
+        return "Respond with a JSON object containing your recommended actions."
+
+    parts = [
+        "Respond with a JSON object using this extended schema:\n"
+        "```json\n{\n"
+        '  "actions": [...],'
+    ]
+
+    if has_interactions:
+        parts.append(
+            '\n  "cross_guideline_resolutions": [\n'
+            "    {\n"
+            '      "type": "preemption | modification | convergence",\n'
+            '      "guidelines_involved": ["Guideline A", "Guideline B"],\n'
+            '      "resolution": "How the interaction was resolved",\n'
+            '      "impact_on_actions": "How this affects the recommended actions"\n'
+            "    }\n"
+            "  ],"
+        )
+
+    if has_negative_evidence:
+        parts.append(
+            '\n  "guidelines_without_recommendations": [\n'
+            "    {\n"
+            '      "guideline": "Guideline name",\n'
+            '      "reason": "Why no recommendations were produced"\n'
+            "    }\n"
+            "  ],"
+        )
+
+    parts.append(
+        '\n  "reasoning": "..."\n'
+        "}\n```"
+    )
+
+    return "".join(parts)
 
 
 def _build_interactions_section(trace_summary: dict[str, Any]) -> str:

@@ -602,6 +602,101 @@ def serialize_satisfied_strategies(trace: dict[str, Any]) -> list[dict[str, Any]
     return satisfied
 
 
+def serialize_negative_evidence(trace: dict[str, Any]) -> list[dict[str, Any]]:
+    """Extract guidelines that were evaluated but produced no actionable recs.
+
+    Two cases:
+    1. A guideline was entered but zero recommendation_emitted events exist
+       for it (all recs exited or were ineligible).
+    2. A guideline emitted recs but all were preempted by another guideline.
+
+    Returns a list of {"guideline_id", "guideline_label", "reason"} dicts.
+    """
+    events = trace.get("events", [])
+
+    # Track guideline enter/exit pairs
+    guideline_ids_entered: list[str] = []
+    for event in events:
+        if event.get("type") == "guideline_entered":
+            guideline_ids_entered.append(event["guideline_id"])
+
+    # Collect recs emitted per guideline
+    recs_by_guideline: dict[str, list[str]] = {}
+    for event in events:
+        if event.get("type") == "recommendation_emitted":
+            gid = event.get("guideline_id", "")
+            if gid not in recs_by_guideline:
+                recs_by_guideline[gid] = []
+            recs_by_guideline[gid].append(event["recommendation_id"])
+
+    # Collect exit reasons per guideline
+    exits_by_guideline: dict[str, list[str]] = {}
+    for event in events:
+        if event.get("type") == "exit_condition_triggered":
+            gid = event.get("guideline_id", "")
+            if gid not in exits_by_guideline:
+                exits_by_guideline[gid] = []
+            exits_by_guideline[gid].append(
+                f"{event['exit']}: {event['rationale']}"
+            )
+
+    # Collect preempted rec IDs and the preempting guideline
+    preempted_recs: dict[str, str] = {}  # rec_id -> preempting_rec_id
+    for event in events:
+        if event.get("type") == "preemption_resolved":
+            preempted_recs[event["preempted_recommendation_id"]] = (
+                event["preempting_recommendation_id"]
+            )
+
+    result: list[dict[str, Any]] = []
+
+    for gid in guideline_ids_entered:
+        emitted = recs_by_guideline.get(gid, [])
+        exits = exits_by_guideline.get(gid, [])
+
+        if not emitted:
+            # Case 1: guideline entered, zero recs emitted
+            if exits:
+                reason = "; ".join(exits)
+            else:
+                reason = "No eligible recommendations"
+            result.append({
+                "guideline_id": gid,
+                "guideline_label": _guideline_label(gid),
+                "reason": reason,
+            })
+        else:
+            # Case 2: all emitted recs were preempted
+            all_preempted = all(rid in preempted_recs for rid in emitted)
+            if all_preempted:
+                # Find the preempting guideline(s)
+                preempting_rec_ids = {preempted_recs[rid] for rid in emitted}
+                # Resolve preempting rec -> guideline
+                preempting_guidelines = set()
+                for event in events:
+                    if (
+                        event.get("type") == "recommendation_emitted"
+                        and event.get("recommendation_id") in preempting_rec_ids
+                    ):
+                        preempting_guidelines.add(
+                            _guideline_label(event.get("guideline_id", ""))
+                        )
+                if preempting_guidelines:
+                    reason = (
+                        f"All recommendations preempted by "
+                        f"{', '.join(sorted(preempting_guidelines))}"
+                    )
+                else:
+                    reason = "All recommendations preempted"
+                result.append({
+                    "guideline_id": gid,
+                    "guideline_label": _guideline_label(gid),
+                    "reason": reason,
+                })
+
+    return result
+
+
 def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
     """Build the full Arm C context object from an EvalTrace.
 
@@ -614,4 +709,5 @@ def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
         "subgraph": subgraph,
         "convergence_summary": serialize_convergence_summary(trace, subgraph),
         "satisfied_strategies": serialize_satisfied_strategies(trace),
+        "negative_evidence": serialize_negative_evidence(trace),
     }

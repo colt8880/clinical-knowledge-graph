@@ -10,8 +10,9 @@
 #   3. statins.cypher          — guideline-scoped nodes + edges (MERGE entities, CREATE Rec/Strategy)
 #   4. cholesterol.cypher      — ACC/AHA 2018 subgraph
 #   5. kdigo-ckd.cypher        — KDIGO 2024 CKD subgraph
-#   6. cross-edges-uspstf-accaha.cypher — PREEMPTED_BY edges (F25)
-#   7. cross-edges-kdigo.cypher — MODIFIES edges (F26)
+#   6. ada-diabetes.cypher     — ADA 2024 Diabetes subgraph
+#   7. cross-edges-uspstf-accaha.cypher — PREEMPTED_BY edges (F25)
+#   8. cross-edges-kdigo.cypher — MODIFIES edges (F26)
 #
 # Expected environment:
 #   NEO4J_URI       bolt://neo4j:7687
@@ -35,6 +36,9 @@ cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seed
 echo "==> Applying KDIGO CKD seed..."
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/kdigo-ckd.cypher
 
+echo "==> Applying ADA Diabetes seed..."
+cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/ada-diabetes.cypher
+
 echo "==> Applying cross-edges USPSTF ↔ ACC/AHA..."
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/cross-edges-uspstf-accaha.cypher
 
@@ -45,10 +49,10 @@ echo "==> Verifying node count..."
 NODE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH (n) RETURN count(n) AS c" | tail -1 | tr -d '[:space:]')
 
-# 30 (statins+ACC/AHA) + 11 KDIGO entities + 9 KDIGO guideline-scoped = 50
-echo "    Node count: $NODE_COUNT (expected 50)"
-if [ "$NODE_COUNT" -ne 50 ]; then
-  echo "ERROR: Expected 50 nodes, got $NODE_COUNT"
+# 50 (previous) + 10 ADA entities + 14 ADA guideline-scoped = 74
+echo "    Node count: $NODE_COUNT (expected 74)"
+if [ "$NODE_COUNT" -ne 74 ]; then
+  echo "ERROR: Expected 74 nodes, got $NODE_COUNT"
   exit 1
 fi
 
@@ -56,10 +60,10 @@ echo "==> Verifying edge count..."
 EDGE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH ()-[r]->() RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
-# 33 (statins+ACC/AHA) + 29 KDIGO + 6 PREEMPTED_BY + 2 MODIFIES = 70 (clinician-reviewed cross-edges)
-echo "    Edge count: $EDGE_COUNT (expected 70)"
-if [ "$EDGE_COUNT" -ne 70 ]; then
-  echo "ERROR: Expected 70 edges, got $EDGE_COUNT"
+# 70 (previous) + 43 ADA edges (5 FROM_GUIDELINE + 5 FOR_CONDITION + 9 OFFERS_STRATEGY + 24 INCLUDES_ACTION) = 113
+echo "    Edge count: $EDGE_COUNT (expected 113)"
+if [ "$EDGE_COUNT" -ne 113 ]; then
+  echo "ERROR: Expected 113 edges, got $EDGE_COUNT"
   exit 1
 fi
 
@@ -75,7 +79,7 @@ fi
 
 echo "==> Verifying domain labels..."
 UNLABELED_RECS=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
-  --format plain "MATCH (r:Recommendation) WHERE NOT r:USPSTF AND NOT r:ACC_AHA AND NOT r:KDIGO RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
+  --format plain "MATCH (r:Recommendation) WHERE NOT r:USPSTF AND NOT r:ACC_AHA AND NOT r:KDIGO AND NOT r:ADA RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
 echo "    Unlabeled Recommendations: $UNLABELED_RECS (expected 0)"
 if [ "$UNLABELED_RECS" -ne 0 ]; then
@@ -123,6 +127,26 @@ if [ "$KDIGO_GUIDELINE" -ne 1 ]; then
   exit 1
 fi
 
+echo "==> Verifying ADA Recommendation count..."
+ADA_RECS=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
+  --format plain "MATCH (r:Recommendation:ADA) RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
+
+echo "    ADA Recommendations: $ADA_RECS (expected 5)"
+if [ "$ADA_RECS" -ne 5 ]; then
+  echo "ERROR: Expected 5 ADA Recommendation nodes, got $ADA_RECS"
+  exit 1
+fi
+
+echo "==> Verifying ADA Guideline node..."
+ADA_GUIDELINE=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
+  --format plain "MATCH (g:Guideline {id: 'guideline:ada-diabetes-2024'}) RETURN count(g) AS c" | tail -1 | tr -d '[:space:]')
+
+echo "    ADA Guideline: $ADA_GUIDELINE (expected 1)"
+if [ "$ADA_GUIDELINE" -ne 1 ]; then
+  echo "ERROR: Expected 1 ADA Guideline node, got $ADA_GUIDELINE"
+  exit 1
+fi
+
 echo "==> Verifying no orphan medications..."
 ORPHAN_MEDS=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH (m:Medication) WHERE NOT (m)<-[:INCLUDES_ACTION|TARGETS]-() RETURN count(m) AS c" | tail -1 | tr -d '[:space:]')
@@ -133,4 +157,4 @@ if [ "$ORPHAN_MEDS" -ne 0 ]; then
   exit 1
 fi
 
-echo "==> Seed complete. 50 nodes, 70 edges. All checks passed."
+echo "==> Seed complete. 74 nodes, 113 edges. All checks passed."

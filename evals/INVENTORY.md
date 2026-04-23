@@ -76,6 +76,24 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 - Dialysis patient (CKD G5D) — KDIGO statin evidence different for dialysis.
 - CKD + diabetes deep integration fixture.
 
+## Diabetes (v2 — ADA 2024)
+
+### Landed
+
+| ID | Directory | Coverage |
+|---|---|---|
+| 01 | `fixtures/diabetes/case-01/` | 52M, newly diagnosed T2DM, A1C 7.8%, no CVD, no CKD, eGFR 85. Metformin first-line (R1). Statin for diabetes (R5, moderate-intensity). |
+| 02 | `fixtures/diabetes/case-02/` | 60F, T2DM on metformin, A1C 8.2%, established ASCVD (prior MI), eGFR 62. SGLT2i cardiorenal (R2). GLP-1 RA CVD (R3). Intensification (R4). Statin high-intensity (R5). |
+| 03 | `fixtures/diabetes/case-03/` | 58M, T2DM on metformin, A1C 9.1%, CKD 3a (eGFR 50), albuminuria A2 (ACR 120), HF. SGLT2i cardiorenal (R2). Intensification (R4). Statin (R5). |
+| 04 | `fixtures/diabetes/case-04/` | 45F, T2DM on metformin + empagliflozin, A1C 6.8%, no CVD, eGFR 92. At target. Only statin (R5, moderate-intensity) fires. |
+
+### Deferred
+
+- Cross-domain fixtures (ADA + KDIGO SGLT2i overlap, ADA + ACC/AHA statin overlap): F54.
+- Type 1 diabetes.
+- Insulin titration scenarios.
+- Gestational diabetes.
+
 ## Archived
 
 - `archive/` — CRC-era fixtures and inventory retained for reference. Not loaded by the evaluator.

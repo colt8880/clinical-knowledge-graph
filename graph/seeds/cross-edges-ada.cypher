@@ -28,7 +28,7 @@ MATCH (target:Recommendation {id: 'rec:ada-metformin-first-line'})
 MERGE (source)-[r:MODIFIES]->(target)
 ON CREATE SET
   r.nature = 'dose_adjustment',
-  r.note = 'KDIGO 2024 CKD monitoring (eGFR and urine ACR tracking) directly informs ADA metformin dosing. eGFR < 45 mL/min/1.73m2 requires metformin dose reduction; eGFR < 30 contraindicates metformin entirely. This is a cross-domain dependency: one guideline''s monitoring output feeds another guideline''s dosing decision.',
+  r.note = 'KDIGO 2024 CKD monitoring (eGFR and urine ACR tracking) directly informs ADA metformin dosing. eGFR < 45 mL/min/1.73m2 requires metformin dose reduction; eGFR < 30 contraindicates metformin entirely. This is a cross-domain dependency: one guidelines monitoring output feeds another guidelines dosing decision.',
   r.reviewer = 'Colton Ortolf',
   r.review_date = '2026-04-23',
   r.provenance_source = 'cross-edges-ada',

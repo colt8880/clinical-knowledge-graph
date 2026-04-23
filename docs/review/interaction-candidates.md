@@ -353,12 +353,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ---
 
 ## C11
-**Rec A:** Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024)
+**Rec A:** Statin therapy for adults with diabetes aged 40-75 (ADA)
 **Rec B:** Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA)
 
 | | Rec A | Rec B |
 |---|---|---|
-| **Guideline** | guideline:ada-diabetes-2024 | ACC/AHA |
+| **Guideline** | ADA | ACC/AHA |
 | **ID** | `rec:ada-statin-for-diabetes` | `rec:accaha-statin-diabetes` |
 | **Grade** | ADA-A | COR I, LOE A |
 | **Intent** | primary_prevention | primary_prevention |
@@ -367,17 +367,17 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | Ascvd Established; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-> **Overlap population:** adults age 40–75 with Diabetes (guideline:ada-diabetes-2024).
+> **Overlap population:** adults age 40–75 with Diabetes (ADA).
 >
-> **Must NOT have:** Ascvd Established (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), active Atorvastatin (guideline:ada-diabetes-2024), active Rosuvastatin (guideline:ada-diabetes-2024), active Simvastatin (guideline:ada-diabetes-2024), active Pravastatin (guideline:ada-diabetes-2024), active Lovastatin (guideline:ada-diabetes-2024), active Fluvastatin (guideline:ada-diabetes-2024), active Pitavastatin (guideline:ada-diabetes-2024).
+> **Must NOT have:** Ascvd Established (ACC/AHA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA), active Atorvastatin (ADA), active Rosuvastatin (ADA), active Simvastatin (ADA), active Pravastatin (ADA), active Lovastatin (ADA), active Fluvastatin (ADA), active Pitavastatin (ADA).
 >
 > **Actions:** Both recs prescribe the same actions: Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin. No conflict in agent selection.
 
 ### Verdict
 
 - [x] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **PREEMPTED_BY:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) preempts guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75)
-- [ ] **MODIFIES:** ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75) modifies guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75); nature: ___
+- [ ] **PREEMPTED_BY:** ADA (Statin therapy for adults with diabetes aged 40-75) preempts ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75)
+- [ ] **MODIFIES:** ADA (Statin therapy for adults with diabetes aged 40-75) modifies ACC/AHA (Moderate-intensity statin for diabetes mellitus, age 40-75); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
 **Rationale:** Both recs prescribe overlapping statin medications for the overlap population. No intensity conflict detected. Shared entity layer handles deduplication.
@@ -385,12 +385,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ---
 
 ## C12
-**Rec A:** Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024)
+**Rec A:** Statin therapy for adults with diabetes aged 40-75 (ADA)
 **Rec B:** High-intensity statin for secondary prevention in clinical ASCVD (age ≤75) (ACC/AHA)
 
 | | Rec A | Rec B |
 |---|---|---|
-| **Guideline** | guideline:ada-diabetes-2024 | ACC/AHA |
+| **Guideline** | ADA | ACC/AHA |
 | **ID** | `rec:ada-statin-for-diabetes` | `rec:accaha-statin-secondary-prevention` |
 | **Grade** | ADA-A | COR I, LOE A |
 | **Intent** | primary_prevention | treatment |
@@ -399,18 +399,18 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | — |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Rosuvastatin |
 
-> **Overlap population:** adults age 40–75 with Diabetes (guideline:ada-diabetes-2024), Ascvd Established (ACC/AHA).
+> **Overlap population:** adults age 40–75 with Diabetes (ADA), Ascvd Established (ACC/AHA).
 >
-> **Must NOT have:** active Atorvastatin (guideline:ada-diabetes-2024), active Rosuvastatin (guideline:ada-diabetes-2024), active Simvastatin (guideline:ada-diabetes-2024), active Pravastatin (guideline:ada-diabetes-2024), active Lovastatin (guideline:ada-diabetes-2024), active Fluvastatin (guideline:ada-diabetes-2024), active Pitavastatin (guideline:ada-diabetes-2024).
+> **Must NOT have:** active Atorvastatin (ADA), active Rosuvastatin (ADA), active Simvastatin (ADA), active Pravastatin (ADA), active Lovastatin (ADA), active Fluvastatin (ADA), active Pitavastatin (ADA).
 >
 > **Shared actions:** Atorvastatin, Rosuvastatin.
-> **guideline:ada-diabetes-2024 only:** Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Simvastatin.
+> **ADA only:** Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Simvastatin.
 
 ### Verdict
 
 - [x] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) preempts guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75)
-- [ ] **MODIFIES:** ACC/AHA (High-intensity statin for secondary prevention in clinica...) modifies guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75); nature: ___
+- [ ] **PREEMPTED_BY:** ADA (Statin therapy for adults with diabetes aged 40-75) preempts ACC/AHA (High-intensity statin for secondary prevention in clinica...)
+- [ ] **MODIFIES:** ADA (Statin therapy for adults with diabetes aged 40-75) modifies ACC/AHA (High-intensity statin for secondary prevention in clinica...); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
 **Rationale:** Both recs prescribe overlapping statin medications for the overlap population. No intensity conflict detected. Shared entity layer handles deduplication.
@@ -418,12 +418,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ---
 
 ## C13
-**Rec A:** Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024)
+**Rec A:** Statin therapy for adults with diabetes aged 40-75 (ADA)
 **Rec B:** High-intensity statin for severe hypercholesterolemia (LDL ≥190, age 20-75) (ACC/AHA)
 
 | | Rec A | Rec B |
 |---|---|---|
-| **Guideline** | guideline:ada-diabetes-2024 | ACC/AHA |
+| **Guideline** | ADA | ACC/AHA |
 | **ID** | `rec:ada-statin-for-diabetes` | `rec:accaha-statin-severe-hypercholesterolemia` |
 | **Grade** | ADA-A | COR I, LOE B-NR |
 | **Intent** | primary_prevention | treatment |
@@ -432,18 +432,18 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | Ascvd Established |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Rosuvastatin |
 
-> **Overlap population:** adults age 40–75 with Diabetes (guideline:ada-diabetes-2024), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
+> **Overlap population:** adults age 40–75 with Diabetes (ADA), Ldl Cholesterol ≥ 190 mg/dL (ACC/AHA).
 >
-> **Must NOT have:** Ascvd Established (ACC/AHA), active Atorvastatin (guideline:ada-diabetes-2024), active Rosuvastatin (guideline:ada-diabetes-2024), active Simvastatin (guideline:ada-diabetes-2024), active Pravastatin (guideline:ada-diabetes-2024), active Lovastatin (guideline:ada-diabetes-2024), active Fluvastatin (guideline:ada-diabetes-2024), active Pitavastatin (guideline:ada-diabetes-2024).
+> **Must NOT have:** Ascvd Established (ACC/AHA), active Atorvastatin (ADA), active Rosuvastatin (ADA), active Simvastatin (ADA), active Pravastatin (ADA), active Lovastatin (ADA), active Fluvastatin (ADA), active Pitavastatin (ADA).
 >
 > **Shared actions:** Atorvastatin, Rosuvastatin.
-> **guideline:ada-diabetes-2024 only:** Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Simvastatin.
+> **ADA only:** Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Simvastatin.
 
 ### Verdict
 
 - [x] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **PREEMPTED_BY:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) preempts guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75)
-- [ ] **MODIFIES:** ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...) modifies guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75); nature: ___
+- [ ] **PREEMPTED_BY:** ADA (Statin therapy for adults with diabetes aged 40-75) preempts ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...)
+- [ ] **MODIFIES:** ADA (Statin therapy for adults with diabetes aged 40-75) modifies ACC/AHA (High-intensity statin for severe hypercholesterolemia (LD...); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
 **Rationale:** Both recs prescribe overlapping statin medications for the overlap population. No intensity conflict detected. Shared entity layer handles deduplication.
@@ -451,12 +451,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ---
 
 ## C14
-**Rec A:** Intensification of glycemic therapy when A1C remains above target (guideline:ada-diabetes-2024)
+**Rec A:** Intensification of glycemic therapy when A1C remains above target (ADA)
 **Rec B:** SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO)
 
 | | Rec A | Rec B |
 |---|---|---|
-| **Guideline** | guideline:ada-diabetes-2024 | KDIGO |
+| **Guideline** | ADA | KDIGO |
 | **ID** | `rec:ada-intensification` | `rec:kdigo-sglt2-for-ckd` |
 | **Grade** | ADA-A | 1A |
 | **Intent** | treatment | treatment |
@@ -465,18 +465,18 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | — | Active: Empagliflozin, Dapagliflozin |
 | **Actions** | Canagliflozin, Dapagliflozin, Dulaglutide, Empagliflozin, Insulin Glargine, Insulin Lispro, Liraglutide, Semaglutide | Dapagliflozin, Empagliflozin |
 
-> **Overlap population:** adults age 18–120 with Diabetes (guideline:ada-diabetes-2024), one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Hba1C ≥ 7 % (guideline:ada-diabetes-2024), Egfr ≥ 20 mL/min/1.73m2 (KDIGO).
+> **Overlap population:** adults age 18–120 with Diabetes (ADA), one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Hba1C ≥ 7 % (ADA), Egfr ≥ 20 mL/min/1.73m2 (KDIGO).
 >
 > **Must NOT have:** active Empagliflozin (KDIGO), active Dapagliflozin (KDIGO).
 >
 > **Shared actions:** Dapagliflozin, Empagliflozin.
-> **guideline:ada-diabetes-2024 only:** Canagliflozin, Dulaglutide, Insulin Glargine, Insulin Lispro, Liraglutide, Semaglutide.
+> **ADA only:** Canagliflozin, Dulaglutide, Insulin Glargine, Insulin Lispro, Liraglutide, Semaglutide.
 
 ### Verdict
 
 - [x] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **PREEMPTED_BY:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) preempts guideline:ada-diabetes-2024 (Intensification of glycemic therapy when A1C remains abov...)
-- [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies guideline:ada-diabetes-2024 (Intensification of glycemic therapy when A1C remains abov...); nature: ___
+- [ ] **PREEMPTED_BY:** ADA (Intensification of glycemic therapy when A1C remains abov...) preempts KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria)
+- [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies ADA (Intensification of glycemic therapy when A1C remains abov...); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
 **Rationale:** Both recs target shared entities but in different clinical contexts. The shared entity layer handles deduplication.
@@ -484,12 +484,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ---
 
 ## C15
-**Rec A:** SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024)
+**Rec A:** SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA)
 **Rec B:** SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO)
 
 | | Rec A | Rec B |
 |---|---|---|
-| **Guideline** | guideline:ada-diabetes-2024 | KDIGO |
+| **Guideline** | ADA | KDIGO |
 | **ID** | `rec:ada-sglt2-cardiorenal` | `rec:kdigo-sglt2-for-ckd` |
 | **Grade** | ADA-A | 1A |
 | **Intent** | treatment | treatment |
@@ -498,18 +498,18 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Empagliflozin, Dapagliflozin, Canagliflozin | Active: Empagliflozin, Dapagliflozin |
 | **Actions** | Canagliflozin, Dapagliflozin, Empagliflozin | Dapagliflozin, Empagliflozin |
 
-> **Overlap population:** adults age 18–120 with Diabetes (guideline:ada-diabetes-2024), one of: Ascvd Established / Heart Failure / Egfr ≤ 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (guideline:ada-diabetes-2024), one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Egfr ≥ 20 mL/min/1.73m2 (guideline:ada-diabetes-2024).
+> **Overlap population:** adults age 18–120 with Diabetes (ADA), one of: Ascvd Established / Heart Failure / Egfr ≤ 60 mL/min/1.73m2 / Urine Acr ≥ 30 mg/g (ADA), one of: Diabetes / Egfr < 60 mL/min/1.73m2 / Urine Acr ≥ 200 mg/g (KDIGO), Egfr ≥ 20 mL/min/1.73m2 (ADA).
 >
-> **Must NOT have:** active Empagliflozin (guideline:ada-diabetes-2024), active Dapagliflozin (guideline:ada-diabetes-2024), active Canagliflozin (guideline:ada-diabetes-2024).
+> **Must NOT have:** active Empagliflozin (ADA), active Dapagliflozin (ADA), active Canagliflozin (ADA).
 >
 > **Shared actions:** Dapagliflozin, Empagliflozin.
-> **guideline:ada-diabetes-2024 only:** Canagliflozin.
+> **ADA only:** Canagliflozin.
 
 ### Verdict
 
 - [x] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **PREEMPTED_BY:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) preempts guideline:ada-diabetes-2024 (SGLT2 inhibitor for cardiorenal benefit in T2DM)
-- [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies guideline:ada-diabetes-2024 (SGLT2 inhibitor for cardiorenal benefit in T2DM); nature: ___
+- [ ] **PREEMPTED_BY:** ADA (SGLT2 inhibitor for cardiorenal benefit in T2DM) preempts KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria)
+- [ ] **MODIFIES:** KDIGO (SGLT2 inhibitor for CKD with T2DM or significant albuminuria) modifies ADA (SGLT2 inhibitor for cardiorenal benefit in T2DM); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
 **Rationale:** Both recs target shared entities but in different clinical contexts. The shared entity layer handles deduplication.
@@ -517,12 +517,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ---
 
 ## C16
-**Rec A:** Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024)
+**Rec A:** Statin therapy for adults with diabetes aged 40-75 (ADA)
 **Rec B:** Moderate-intensity statin for CKD patients aged ≥50, not on dialysis (KDIGO)
 
 | | Rec A | Rec B |
 |---|---|---|
-| **Guideline** | guideline:ada-diabetes-2024 | KDIGO |
+| **Guideline** | ADA | KDIGO |
 | **ID** | `rec:ada-statin-for-diabetes` | `rec:kdigo-statin-for-ckd` |
 | **Grade** | ADA-A | 1A |
 | **Intent** | primary_prevention | primary_prevention |
@@ -531,17 +531,17 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-> **Overlap population:** adults age 50–75 with Diabetes (guideline:ada-diabetes-2024), Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO).
+> **Overlap population:** adults age 50–75 with Diabetes (ADA), Egfr < 60 mL/min/1.73m2 (KDIGO), Egfr ≥ 15 mL/min/1.73m2 (KDIGO).
 >
-> **Must NOT have:** active Atorvastatin (guideline:ada-diabetes-2024), active Rosuvastatin (guideline:ada-diabetes-2024), active Simvastatin (guideline:ada-diabetes-2024), active Pravastatin (guideline:ada-diabetes-2024), active Lovastatin (guideline:ada-diabetes-2024), active Fluvastatin (guideline:ada-diabetes-2024), active Pitavastatin (guideline:ada-diabetes-2024).
+> **Must NOT have:** active Atorvastatin (ADA), active Rosuvastatin (ADA), active Simvastatin (ADA), active Pravastatin (ADA), active Lovastatin (ADA), active Fluvastatin (ADA), active Pitavastatin (ADA).
 >
 > **Actions:** Both recs prescribe the same actions: Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin. No conflict in agent selection.
 
 ### Verdict
 
 - [x] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **PREEMPTED_BY:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) preempts guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75)
-- [ ] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75); nature: ___
+- [ ] **PREEMPTED_BY:** ADA (Statin therapy for adults with diabetes aged 40-75) preempts KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...)
+- [ ] **MODIFIES:** KDIGO (Moderate-intensity statin for CKD patients aged ≥50, not ...) modifies ADA (Statin therapy for adults with diabetes aged 40-75); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
 **Rationale:** Both recs recommend moderate-intensity statin therapy for the overlap population. No conflict — the shared entity layer deduplicates. No cross-edge needed.
@@ -549,12 +549,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ---
 
 ## C17
-**Rec A:** Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024)
+**Rec A:** Statin therapy for adults with diabetes aged 40-75 (ADA)
 **Rec B:** Initiate statin for primary prevention of CVD (Grade B) (USPSTF)
 
 | | Rec A | Rec B |
 |---|---|---|
-| **Guideline** | guideline:ada-diabetes-2024 | USPSTF |
+| **Guideline** | ADA | USPSTF |
 | **ID** | `rec:ada-statin-for-diabetes` | `rec:statin-initiate-grade-b` |
 | **Grade** | ADA-A | B |
 | **Intent** | primary_prevention | primary_prevention |
@@ -563,17 +563,17 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin |
 
-> **Overlap population:** adults age 40–75 with Diabetes (guideline:ada-diabetes-2024), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), ascvd_10yr ≥ 10% (USPSTF).
+> **Overlap population:** adults age 40–75 with Diabetes (ADA), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), ascvd_10yr ≥ 10% (USPSTF).
 >
-> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Atorvastatin (guideline:ada-diabetes-2024), active Rosuvastatin (guideline:ada-diabetes-2024), active Simvastatin (guideline:ada-diabetes-2024), active Pravastatin (guideline:ada-diabetes-2024), active Lovastatin (guideline:ada-diabetes-2024), active Fluvastatin (guideline:ada-diabetes-2024), active Pitavastatin (guideline:ada-diabetes-2024).
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Atorvastatin (ADA), active Rosuvastatin (ADA), active Simvastatin (ADA), active Pravastatin (ADA), active Lovastatin (ADA), active Fluvastatin (ADA), active Pitavastatin (ADA).
 >
 > **Actions:** Both recs prescribe the same actions: Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin. No conflict in agent selection.
 
 ### Verdict
 
 - [x] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **PREEMPTED_BY:** guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
-- [ ] **MODIFIES:** guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
+- [ ] **PREEMPTED_BY:** ADA (Statin therapy for adults with diabetes aged 40-75) preempts USPSTF (Initiate statin for primary prevention of CVD (Grade B))
+- [ ] **MODIFIES:** ADA (Statin therapy for adults with diabetes aged 40-75) modifies USPSTF (Initiate statin for primary prevention of CVD (Grade B)); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
 **Rationale:** Both recs prescribe overlapping statin medications for the overlap population. No intensity conflict detected. Shared entity layer handles deduplication.
@@ -581,12 +581,12 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ---
 
 ## C18
-**Rec A:** Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024)
+**Rec A:** Statin therapy for adults with diabetes aged 40-75 (ADA)
 **Rec B:** Selectively offer statin based on shared decision-making (Grade C) (USPSTF)
 
 | | Rec A | Rec B |
 |---|---|---|
-| **Guideline** | guideline:ada-diabetes-2024 | USPSTF |
+| **Guideline** | ADA | USPSTF |
 | **ID** | `rec:ada-statin-for-diabetes` | `rec:statin-selective-grade-c` |
 | **Grade** | ADA-A | C |
 | **Intent** | primary_prevention | shared_decision |
@@ -595,9 +595,9 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 | **Excludes** | Active: Atorvastatin, Rosuvastatin, Simvastatin, Pravastatin, Lovastatin, Fluvastatin, Pitavastatin | Ascvd Established, Familial Hypercholesterolemia; Ldl Cholesterol ≥ 190 mg/dL |
 | **Actions** | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin | Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin, Sdm Statin Discussion |
 
-> **Overlap population:** adults age 40–75 with Diabetes (guideline:ada-diabetes-2024), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), ascvd_10yr ≥ 7.5% (USPSTF), ascvd_10yr < 10% (USPSTF).
+> **Overlap population:** adults age 40–75 with Diabetes (ADA), one of: Dyslipidemia / Diabetes / Hypertension / smoking: current / smoking: current_some_day / smoking: current_every_day (USPSTF), ascvd_10yr ≥ 7.5% (USPSTF), ascvd_10yr < 10% (USPSTF).
 >
-> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Atorvastatin (guideline:ada-diabetes-2024), active Rosuvastatin (guideline:ada-diabetes-2024), active Simvastatin (guideline:ada-diabetes-2024), active Pravastatin (guideline:ada-diabetes-2024), active Lovastatin (guideline:ada-diabetes-2024), active Fluvastatin (guideline:ada-diabetes-2024), active Pitavastatin (guideline:ada-diabetes-2024).
+> **Must NOT have:** Ascvd Established (USPSTF), Familial Hypercholesterolemia (USPSTF), Ldl Cholesterol ≥ 190 mg/dL (USPSTF), active Atorvastatin (ADA), active Rosuvastatin (ADA), active Simvastatin (ADA), active Pravastatin (ADA), active Lovastatin (ADA), active Fluvastatin (ADA), active Pitavastatin (ADA).
 >
 > **Shared actions:** Atorvastatin, Fluvastatin, Lovastatin, Pitavastatin, Pravastatin, Rosuvastatin, Simvastatin.
 > **USPSTF only:** Sdm Statin Discussion.
@@ -605,8 +605,8 @@ Both recs recommend the same medication(s) or action(s). Likely outcome: one **p
 ### Verdict
 
 - [x] **Convergence only** — no edge needed, shared entity layer handles it
-- [ ] **PREEMPTED_BY:** guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
-- [ ] **MODIFIES:** guideline:ada-diabetes-2024 (Statin therapy for adults with diabetes aged 40-75) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
+- [ ] **PREEMPTED_BY:** ADA (Statin therapy for adults with diabetes aged 40-75) preempts USPSTF (Selectively offer statin based on shared decision-making ...)
+- [ ] **MODIFIES:** ADA (Statin therapy for adults with diabetes aged 40-75) modifies USPSTF (Selectively offer statin based on shared decision-making ...); nature: ___
 - [ ] **Reject** — no clinically meaningful interaction
 
 **Rationale:** Both recs prescribe overlapping statin medications for the overlap population. No intensity conflict detected. Shared entity layer handles deduplication.
@@ -698,42 +698,42 @@ These pairs can co-fire for the same patient but address **unrelated therapeutic
 | 10 | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | lipid management | RAS blockade / renal protection | 20–75 |
 | 11 | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | lipid management | CKD monitoring | 20–75 |
 | 12 | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO) | lipid management | SGLT2i / renal protection | 20–75 |
-| 13 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | treatment | lipid management | 55–75 |
-| 14 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA) | SGLT2i / renal protection | lipid management | 40–75 |
-| 15 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | SGLT2i / renal protection | lipid management | 18–75 |
-| 16 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | SGLT2i / renal protection | lipid management | 20–75 |
-| 17 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA) | treatment | lipid management | 40–75 |
-| 18 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | treatment | lipid management | 18–75 |
-| 19 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | treatment | lipid management | 20–75 |
-| 20 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA) | SGLT2i / renal protection | lipid management | 40–75 |
-| 21 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | SGLT2i / renal protection | lipid management | 18–75 |
-| 22 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | SGLT2i / renal protection | lipid management | 20–75 |
-| 23 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | treatment | RAS blockade / renal protection | 55–120 |
-| 24 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | treatment | CKD monitoring | 55–120 |
-| 25 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO) | treatment | SGLT2i / renal protection | 55–120 |
-| 26 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | Moderate-intensity statin for CKD patients aged ≥50, not ... (KDIGO) | treatment | lipid management | 55–120 |
-| 27 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | SGLT2i / renal protection | RAS blockade / renal protection | 18–120 |
-| 28 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | SGLT2i / renal protection | CKD monitoring | 18–120 |
-| 29 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | Moderate-intensity statin for CKD patients aged ≥50, not ... (KDIGO) | SGLT2i / renal protection | lipid management | 50–120 |
-| 30 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | treatment | RAS blockade / renal protection | 18–120 |
-| 31 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | treatment | CKD monitoring | 18–120 |
-| 32 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO) | treatment | SGLT2i / renal protection | 18–120 |
-| 33 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | Moderate-intensity statin for CKD patients aged ≥50, not ... (KDIGO) | treatment | lipid management | 50–120 |
-| 34 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | SGLT2i / renal protection | RAS blockade / renal protection | 18–120 |
-| 35 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | SGLT2i / renal protection | CKD monitoring | 18–120 |
-| 36 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | Moderate-intensity statin for CKD patients aged ≥50, not ... (KDIGO) | SGLT2i / renal protection | lipid management | 50–120 |
-| 37 | Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | lipid management | RAS blockade / renal protection | 40–75 |
-| 38 | Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | lipid management | CKD monitoring | 40–75 |
-| 39 | Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024) | SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO) | lipid management | SGLT2i / renal protection | 40–75 |
-| 40 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | SGLT2i / renal protection | lipid management | 40–75 |
-| 41 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | Insufficient evidence to recommend for or against initiat... (USPSTF) | SGLT2i / renal protection | primary_prevention | 76–120 |
-| 42 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | Selectively offer statin based on shared decision-making ... (USPSTF) | SGLT2i / renal protection | lipid management | 40–75 |
-| 43 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | treatment | lipid management | 40–75 |
-| 44 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | Insufficient evidence to recommend for or against initiat... (USPSTF) | treatment | primary_prevention | 76–120 |
-| 45 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | Selectively offer statin based on shared decision-making ... (USPSTF) | treatment | lipid management | 40–75 |
-| 46 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | SGLT2i / renal protection | lipid management | 40–75 |
-| 47 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | Insufficient evidence to recommend for or against initiat... (USPSTF) | SGLT2i / renal protection | primary_prevention | 76–120 |
-| 48 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | Selectively offer statin based on shared decision-making ... (USPSTF) | SGLT2i / renal protection | lipid management | 40–75 |
+| 13 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | treatment | lipid management | 55–75 |
+| 14 | Intensification of glycemic therapy when A1C remains abov... (ADA) | Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA) | SGLT2i / renal protection | lipid management | 40–75 |
+| 15 | Intensification of glycemic therapy when A1C remains abov... (ADA) | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | SGLT2i / renal protection | lipid management | 18–75 |
+| 16 | Intensification of glycemic therapy when A1C remains abov... (ADA) | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | SGLT2i / renal protection | lipid management | 20–75 |
+| 17 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA) | treatment | lipid management | 40–75 |
+| 18 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | treatment | lipid management | 18–75 |
+| 19 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | treatment | lipid management | 20–75 |
+| 20 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA) | SGLT2i / renal protection | lipid management | 40–75 |
+| 21 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | SGLT2i / renal protection | lipid management | 18–75 |
+| 22 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | SGLT2i / renal protection | lipid management | 20–75 |
+| 23 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | treatment | RAS blockade / renal protection | 55–120 |
+| 24 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | treatment | CKD monitoring | 55–120 |
+| 25 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO) | treatment | SGLT2i / renal protection | 55–120 |
+| 26 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | Moderate-intensity statin for CKD patients aged ≥50, not ... (KDIGO) | treatment | lipid management | 55–120 |
+| 27 | Intensification of glycemic therapy when A1C remains abov... (ADA) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | SGLT2i / renal protection | RAS blockade / renal protection | 18–120 |
+| 28 | Intensification of glycemic therapy when A1C remains abov... (ADA) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | SGLT2i / renal protection | CKD monitoring | 18–120 |
+| 29 | Intensification of glycemic therapy when A1C remains abov... (ADA) | Moderate-intensity statin for CKD patients aged ≥50, not ... (KDIGO) | SGLT2i / renal protection | lipid management | 50–120 |
+| 30 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | treatment | RAS blockade / renal protection | 18–120 |
+| 31 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | treatment | CKD monitoring | 18–120 |
+| 32 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO) | treatment | SGLT2i / renal protection | 18–120 |
+| 33 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | Moderate-intensity statin for CKD patients aged ≥50, not ... (KDIGO) | treatment | lipid management | 50–120 |
+| 34 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | SGLT2i / renal protection | RAS blockade / renal protection | 18–120 |
+| 35 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | SGLT2i / renal protection | CKD monitoring | 18–120 |
+| 36 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | Moderate-intensity statin for CKD patients aged ≥50, not ... (KDIGO) | SGLT2i / renal protection | lipid management | 50–120 |
+| 37 | Statin therapy for adults with diabetes aged 40-75 (ADA) | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | lipid management | RAS blockade / renal protection | 40–75 |
+| 38 | Statin therapy for adults with diabetes aged 40-75 (ADA) | Monitor eGFR and urine ACR in patients with CKD (KDIGO) | lipid management | CKD monitoring | 40–75 |
+| 39 | Statin therapy for adults with diabetes aged 40-75 (ADA) | SGLT2 inhibitor for CKD with T2DM or significant albuminuria (KDIGO) | lipid management | SGLT2i / renal protection | 40–75 |
+| 40 | Intensification of glycemic therapy when A1C remains abov... (ADA) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | SGLT2i / renal protection | lipid management | 40–75 |
+| 41 | Intensification of glycemic therapy when A1C remains abov... (ADA) | Insufficient evidence to recommend for or against initiat... (USPSTF) | SGLT2i / renal protection | primary_prevention | 76–120 |
+| 42 | Intensification of glycemic therapy when A1C remains abov... (ADA) | Selectively offer statin based on shared decision-making ... (USPSTF) | SGLT2i / renal protection | lipid management | 40–75 |
+| 43 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | treatment | lipid management | 40–75 |
+| 44 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | Insufficient evidence to recommend for or against initiat... (USPSTF) | treatment | primary_prevention | 76–120 |
+| 45 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | Selectively offer statin based on shared decision-making ... (USPSTF) | treatment | lipid management | 40–75 |
+| 46 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | SGLT2i / renal protection | lipid management | 40–75 |
+| 47 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | Insufficient evidence to recommend for or against initiat... (USPSTF) | SGLT2i / renal protection | primary_prevention | 76–120 |
+| 48 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | Selectively offer statin based on shared decision-making ... (USPSTF) | SGLT2i / renal protection | lipid management | 40–75 |
 | 49 | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | RAS blockade / renal protection | lipid management | 40–75 |
 | 50 | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | Insufficient evidence to recommend for or against initiat... (USPSTF) | RAS blockade / renal protection | primary_prevention | 76–120 |
 | 51 | ACE inhibitor or ARB for CKD with albuminuria (ACR ≥30) (KDIGO) | Selectively offer statin based on shared decision-making ... (USPSTF) | RAS blockade / renal protection | lipid management | 40–75 |
@@ -759,14 +759,14 @@ These pairs cannot co-match the same patient — age ranges don't overlap or con
 | 4 | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | Insufficient evidence to recommend for or against initiat... (USPSTF) | NO OVERLAP (18–75 vs ≥76) |
 | 5 | High-intensity statin for secondary prevention in clinica... (ACC/AHA) | Selectively offer statin based on shared decision-making ... (USPSTF) | Rec A requires Ascvd Established which Rec B excludes |
 | 6 | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | Insufficient evidence to recommend for or against initiat... (USPSTF) | NO OVERLAP (20–75 vs ≥76) |
-| 7 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B; Both require: Diabetes |
-| 8 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes; All branches of Rec A disjunction (Ascvd Established) excluded by Rec B |
-| 9 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B |
-| 10 | Intensification of glycemic therapy when A1C remains abov... (guideline:ada-diabetes-2024) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes |
-| 11 | Metformin as first-line pharmacotherapy for type 2 diabetes (guideline:ada-diabetes-2024) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes |
-| 12 | SGLT2 inhibitor for cardiorenal benefit in T2DM (guideline:ada-diabetes-2024) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes |
-| 13 | Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes |
-| 14 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B; Shared condition (some disjunctive): Diabetes, Dyslipidemia, Hypertension |
-| 15 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | Insufficient evidence to recommend for or against initiat... (USPSTF) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B |
-| 16 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (guideline:ada-diabetes-2024) | Selectively offer statin based on shared decision-making ... (USPSTF) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B; Shared condition (some disjunctive): Diabetes, Dyslipidemia, Hypertension |
-| 17 | Statin therapy for adults with diabetes aged 40-75 (guideline:ada-diabetes-2024) | Insufficient evidence to recommend for or against initiat... (USPSTF) | NO OVERLAP (40–75 vs ≥76) |
+| 7 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | Moderate-intensity statin for diabetes mellitus, age 40-75 (ACC/AHA) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B; Both require: Diabetes |
+| 8 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes; All branches of Rec A disjunction (Ascvd Established) excluded by Rec B |
+| 9 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | High-intensity statin for severe hypercholesterolemia (LD... (ACC/AHA) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B |
+| 10 | Intensification of glycemic therapy when A1C remains abov... (ADA) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes |
+| 11 | Metformin as first-line pharmacotherapy for type 2 diabetes (ADA) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes |
+| 12 | SGLT2 inhibitor for cardiorenal benefit in T2DM (ADA) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes |
+| 13 | Statin therapy for adults with diabetes aged 40-75 (ADA) | Moderate-to-high-intensity statin for primary prevention ... (ACC/AHA) | Rec A requires Diabetes which Rec B excludes |
+| 14 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | Initiate statin for primary prevention of CVD (Grade B) (USPSTF) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B; Shared condition (some disjunctive): Diabetes, Dyslipidemia, Hypertension |
+| 15 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | Insufficient evidence to recommend for or against initiat... (USPSTF) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B |
+| 16 | GLP-1 receptor agonist for cardiovascular benefit in T2DM (ADA) | Selectively offer statin based on shared decision-making ... (USPSTF) | All branches of Rec A disjunction (Ascvd Established) excluded by Rec B; Shared condition (some disjunctive): Diabetes, Dyslipidemia, Hypertension |
+| 17 | Statin therapy for adults with diabetes aged 40-75 (ADA) | Insufficient evidence to recommend for or against initiat... (USPSTF) | NO OVERLAP (40–75 vs ≥76) |

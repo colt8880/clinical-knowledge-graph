@@ -8,12 +8,12 @@
 
 | Decision | Count | Candidates |
 |----------|-------|------------|
-| MODIFIES (approved) | 2 | M1, M2 |
-| Convergence only (no edge) | 8 | C11, C12, C13, C14, C15, C16, C17, C18 |
+| MODIFIES (approved) | 1 | M1 |
+| Convergence only (no edge) | 9 | C11, C12, C13, C14, C15, C16, C17, C18, + original M1 reclassified |
 | Auto-rejected (different domains) | 36 | — |
 | Auto-rejected (no eligibility overlap) | 11 | — |
 | **Total ADA pairs reviewed** | **10** | |
-| **Edges to add** | **2** | |
+| **Edges to add** | **1** | |
 
 Note: 36 auto-rejected cross-domain pairs and 11 no-overlap pairs involving ADA recs were auto-rejected by the discovery tool. Only the 10 pairs requiring clinical judgment are documented below.
 
@@ -21,17 +21,7 @@ Note: 36 auto-rejected cross-domain pairs and 11 no-overlap pairs involving ADA 
 
 ## Approved MODIFIES edges
 
-Both MODIFIES edges follow the established pattern: KDIGO provides CKD-specific guidance that adjusts how an ADA recommendation should be applied for the CKD overlap population. These are complementary (not competing) recommendations where KDIGO's renal expertise informs ADA's diabetes management.
-
-### M1 — KDIGO SGLT2i modifies ADA intensification (agent preference)
-
-- **Edge:** `(rec:kdigo-sglt2-for-ckd)-[:MODIFIES]->(rec:ada-intensification)`
-- **Nature:** `agent_preference`
-- **Overlap:** adults 18+ with T2DM, A1C >= 7%, on metformin, eGFR 20-<60 or albuminuria (ACR >= 200)
-- **Rationale:** When a patient has CKD + uncontrolled diabetes requiring intensification, KDIGO's independent SGLT2i recommendation (1A evidence) changes the intensification agent calculus. SGLT2i should be preferred over other intensification agents (GLP-1 RA, insulin) because the cardiorenal benefit is independently indicated by KDIGO, not just for glycemic control. ADA lists SGLT2i, GLP-1 RA, and insulin as intensification options without CKD-specific preference; KDIGO provides the preference signal.
-- **Source candidates:** C14 (tool classified as convergence due to shared SGLT2i entities; clinical review identifies modification — KDIGO doesn't just converge, it changes the relative priority of ADA's intensification options)
-
-### M2 — KDIGO CKD monitoring modifies ADA metformin first-line (dose adjustment)
+### M1 — KDIGO CKD monitoring modifies ADA metformin first-line (dose adjustment)
 
 - **Edge:** `(rec:kdigo-ckd-monitoring)-[:MODIFIES]->(rec:ada-metformin-first-line)`
 - **Nature:** `dose_adjustment`
@@ -41,9 +31,19 @@ Both MODIFIES edges follow the established pattern: KDIGO provides CKD-specific 
 
 ---
 
+## Reclassified to convergence
+
+### Originally M1 — KDIGO SGLT2i ↔ ADA intensification
+
+- **Original verdict:** MODIFIES with nature `agent_preference`
+- **Reclassified to:** Convergence only (no edge)
+- **Reason:** `agent_preference` is not in the ADR 0019 nature enum (`intensity_reduction`, `dose_adjustment`, `monitoring`, `contraindication_warning`). Extending the enum would require a new ADR + schema update. On review, convergence is sufficient: the evaluator already fires both KDIGO SGLT2i and ADA intensification for the overlap patient, the shared entity layer handles SGLT2i deduplication, and the "preference" signal is clinical nuance that an LLM can derive from the trace context without a structured edge.
+
+---
+
 ## Convergence only (no edge needed)
 
-All eight statin/SGLT2i convergence pairs confirmed as convergence only. The shared clinical entity layer handles deduplication — both guidelines recommend the same medications for the same overlap population, with no conflict in intensity or agent selection.
+All statin/SGLT2i convergence pairs confirmed as convergence only. The shared clinical entity layer handles deduplication — both guidelines recommend the same medications for the same overlap population, with no conflict in intensity or agent selection.
 
 ### ADA ↔ ACC/AHA statin convergence
 
@@ -57,7 +57,7 @@ All eight statin/SGLT2i convergence pairs confirmed as convergence only. The sha
 
 | # | ADA Rec | KDIGO Rec | Rationale |
 |---|---------|-----------|-----------|
-| C14 | R4 (intensification, SGLT2i option) | SGLT2i for CKD | Shared empagliflozin/dapagliflozin entities. KDIGO's rec is independent of glycemic control; ADA R4 is glycemic. Different clinical triggers but same medication. M1 (above) captures the modification; shared entity layer handles the convergence. |
+| C14 | R4 (intensification, SGLT2i option) | SGLT2i for CKD | Shared empagliflozin/dapagliflozin entities. KDIGO's rec is independent of glycemic control; ADA R4 is glycemic. Different clinical triggers but same medication. Originally classified as MODIFIES (agent_preference) but reclassified to convergence — see above. |
 | C15 | R2 (SGLT2i cardiorenal) | SGLT2i for CKD | Both recommend SGLT2i for cardiorenal benefit. ADA's trigger is ASCVD/HF/CKD in diabetes; KDIGO's is CKD regardless of diabetes. For the overlap population (T2DM + CKD), they agree. Shared entity layer deduplicates. |
 | C16 | R5 (statin for diabetes) | CKD statin (moderate-intensity) | Both recommend moderate-intensity statin. ADA for diabetes; KDIGO for CKD. Same 7 statin entities. For diabetic CKD patients, they agree. No conflict. |
 
@@ -74,5 +74,4 @@ All eight statin/SGLT2i convergence pairs confirmed as convergence only. The sha
 
 | Edge | Status |
 |------|--------|
-| M1 (KDIGO SGLT2i → ADA intensification) | added to graph — `cross-edges-ada.cypher` |
-| M2 (KDIGO monitoring → ADA metformin) | added to graph — `cross-edges-ada.cypher` |
+| M1 (KDIGO monitoring → ADA metformin) | added to graph — `cross-edges-ada.cypher` |

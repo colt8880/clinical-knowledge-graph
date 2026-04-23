@@ -69,6 +69,18 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 
 - **Single-guideline eval harness gate for ADA diabetes.** Docker seed verification passes (74 nodes, 112 edges). Eval harness runs complete but composite scores are below the 4.0 threshold (completeness 3.44/5, composite 3.75/5). Root cause: the Arm C evaluator runs all 4 guidelines simultaneously — ADA fixture expected-actions are ADA-only, but the LLM output includes cross-guideline actions from ACC/AHA and USPSTF that subsume ADA statin recs. The judge penalizes for "missing" ADA-specific actions covered by equivalent cross-guideline recs. This is a multi-guideline interaction issue, not an ADA subgraph defect. Resolution: F53 (cross-guideline edges) + F54 (multi-morbidity fixtures) will produce fixtures designed for multi-guideline evaluation. Single-guideline isolation mode for Arm C would require evaluator scoping (filter to one guideline_id) which is not in scope for F52.
 
+## F53 Cypher quote escaping bug
+
+`graph/seeds/cross-edges-ada.cypher` used SQL-style `''` escaping for apostrophes in a Cypher string literal, which is not valid Cypher. This was merged in PR #51 (F53) and blocked `docker compose up` from completing the seed step. Fixed in F55 by removing possessives from the note text. Future seed files should use double-quoted strings or avoid apostrophes in Cypher string literals.
+
+## F55 eval harness missing data points
+
+The v2-phase2 thesis run had 15 missing fixture/arm entries out of 96 expected (15.6% missingness). Arm C was worst affected (7 missing). Root cause is likely API errors or timeouts during the Braintrust run. The harness has no retry logic — a failed fixture/arm combination is silently dropped. This makes aggregate comparisons unreliable when arms have different missing sets. Future runs should add retry logic or at minimum log which entries failed and why.
+
+## F55 serialization scaling with 4+ guidelines
+
+Adding ADA Diabetes as the 4th guideline degraded Arm C's completeness and prioritization scores even on existing fixtures that don't involve diabetes. The serialization context grows linearly with guideline count, and the ADA subgraph content appears in Arm C's context even for non-diabetic patients. Two potential fixes: (1) scope serialization to only guidelines relevant to the patient's conditions, (2) compress the serialization more aggressively when 4+ guidelines are active.
+
 ## Cleanup
 
 - Delete `/diagrams/crc-graph.html` and the `/diagrams` directory once UI Explore tab ships (backlog #05). Interim artifact superseded by live Explore.

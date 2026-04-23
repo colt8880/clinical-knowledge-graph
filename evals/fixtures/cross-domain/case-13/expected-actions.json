@@ -1,5 +1,5 @@
 {
-  "description": "68M with T2DM on metformin + empagliflozin, A1C 6.9%, CKD 3b (eGFR 35), ACR 320, HF, no ASCVD. ADA + KDIGO case testing satisfied-strategy handling. ADA R2 (SGLT2i cardiorenal) is satisfied — empagliflozin already active. KDIGO R2 (SGLT2i for CKD) also satisfied. ADA R5 and KDIGO R3 converge on moderate-intensity statin. KDIGO R1 monitoring fires. KDIGO R4 satisfied (losartan active). ADA R4 does NOT fire (A1C 6.9% < 7%). Metformin at eGFR 35 — dose reduction territory (30-45 range).",
+  "description": "68M with T2DM on metformin + empagliflozin, A1C 6.9%, CKD 3b (eGFR 35), ACR 320, HF, no ASCVD. ADA + KDIGO case testing satisfied-strategy handling. ADA R2 (SGLT2i cardiorenal) is satisfied — empagliflozin already active. KDIGO R2 (SGLT2i for CKD) also satisfied. ADA R3 (GLP-1 RA CVD) fires via high-risk path (age 68 >=55 + HTN). ADA R5 and KDIGO R3 converge on moderate-intensity statin. KDIGO R1 monitoring fires. KDIGO R4 satisfied (losartan active). ADA R4 does NOT fire (A1C 6.9% < 7%). Metformin at eGFR 35 — dose reduction territory (30-45 range).",
   "actions": [
     {
       "id": "initiate-statin-moderate-intensity",
@@ -23,18 +23,25 @@
       "priority": 3
     },
     {
+      "id": "consider-glp1ra-cvd",
+      "label": "Consider GLP-1 receptor agonist for cardiovascular benefit",
+      "rationale": "ADA R3 (ADA-A): GLP-1 RA for T2DM with high CVD risk. Patient meets eligibility via high-risk path: age 68 (>=55) + HTN. No established ASCVD, but high-risk criteria satisfied. Not already on GLP-1 RA. Can be used alongside SGLT2i for additive benefit. Weight loss is additional benefit.",
+      "source_rec_id": "rec:ada-glp1ra-cvd-benefit",
+      "priority": 4
+    },
+    {
       "id": "continue-sglt2i",
       "label": "Continue empagliflozin (SGLT2i already active — satisfied strategy)",
       "rationale": "ADA R2 (SGLT2i cardiorenal): satisfied — empagliflozin active. CKD (eGFR 35, >=20) + HF = dual indication. KDIGO R2 (SGLT2i for CKD): also satisfied — T2DM + eGFR 20-59. Both strategies show as satisfied. Continue empagliflozin; do not discontinue despite eGFR 35 (can continue once initiated per both guidelines).",
       "source_rec_id": "rec:ada-sglt2-cardiorenal",
-      "priority": 4
+      "priority": 5
     },
     {
       "id": "continue-arb",
       "label": "Continue losartan (ARB) for albuminuric CKD",
       "rationale": "KDIGO R4 (1B): ACEi/ARB for CKD with albuminuria (ACR >=30). Patient on losartan — KDIGO R4 satisfied. Titrate to maximally tolerated dose. ACR 320 (A3) = strongest evidence for benefit.",
       "source_rec_id": "rec:kdigo-acei-arb-for-ckd",
-      "priority": 5
+      "priority": 6
     }
   ],
   "contraindications": [
@@ -50,13 +57,8 @@
     },
     {
       "id": "no-ada-intensification",
-      "label": "Do not recommend glycemic intensification",
-      "rationale": "ADA R4 requires A1C >=7% on metformin. A1C 6.9% is below target — patient is at goal. No additional glucose-lowering agents needed for glycemic reasons."
-    },
-    {
-      "id": "no-glp1ra-cvd",
-      "label": "Do not recommend GLP-1 RA for cardiovascular benefit",
-      "rationale": "ADA R3 requires established ASCVD or age >=55 with CVD risk factors. Patient has HF but not established ASCVD. Age 68 with HTN meets the secondary criterion, but the primary benefit of GLP-1 RA is for atherosclerotic CVD, not HF."
+      "label": "Do not recommend glycemic intensification via R4",
+      "rationale": "ADA R4 requires A1C >=7% on metformin. A1C 6.9% is below target. GLP-1 RA is recommended via R3 (CVD benefit), not R4 (glycemic intensification)."
     }
   ]
 }

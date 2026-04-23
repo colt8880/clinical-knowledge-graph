@@ -4,7 +4,7 @@
     {
       "id": "initiate-statin-moderate-intensity",
       "label": "Initiate moderate-intensity statin therapy for diabetes",
-      "rationale": "ADA R5 (ADA-A): moderate-intensity statin for all diabetic adults 40-75 regardless of ASCVD risk score. ACC/AHA R3 (COR I, LOE A) converges: moderate-intensity statin for diabetes 40-75. ASCVD 5.2% is below the 7.5% threshold for high-intensity consideration, so moderate-intensity is appropriate. No diabetes-specific risk enhancers beyond diabetes itself (LDL 110 < 100 threshold, no HTN, no smoking).",
+      "rationale": "ADA R5 (ADA-A): moderate-intensity statin for all diabetic adults 40-75 regardless of ASCVD risk score. ACC/AHA R3 (COR I, LOE A) converges: moderate-intensity statin for diabetes 40-75. ASCVD 5.2% is below the 7.5% threshold for high-intensity consideration, so moderate-intensity is appropriate. LDL 110 is modestly above 100 but without additional risk enhancers (no HTN, no smoking, ASCVD 5.2%), moderate-intensity is appropriate.",
       "source_rec_id": "rec:ada-statin-for-diabetes",
       "priority": 1
     },

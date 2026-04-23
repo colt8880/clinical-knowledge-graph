@@ -91,7 +91,7 @@ Adds ADA 2024 Diabetes as a 4th guideline, connects via clinician-reviewed cross
 
 | #   | Feature                                         | Components              | Status  | Depends on            | Spec                                                         | PR  |
 | --- | ----------------------------------------------- | ----------------------- | ------- | --------------------- | ------------------------------------------------------------ | --- |
-| 52  | ADA 2024 Diabetes subgraph                      | graph, docs, evals      | in-progress | 20, 21, 22            | [52](../../docs/build/52-ada-diabetes-subgraph.md)           | [#50](../../pull/50) |
+| 52  | ADA 2024 Diabetes subgraph                      | graph, docs, evals      | shipped | 20, 21, 22            | [52](../../docs/build/52-ada-diabetes-subgraph.md)           | [#50](../../pull/50) |
 | 53  | ADA cross-guideline edges                       | graph, docs             | pending | 52 + clinician review | [53](../../docs/build/53-ada-cross-guideline-edges.md)       | —   |
 | 54  | Multi-morbidity fixtures                        | evals, docs             | pending | 53                    | [54](../../docs/build/54-multi-morbidity-fixtures.md)        | —   |
 | 55  | v2 Phase 2 thesis run                           | evals, docs             | pending | 54                    | [55](../../docs/build/55-v2-phase2-thesis-run.md)            | —   |

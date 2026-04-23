@@ -1,5 +1,5 @@
 {
-  "description": "58M, T2DM on metformin, A1C 9.1%, CKD 3a (eGFR 50), albuminuria A2 (ACR 120), heart failure. SGLT2i cardiorenal (R2). Intensification (R4, A1C ≥7%). Statin (R5). GLP-1 RA (R3) — patient has high CVD risk via age ≥55 + hypertension-equivalent risk.",
+  "description": "58M, T2DM on metformin, A1C 9.1%, CKD 3a (eGFR 50), albuminuria A2 (ACR 120), heart failure. SGLT2i cardiorenal (R2). Intensification (R4, A1C ≥7%). Statin (R5).",
   "actions": [
     {
       "id": "initiate-sglt2i",

@@ -42,12 +42,12 @@ The target Rec still fires. The modifier annotates — it does not suppress, rep
 
 ### Nature enum
 
-| Value | Meaning | v1 usage |
-|-------|---------|----------|
-| `intensity_reduction` | Strategy-level change: high → moderate intensity. | KDIGO statin-for-CKD modifies ACC/AHA high-intensity strategies. |
-| `dose_adjustment` | Medication-level change within a chosen intensity. | Reserved; not authored in v1. |
-| `monitoring` | Additional monitoring required when the target Rec fires. | Reserved; not authored in v1. |
-| `contraindication_warning` | The source condition creates a relative contraindication for the target action. | Reserved; not authored in v1. |
+| Value | Meaning | Usage |
+|-------|---------|-------|
+| `intensity_reduction` | Strategy-level change: high → moderate intensity. | v1 F26: KDIGO statin-for-CKD modifies ACC/AHA high-intensity strategies. |
+| `dose_adjustment` | Medication-level change within a chosen intensity. | v2 F53: KDIGO CKD monitoring modifies ADA metformin first-line (eGFR-based dose reduction/contraindication). |
+| `monitoring` | Additional monitoring required when the target Rec fires. | Not yet authored. |
+| `contraindication_warning` | The source condition creates a relative contraindication for the target action. | Not yet authored. |
 
 ### Trace emission
 

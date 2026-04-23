@@ -1,0 +1,40 @@
+{
+  "description": "60F, T2DM on metformin, A1C 8.2%, established ASCVD (prior MI), eGFR 62. SGLT2i for cardiorenal benefit (R2). GLP-1 RA for CVD benefit (R3). Intensification (R4, A1C ≥7%). Statin high-intensity (R5).",
+  "actions": [
+    {
+      "id": "initiate-sglt2i",
+      "label": "Initiate SGLT2 inhibitor for cardiorenal benefit",
+      "rationale": "ADA-A: Patient has T2DM with established ASCVD (prior MI) and borderline CKD (eGFR 62). SGLT2i recommended independent of A1C for cardiorenal protection. Empagliflozin, dapagliflozin, or canagliflozin.",
+      "source_rec_id": "rec:ada-sglt2-cardiorenal",
+      "priority": 1
+    },
+    {
+      "id": "initiate-glp1ra",
+      "label": "Initiate GLP-1 receptor agonist for cardiovascular benefit",
+      "rationale": "ADA-A: Patient has T2DM with established ASCVD. GLP-1 RA with proven CVD benefit (semaglutide, liraglutide, dulaglutide) recommended. Can be used with SGLT2i for additive benefit.",
+      "source_rec_id": "rec:ada-glp1ra-cvd-benefit",
+      "priority": 2
+    },
+    {
+      "id": "intensify-glycemic-therapy",
+      "label": "Intensify glycemic therapy (A1C above target)",
+      "rationale": "ADA-A: A1C 8.2% is above the 7% target despite metformin. Add SGLT2i (addresses cardiorenal risk too), GLP-1 RA (addresses ASCVD risk), or both. Insulin if A1C remains high.",
+      "source_rec_id": "rec:ada-intensification",
+      "priority": 3
+    },
+    {
+      "id": "initiate-statin-high-intensity",
+      "label": "Initiate high-intensity statin therapy",
+      "rationale": "ADA-A: Diabetic adult age 40-75 with established ASCVD and LDL 128 mg/dL ≥100. Multiple risk factors warrant high-intensity statin (atorvastatin 40-80 mg or rosuvastatin 20-40 mg) to achieve ≥50% LDL-C reduction.",
+      "source_rec_id": "rec:ada-statin-for-diabetes",
+      "priority": 4
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-escalation",
+      "label": "Continue metformin alone without escalation",
+      "rationale": "ADA-A: A1C 8.2% above target and established ASCVD require intensification with agents that have proven cardiovascular benefit."
+    }
+  ]
+}

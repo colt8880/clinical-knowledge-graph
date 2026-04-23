@@ -1,0 +1,67 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1981-09-18",
+    "administrative_sex": "female",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-t2dm",
+      "codes": [
+        { "system": "snomed", "code": "73211009", "display": "Diabetes mellitus" },
+        { "system": "icd10", "code": "E11.9", "display": "Type 2 diabetes mellitus without complications" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2022-01-10"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-hba1c-2026-03",
+      "codes": [{ "system": "loinc", "code": "4548-4", "display": "Hemoglobin A1c" }],
+      "status": "final",
+      "effective_date": "2026-03-20T09:00:00Z",
+      "value": { "value_quantity": { "value": 6.8, "unit": "%" } }
+    },
+    {
+      "id": "obs-egfr-2026-03",
+      "codes": [{ "system": "loinc", "code": "48642-3", "display": "eGFR" }],
+      "status": "final",
+      "effective_date": "2026-03-20T09:00:00Z",
+      "value": { "value_quantity": { "value": 92, "unit": "mL/min/1.73m2" } }
+    }
+  ],
+  "medications": [
+    {
+      "id": "med-metformin",
+      "codes": [{ "system": "rxnorm", "code": "6809", "display": "Metformin" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2022-02-01"
+    },
+    {
+      "id": "med-empagliflozin",
+      "codes": [{ "system": "rxnorm", "code": "1545653", "display": "Empagliflozin" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2023-06-15"
+    }
+  ],
+  "social_history": {
+    "tobacco": { "status": "never", "as_of": "2026-03-20" }
+  },
+  "risk_scores": {
+    "ascvd_10yr": {
+      "name": "ascvd_10yr",
+      "value": 3.2,
+      "computed_date": "2026-03-20",
+      "method_version": "pooled_cohort_equations_2013_goff"
+    }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

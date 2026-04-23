@@ -71,10 +71,16 @@ Top-level inventory. Fixtures live in `evals/fixtures/<domain>/<id>/`. See `eval
 | 09 | `fixtures/cross-domain/case-09/` | 58M, Black, HTN, smoker, CKD G3b (eGFR 38), ASCVD 9%. ACC/AHA R4 preempts USPSTF Grade C (P4). KDIGO R3 converges on moderate intensity (no MODIFIES edge to R4). Preemption + convergence. |
 | 10 | `fixtures/cross-domain/case-10/` | Bias probe: 52F, ASCVD 6.8%, LDL 160, CKD G3a (eGFR 55), controlled HTN on ACEi. Only KDIGO CKD statin fires — ASCVD below both USPSTF and ACC/AHA thresholds. Tests trace-divergent correct answer. |
 
+| 11 | `fixtures/cross-domain/case-11/` | 55M, T2DM on metformin, A1C 7.2%, HTN, ASCVD 14%, eGFR 85. ADA + ACC/AHA + USPSTF. ACC/AHA R3 preempts USPSTF (P1+P2). ADA R5 statin converges with ACC/AHA R3. ADA R4 intensification. Simplest 3-guideline diabetes case. |
+| 12 | `fixtures/cross-domain/case-12/` | 62F, T2DM on metformin, A1C 8.5%, prior stroke, CKD 3a (eGFR 48), ACR 180. Full 4-guideline activation. KDIGO M1 modifies ACC/AHA R1 intensity. ADA R2 SGLT2i converges with KDIGO R2. ADA R3 GLP-1 RA. The hardest case. |
+| 13 | `fixtures/cross-domain/case-13/` | 68M, T2DM on metformin + empagliflozin, A1C 6.9%, CKD 3b (eGFR 35), ACR 320, HF. ADA + KDIGO. Satisfied SGLT2i strategies. Statin convergence. Metformin dose reduction (eGFR 30-45). |
+| 14 | `fixtures/cross-domain/case-14/` | 50M, newly diagnosed T2DM, A1C 8.8%, HTN, smoker, ASCVD 18%, LDL 175, eGFR 72. ADA + ACC/AHA + USPSTF. High-intensity statin (multiple risk enhancers). ADA R1 metformin first-line. |
+| 15 | `fixtures/cross-domain/case-15/` | 72F, T2DM on metformin + glargine, A1C 7.8%, CKD 4 (eGFR 22), ACR 250, HF. ADA + KDIGO. Metformin contraindicated (eGFR < 30). SGLT2i borderline (eGFR 22). Hardest eGFR boundary case. |
+| 16 | `fixtures/cross-domain/case-16/` | 48M, well-controlled T2DM on metformin, A1C 6.5%, eGFR 95, LDL 110, ASCVD 5.2%. ADA + ACC/AHA borderline. Only moderate statin fires. Tests correct non-activation. |
+
 ### Deferred
 
 - Dialysis patient (CKD G5D) — KDIGO statin evidence different for dialysis.
-- CKD + diabetes deep integration fixture.
 
 ## Diabetes (v2 — ADA 2024)
 

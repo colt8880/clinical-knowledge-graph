@@ -21,6 +21,7 @@ export const DOMAIN_PARENTS: Record<string, string> = {
   USPSTF: "__cluster_uspstf",
   ACC_AHA: "__cluster_acc_aha",
   KDIGO: "__cluster_kdigo",
+  ADA: "__cluster_ada",
 };
 
 /** Layout options for the whole-forest view. */

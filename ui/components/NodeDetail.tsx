@@ -40,7 +40,7 @@ const DOMAIN_DISPLAY: Record<string, string> = {
 };
 
 /** Domain labels to filter out of generic badge list (shown via DomainBadge instead). */
-const DOMAIN_LABELS = new Set(["USPSTF", "ACC_AHA", "KDIGO"]);
+const DOMAIN_LABELS = new Set(["USPSTF", "ACC_AHA", "KDIGO", "ADA"]);
 
 function Badge({ label }: { label: string }) {
   const colors =

@@ -6,7 +6,7 @@ from app.db import fetch_subgraph
 
 router = APIRouter(tags=["query"])
 
-VALID_DOMAINS = {"USPSTF", "ACC_AHA", "KDIGO"}
+VALID_DOMAINS = {"USPSTF", "ACC_AHA", "KDIGO", "ADA"}
 
 
 @router.get("/subgraph")
@@ -14,7 +14,7 @@ async def get_subgraph(
     domains: str | None = Query(
         None,
         description=(
-            "Comma-separated domain labels (USPSTF, ACC_AHA, KDIGO). "
+            "Comma-separated domain labels (USPSTF, ACC_AHA, KDIGO, ADA). "
             "Default (absent) returns all guidelines. "
             "Empty string returns only shared entities."
         ),

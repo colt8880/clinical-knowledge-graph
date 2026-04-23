@@ -120,7 +120,7 @@ async def fetch_subgraph(domains: list[str]) -> dict[str, Any]:
     async with driver.session() as session:
         # Domain labels are Neo4j labels on guideline-scoped nodes (e.g. :USPSTF).
         # Shared entities (Medication, Condition, etc.) have no domain label.
-        domain_labels = ["USPSTF", "ACC_AHA", "KDIGO"]
+        domain_labels = ["USPSTF", "ACC_AHA", "KDIGO", "ADA"]
         shared_entity_labels = ["Medication", "Condition", "Observation", "Procedure"]
 
         if domains:

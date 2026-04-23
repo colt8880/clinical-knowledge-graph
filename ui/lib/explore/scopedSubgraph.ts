@@ -14,6 +14,7 @@ const SLUG_TO_DOMAIN: Record<string, string> = {
   "uspstf-statin-2022": "USPSTF",
   "acc-aha-cholesterol-2018": "ACC_AHA",
   "kdigo-ckd-2024": "KDIGO",
+  "ada-diabetes-2024": "ADA",
 };
 
 /** Edge types that cross guideline boundaries and should be excluded. */

@@ -48,13 +48,14 @@ async def test_guidelines_coverage_block_present(client):
 
 @pytest.mark.anyio
 async def test_guidelines_rec_counts(client):
-    """USPSTF has 3 recs, ACC/AHA has 4, KDIGO has 4."""
+    """USPSTF has 3 recs, ACC/AHA has 4, KDIGO has 4, ADA has 5."""
     resp = await client.get("/guidelines")
     data = resp.json()
     by_domain = {g["domain"]: g for g in data}
     assert by_domain["USPSTF"]["rec_count"] == 3
     assert by_domain["ACC/AHA"]["rec_count"] == 4
     assert by_domain["KDIGO"]["rec_count"] == 4
+    assert by_domain["ADA"]["rec_count"] == 5
 
 
 @pytest.mark.anyio

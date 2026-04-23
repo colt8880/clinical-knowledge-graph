@@ -27,6 +27,12 @@ const DOMAINS: { key: DomainKey; label: string; color: string; activeClass: stri
     color: "border-emerald-400",
     activeClass: "bg-emerald-100 text-emerald-800 border-emerald-400",
   },
+  {
+    key: "ada",
+    label: "ADA",
+    color: "border-amber-400",
+    activeClass: "bg-amber-100 text-amber-800 border-amber-400",
+  },
 ];
 
 export default function DomainFilter({ visibleDomains, onChange }: DomainFilterProps) {

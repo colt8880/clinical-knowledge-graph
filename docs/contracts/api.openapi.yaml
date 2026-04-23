@@ -129,7 +129,7 @@ paths:
         - in: query
           name: domains
           description: |
-            Comma-separated domain labels (USPSTF, ACC_AHA, KDIGO).
+            Comma-separated domain labels (USPSTF, ACC_AHA, KDIGO, ADA).
             Default (absent) returns all. Empty string returns shared entities only.
           schema: { type: string }
       responses:
@@ -345,7 +345,7 @@ components:
               domain:
                 type: string
                 nullable: true
-                enum: [USPSTF, ACC_AHA, KDIGO, null]
+                enum: [USPSTF, ACC_AHA, KDIGO, ADA, null]
                 description: "Domain label for guideline-scoped nodes; null for shared entities."
         edges:
           type: array

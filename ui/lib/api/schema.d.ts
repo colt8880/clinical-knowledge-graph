@@ -237,7 +237,7 @@ export interface paths {
             parameters: {
                 query?: {
                     /**
-                     * @description Comma-separated domain labels (USPSTF, ACC_AHA, KDIGO).
+                     * @description Comma-separated domain labels (USPSTF, ACC_AHA, KDIGO, ADA).
                      *     Default (absent) returns all. Empty string returns shared entities only.
                      */
                     domains?: string;
@@ -444,7 +444,7 @@ export interface components {
                  * @description Domain label for guideline-scoped nodes; null for shared entities.
                  * @enum {string|null}
                  */
-                domain: "USPSTF" | "ACC_AHA" | "KDIGO" | null;
+                domain: "USPSTF" | "ACC_AHA" | "KDIGO" | "ADA" | null;
             }[];
             edges: {
                 id: string;

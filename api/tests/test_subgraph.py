@@ -5,7 +5,7 @@ import pytest
 
 @pytest.mark.anyio
 async def test_subgraph_no_domains_returns_full_forest(client):
-    """No domains param = all three guidelines + shared entities."""
+    """No domains param = all four guidelines + shared entities."""
     resp = await client.get("/subgraph")
     assert resp.status_code == 200
     data = resp.json()
@@ -15,11 +15,12 @@ async def test_subgraph_no_domains_returns_full_forest(client):
     assert len(data["nodes"]) > 0
     assert len(data["edges"]) > 0
 
-    # Should include nodes from all three domains.
+    # Should include nodes from all four domains.
     domains_found = {n.get("domain") for n in data["nodes"]}
     assert "USPSTF" in domains_found
     assert "ACC_AHA" in domains_found
     assert "KDIGO" in domains_found
+    assert "ADA" in domains_found
     # Shared entities have domain=null.
     assert None in domains_found
 

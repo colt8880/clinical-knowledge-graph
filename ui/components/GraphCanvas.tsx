@@ -77,6 +77,7 @@ const DOMAIN_COLORS: Record<string, { bg: string; border: string }> = {
   USPSTF: { bg: "#dbeafe", border: "#2563eb" },       // blue
   ACC_AHA: { bg: "#ede9fe", border: "#7c3aed" },      // purple
   KDIGO: { bg: "#d1fae5", border: "#059669" },         // green
+  ADA: { bg: "#fef3c7", border: "#d97706" },           // amber
 };
 
 const EDGE_COLORS: Record<string, string> = {

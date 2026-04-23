@@ -1,0 +1,64 @@
+{
+  "description": "68M with T2DM on metformin + empagliflozin, A1C 6.9%, CKD 3b (eGFR 35), ACR 320, HF, no ASCVD. ADA + KDIGO case testing satisfied-strategy handling. ADA R2 (SGLT2i cardiorenal) is satisfied — empagliflozin already active. KDIGO R2 (SGLT2i for CKD) also satisfied. ADA R3 (GLP-1 RA CVD) fires via high-risk path (age 68 >=55 + HTN). ADA R5 and KDIGO R3 converge on moderate-intensity statin. KDIGO R1 monitoring fires. KDIGO R4 satisfied (losartan active). ADA R4 does NOT fire (A1C 6.9% < 7%). Metformin at eGFR 35 — dose reduction territory (30-45 range).",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "ADA R5 (ADA-A): moderate-intensity statin for diabetic adults 40-75. KDIGO R3 (1A): moderate-intensity statin for CKD patients >=50 (eGFR 15-59). Convergence — both guidelines agree on moderate-intensity. No high-intensity escalation needed (no ASCVD). ACC/AHA R3 (diabetes) also fires but is covered by ADA/KDIGO convergence.",
+      "source_rec_id": "rec:ada-statin-for-diabetes",
+      "priority": 1
+    },
+    {
+      "id": "ckd-monitoring-high-frequency",
+      "label": "Monitor eGFR and urine ACR per KDIGO (high frequency for CKD 3b + A3)",
+      "rationale": "KDIGO R1 (1B): CKD G3b (eGFR 35) with A3 albuminuria (ACR 320 >= 300) — very high risk category. Monitor eGFR and ACR at least every 3-4 months. KDIGO monitoring also informs metformin dosing via M1 cross-edge.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 2
+    },
+    {
+      "id": "metformin-dose-reduction",
+      "label": "Reduce metformin dose (eGFR 35, in 30-45 range)",
+      "rationale": "ADA R1 clinical_nuance: reduce metformin dose when eGFR 30-45, max 1000mg/day. eGFR 35 is firmly in the dose-reduction zone. KDIGO monitoring (M1 cross-edge: rec:kdigo-ckd-monitoring MODIFIES rec:ada-metformin-first-line) provides the eGFR data triggering this adjustment.",
+      "source_rec_id": "rec:ada-metformin-first-line",
+      "priority": 3
+    },
+    {
+      "id": "consider-glp1ra-cvd",
+      "label": "Consider GLP-1 receptor agonist for cardiovascular benefit",
+      "rationale": "ADA R3 (ADA-A): GLP-1 RA for T2DM with high CVD risk. Patient meets eligibility via high-risk path: age 68 (>=55) + HTN. No established ASCVD, but high-risk criteria satisfied. Not already on GLP-1 RA. Can be used alongside SGLT2i for additive benefit. Weight loss is additional benefit.",
+      "source_rec_id": "rec:ada-glp1ra-cvd-benefit",
+      "priority": 4
+    },
+    {
+      "id": "continue-sglt2i",
+      "label": "Continue empagliflozin (SGLT2i already active — satisfied strategy)",
+      "rationale": "ADA R2 (SGLT2i cardiorenal): satisfied — empagliflozin active. CKD (eGFR 35, >=20) + HF = dual indication. KDIGO R2 (SGLT2i for CKD): also satisfied — T2DM + eGFR 20-59. Both strategies show as satisfied. Continue empagliflozin; do not discontinue despite eGFR 35 (can continue once initiated per both guidelines).",
+      "source_rec_id": "rec:ada-sglt2-cardiorenal",
+      "priority": 5
+    },
+    {
+      "id": "continue-arb",
+      "label": "Continue losartan (ARB) for albuminuric CKD",
+      "rationale": "KDIGO R4 (1B): ACEi/ARB for CKD with albuminuria (ACR >=30). Patient on losartan — KDIGO R4 satisfied. Titrate to maximally tolerated dose. ACR 320 (A3) = strongest evidence for benefit.",
+      "source_rec_id": "rec:kdigo-acei-arb-for-ckd",
+      "priority": 6
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-high-intensity-statin",
+      "label": "Do not prescribe high-intensity statin",
+      "rationale": "KDIGO R3 specifically recommends moderate-intensity in CKD G3-G5. No established ASCVD to trigger ACC/AHA R1 high-intensity. Both ADA R5 and KDIGO R3 converge on moderate-intensity."
+    },
+    {
+      "id": "no-full-dose-metformin",
+      "label": "Do not continue full-dose metformin",
+      "rationale": "eGFR 35 (30-45 range) requires metformin dose reduction per ADA. Maximum 1000mg/day. Continuing full dose risks lactic acidosis."
+    },
+    {
+      "id": "no-ada-intensification",
+      "label": "Do not recommend glycemic intensification via R4",
+      "rationale": "ADA R4 requires A1C >=7% on metformin. A1C 6.9% is below target. GLP-1 RA is recommended via R3 (CVD benefit), not R4 (glycemic intensification)."
+    }
+  ]
+}

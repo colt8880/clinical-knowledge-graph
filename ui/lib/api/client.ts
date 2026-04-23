@@ -55,7 +55,7 @@ export async function evaluate(
 
 /** Node with domain info, as returned by GET /subgraph. */
 export interface ForestNode extends GraphNode {
-  domain: "USPSTF" | "ACC_AHA" | "KDIGO" | null;
+  domain: "USPSTF" | "ACC_AHA" | "KDIGO" | "ADA" | null;
 }
 
 export interface ForestSubgraph {

@@ -23,6 +23,7 @@ const GUIDELINE_CHIPS: { domain: string; label: string; activeClass: string; col
   { domain: "USPSTF", label: "USPSTF", activeClass: "bg-blue-100 text-blue-800 border-blue-400", color: "border-blue-400" },
   { domain: "ACC/AHA", label: "ACC/AHA", activeClass: "bg-purple-100 text-purple-800 border-purple-400", color: "border-purple-400" },
   { domain: "KDIGO", label: "KDIGO", activeClass: "bg-emerald-100 text-emerald-800 border-emerald-400", color: "border-emerald-400" },
+  { domain: "ADA", label: "ADA", activeClass: "bg-amber-100 text-amber-800 border-amber-400", color: "border-amber-400" },
 ];
 
 export default function InteractionsLegend({

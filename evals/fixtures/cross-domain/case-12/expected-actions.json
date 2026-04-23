@@ -1,0 +1,70 @@
+{
+  "description": "62F with T2DM, established ASCVD (prior stroke), CKD 3a (eGFR 48), ACR 180. Full 4-guideline activation — the hardest case in the harness. ACC/AHA R1 (secondary prevention, high-intensity statin) fires. KDIGO R3 MODIFIES ACC/AHA R1 intensity to moderate (M1) due to CKD. ADA R2 (SGLT2i cardiorenal) fires for ASCVD + CKD. KDIGO R2 (SGLT2i for CKD) converges with ADA R2. ADA R3 (GLP-1 RA CVD) fires for established ASCVD. ADA R4 (intensification) fires for A1C 8.5% on metformin. KDIGO R1 (monitoring) + R4 (ACEi/ARB) fire. USPSTF exits (secondary prevention).",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy (KDIGO-modified from high-intensity)",
+      "rationale": "ACC/AHA R1 (COR I, LOE A): high-intensity statin for clinical ASCVD (prior stroke). KDIGO R3 (1A) MODIFIES intensity to moderate (M1) due to CKD G3a (eGFR 48) — altered pharmacokinetics and myopathy risk. ADA R5 also recommends statin for diabetic adults 40-75 (convergence). Consider atorvastatin 20mg or rosuvastatin 10mg.",
+      "source_rec_id": "rec:accaha-statin-secondary-prevention",
+      "priority": 1
+    },
+    {
+      "id": "initiate-sglt2i",
+      "label": "Initiate SGLT2 inhibitor for cardiorenal benefit",
+      "rationale": "ADA R2 (ADA-A): SGLT2i for T2DM with established ASCVD + CKD (eGFR 48, >=20). Independent of A1C. KDIGO R2 (1A) converges: SGLT2i for CKD with diabetes (eGFR 20-59). Shared entities empagliflozin/dapagliflozin. Dual indication — both cardiorenal benefit and CKD progression slowing.",
+      "source_rec_id": "rec:ada-sglt2-cardiorenal",
+      "priority": 2
+    },
+    {
+      "id": "initiate-glp1ra-cvd",
+      "label": "Initiate GLP-1 receptor agonist for cardiovascular benefit",
+      "rationale": "ADA R3 (ADA-A): GLP-1 RA for T2DM with established ASCVD. SUSTAIN-6, LEADER, REWIND evidence. Can be used with SGLT2i for additive benefit. Also addresses glycemic intensification need (A1C 8.5%).",
+      "source_rec_id": "rec:ada-glp1ra-cvd-benefit",
+      "priority": 3
+    },
+    {
+      "id": "ada-intensification",
+      "label": "Intensify glycemic therapy (A1C above target on metformin)",
+      "rationale": "ADA R4 (ADA-A): A1C 8.5% >= 7% on metformin. SGLT2i (R2) and GLP-1 RA (R3) address this dual-purpose — cardiorenal benefit AND glycemic control. Insulin option available if A1C remains above target after dual add-on.",
+      "source_rec_id": "rec:ada-intensification",
+      "priority": 4
+    },
+    {
+      "id": "ckd-monitoring",
+      "label": "Monitor eGFR and urine ACR per KDIGO",
+      "rationale": "KDIGO R1 (1B): regular monitoring for CKD G3a with A2 albuminuria (ACR 180). High-risk category. Monitor at least every 6 months given CKD severity + diabetes.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 5
+    },
+    {
+      "id": "continue-acei",
+      "label": "Continue ACEi (lisinopril) for albuminuric CKD",
+      "rationale": "KDIGO R4 (1B): ACEi/ARB for CKD with albuminuria (ACR >=30). Patient already on lisinopril — KDIGO R4 eligibility satisfied (has_medication_active). Titrate to maximally tolerated dose for renoprotection.",
+      "source_rec_id": "rec:kdigo-acei-arb-for-ckd",
+      "priority": 6
+    },
+    {
+      "id": "metformin-dose-assessment",
+      "label": "Assess metformin dose for CKD (eGFR 48, in 30-45 dose-reduction zone approaching)",
+      "rationale": "ADA R1 clinical_nuance: reduce metformin dose when eGFR 30-45. eGFR 48 is above but approaching this threshold. KDIGO monitoring (M1 cross-edge) informs metformin dosing. Continue current dose but monitor eGFR trajectory.",
+      "priority": 7
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-high-intensity-statin",
+      "label": "Do not prescribe high-intensity statin",
+      "rationale": "Although ACC/AHA R1 recommends high-intensity for ASCVD, KDIGO R3 MODIFIES to moderate intensity (M1) in CKD G3a. Altered pharmacokinetics increase myopathy risk with high-intensity statin in CKD."
+    },
+    {
+      "id": "no-uspstf-statin",
+      "label": "Do not recommend statin based on USPSTF guidance",
+      "rationale": "USPSTF exits at secondary prevention (established ASCVD). ACC/AHA R1 is the governing statin recommendation."
+    },
+    {
+      "id": "no-canagliflozin-preference",
+      "label": "Do not preferentially recommend canagliflozin",
+      "rationale": "KDIGO R2 specifically recommends empagliflozin or dapagliflozin (does not include canagliflozin in its eligible medications). ADA R2 includes canagliflozin, but KDIGO convergence favors empagliflozin/dapagliflozin."
+    }
+  ]
+}

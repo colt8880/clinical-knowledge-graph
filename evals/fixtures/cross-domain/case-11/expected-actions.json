@@ -1,0 +1,50 @@
+{
+  "description": "55M with T2DM on metformin, A1C 7.2%, HTN, ASCVD 14%, eGFR 85, no CKD. Simplest 3-guideline diabetes case. ACC/AHA R3 (diabetes statin) preempts USPSTF Grade B (P1) and Grade C (P2). ADA R5 (statin for diabetes) converges with ACC/AHA R3 on moderate-intensity statin. ADA R4 (intensification) fires because A1C 7.2% >= 7% on metformin. ADA R3 (GLP-1 RA CVD) fires via high-risk path (age 55 >=55 + HTN). ADA R2 (SGLT2i cardiorenal) does NOT fire — no ASCVD, no HF, no CKD. KDIGO does not activate (eGFR 85, normal).",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy for diabetes",
+      "rationale": "ACC/AHA R3 (COR I, LOE A): moderate-intensity statin for adults 40-75 with diabetes. With ASCVD risk 14% (>=7.5%) and HTN, high-intensity is reasonable (COR IIa). ADA R5 (ADA-A) converges: moderate-intensity statin for all diabetic adults 40-75. USPSTF Grade B (ASCVD >=10%) also matched but preempted by ACC/AHA R3 (P1). USPSTF Grade C also preempted (P2).",
+      "source_rec_id": "rec:accaha-statin-diabetes",
+      "priority": 1
+    },
+    {
+      "id": "ada-intensification",
+      "label": "Add second glucose-lowering agent (A1C above target on metformin)",
+      "rationale": "ADA R4 (ADA-A): A1C 7.2% >= 7% target on metformin monotherapy. Options include SGLT2i, GLP-1 RA, or insulin depending on comorbidity profile. Without ASCVD/HF/CKD, agent choice is driven by glycemic efficacy and weight management preferences.",
+      "source_rec_id": "rec:ada-intensification",
+      "priority": 2
+    },
+    {
+      "id": "consider-glp1ra-cvd",
+      "label": "Consider GLP-1 receptor agonist for cardiovascular benefit",
+      "rationale": "ADA R3 (ADA-A): GLP-1 RA for T2DM with high CVD risk. Patient meets eligibility via high-risk path: age 55 (>=55) + HTN. Not on GLP-1 RA. Also addresses glycemic intensification need (A1C 7.2%, R4). SUSTAIN-6, LEADER, REWIND trial evidence.",
+      "source_rec_id": "rec:ada-glp1ra-cvd-benefit",
+      "priority": 3
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure management for diabetic patient",
+      "rationale": "BP 134/82 on lisinopril. ADA target <130/80 for diabetes. HTN is a modifiable CVD risk factor and a diabetes-specific statin risk enhancer per ACC/AHA.",
+      "priority": 4
+    },
+    {
+      "id": "diabetes-management-continuation",
+      "label": "Continue metformin and diabetes monitoring",
+      "rationale": "Active T2DM on metformin. eGFR 85 — no dose adjustment needed. Ongoing glycemic monitoring integral to CVD risk management.",
+      "priority": 5
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-uspstf-statin",
+      "label": "Do not recommend statin based solely on USPSTF guidance",
+      "rationale": "USPSTF Grade B is preempted by ACC/AHA diabetes-specific rec (P1). USPSTF Grade C also preempted (P2). The ACC/AHA rec is more specific to the diabetes population."
+    },
+    {
+      "id": "no-sglt2i-cardiorenal",
+      "label": "Do not recommend SGLT2i specifically for cardiorenal benefit",
+      "rationale": "ADA R2 requires established ASCVD, HF, or CKD (eGFR <=60 or ACR >=30). Patient has none of these — eGFR 85, no ASCVD, no HF. SGLT2i may be an option under R4 intensification for glycemic control, but not for cardiorenal indication."
+    }
+  ]
+}

@@ -81,7 +81,7 @@ async def fetch_guidelines() -> list[dict[str, Any]]:
 
         # Determine domain from labels.
         domain = None
-        for d in ("USPSTF", "ACC_AHA", "KDIGO"):
+        for d in ("USPSTF", "ACC_AHA", "KDIGO", "ADA"):
             if d in labels:
                 domain = d
                 break

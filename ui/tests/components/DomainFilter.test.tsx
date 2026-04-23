@@ -8,15 +8,16 @@ afterEach(() => {
 });
 
 describe("DomainFilter", () => {
-  const allDomains: DomainKey[] = ["uspstf", "acc-aha", "kdigo"];
+  const allDomains: DomainKey[] = ["uspstf", "acc-aha", "kdigo", "ada"];
 
-  it("renders all three domain chips", () => {
+  it("renders all four domain chips", () => {
     const onChange = vi.fn();
     render(<DomainFilter visibleDomains={allDomains} onChange={onChange} />);
 
     expect(screen.getByTestId("domain-chip-uspstf")).toBeDefined();
     expect(screen.getByTestId("domain-chip-acc-aha")).toBeDefined();
     expect(screen.getByTestId("domain-chip-kdigo")).toBeDefined();
+    expect(screen.getByTestId("domain-chip-ada")).toBeDefined();
   });
 
   it("marks active domains as checked", () => {
@@ -33,7 +34,7 @@ describe("DomainFilter", () => {
     render(<DomainFilter visibleDomains={allDomains} onChange={onChange} />);
 
     fireEvent.click(screen.getByTestId("domain-chip-kdigo"));
-    expect(onChange).toHaveBeenCalledWith(["uspstf", "acc-aha"]);
+    expect(onChange).toHaveBeenCalledWith(["uspstf", "acc-aha", "ada"]);
   });
 
   it("toggles a domain on when clicked", () => {

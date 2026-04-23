@@ -9,7 +9,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useMemo, useEffect, useRef } from "react";
 
 /** All available domain keys (lowercase, hyphenated for URL). */
-export const ALL_DOMAIN_KEYS = ["uspstf", "acc-aha", "kdigo"] as const;
+export const ALL_DOMAIN_KEYS = ["uspstf", "acc-aha", "kdigo", "ada"] as const;
 export type DomainKey = (typeof ALL_DOMAIN_KEYS)[number];
 
 /** Map URL keys to API domain labels. */
@@ -17,6 +17,7 @@ const URL_TO_API: Record<DomainKey, string> = {
   uspstf: "USPSTF",
   "acc-aha": "ACC_AHA",
   kdigo: "KDIGO",
+  ada: "ADA",
 };
 
 /** Map API domain labels to URL keys. */
@@ -24,6 +25,7 @@ const API_TO_URL: Record<string, DomainKey> = {
   USPSTF: "uspstf",
   ACC_AHA: "acc-aha",
   KDIGO: "kdigo",
+  ADA: "ada",
 };
 
 export function domainKeysToApiLabels(keys: DomainKey[]): string[] {

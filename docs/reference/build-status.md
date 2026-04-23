@@ -85,6 +85,17 @@ Each improvement is measured in isolation before the combined run. ~$2 per run, 
 | 50  | Arm C scoring leverage                          | evals, docs             | shipped     | 49                | [50](../../docs/build/50-arm-c-scoring-leverage.md)          | [#48](../../pull/48) |
 | 51  | F50 scoring leverage thesis run                 | evals, docs             | shipped     | 50                | [51](../../docs/build/51-f50-scoring-leverage-thesis-run.md) | [#49](../../pull/49) |
 
+### Phase 2: ADA Diabetes + multi-morbidity
+
+Adds ADA 2024 Diabetes as a 4th guideline, connects via clinician-reviewed cross-edges, creates multi-morbidity fixtures exercising 3-4 guidelines simultaneously, and runs the thesis gate on the expanded set.
+
+| #   | Feature                                         | Components              | Status  | Depends on            | Spec                                                         | PR  |
+| --- | ----------------------------------------------- | ----------------------- | ------- | --------------------- | ------------------------------------------------------------ | --- |
+| 52  | ADA 2024 Diabetes subgraph                      | graph, docs, evals      | pending | 20, 21, 22            | [52](../../docs/build/52-ada-diabetes-subgraph.md)           | —   |
+| 53  | ADA cross-guideline edges                       | graph, docs             | pending | 52 + clinician review | [53](../../docs/build/53-ada-cross-guideline-edges.md)       | —   |
+| 54  | Multi-morbidity fixtures                        | evals, docs             | pending | 53                    | [54](../../docs/build/54-multi-morbidity-fixtures.md)        | —   |
+| 55  | v2 Phase 2 thesis run                           | evals, docs             | pending | 54                    | [55](../../docs/build/55-v2-phase2-thesis-run.md)            | —   |
+
 ## Archived
 
 | Feature | Reason |

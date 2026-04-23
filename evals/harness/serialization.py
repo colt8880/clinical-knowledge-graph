@@ -490,6 +490,7 @@ def _guideline_label(guideline_id: str) -> str:
         "guideline:uspstf-statin-2022": "USPSTF 2022 Statin",
         "guideline:acc-aha-cholesterol-2018": "ACC/AHA 2018 Cholesterol",
         "guideline:kdigo-ckd-2024": "KDIGO 2024 CKD",
+        "guideline:ada-diabetes-2024": "ADA 2024 Diabetes",
     }
     return labels.get(guideline_id, guideline_id)
 

@@ -25,6 +25,7 @@ _GUIDELINE_SEED_FILES: dict[str, str] = {
     "guideline:uspstf-statin-2022": "statins.cypher",
     "guideline:acc-aha-cholesterol-2018": "cholesterol.cypher",
     "guideline:kdigo-ckd-2024": "kdigo-ckd.cypher",
+    "guideline:ada-diabetes-2024": "ada-diabetes.cypher",
 }
 
 
@@ -45,12 +46,14 @@ _DOMAIN_SLUGS: dict[str, str] = {
     "USPSTF": "uspstf-statin-2022",
     "ACC_AHA": "acc-aha-cholesterol-2018",
     "KDIGO": "kdigo-ckd-2024",
+    "ADA": "ada-diabetes-2024",
 }
 
 _DOMAIN_LABELS: dict[str, str] = {
     "USPSTF": "USPSTF",
     "ACC_AHA": "ACC/AHA",
     "KDIGO": "KDIGO",
+    "ADA": "ADA",
 }
 
 GUIDELINES_QUERY = """

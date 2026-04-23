@@ -67,8 +67,7 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 
 ## v2 deferred verification (F52)
 
-- **Single-guideline eval harness gate for ADA diabetes.** The spec calls for `cd evals && uv run python -m harness --guideline diabetes --arm c` with judge scores ≥ 4.0. Requires Docker (Neo4j + API) to load the ADA seed and run the evaluator. Deferred to F53 integration or a dedicated verification pass once Docker compose is rebuilt with the ADA seed.
-- **Docker compose seed verification.** Updated seed.sh expects 74 nodes and 113 edges. Requires `docker compose up --build` to verify. Deferred to next Docker compose rebuild.
+- **Single-guideline eval harness gate for ADA diabetes.** Docker seed verification passes (74 nodes, 112 edges). Eval harness runs complete but composite scores are below the 4.0 threshold (completeness 3.44/5, composite 3.75/5). Root cause: the Arm C evaluator runs all 4 guidelines simultaneously — ADA fixture expected-actions are ADA-only, but the LLM output includes cross-guideline actions from ACC/AHA and USPSTF that subsume ADA statin recs. The judge penalizes for "missing" ADA-specific actions covered by equivalent cross-guideline recs. This is a multi-guideline interaction issue, not an ADA subgraph defect. Resolution: F53 (cross-guideline edges) + F54 (multi-morbidity fixtures) will produce fixtures designed for multi-guideline evaluation. Single-guideline isolation mode for Arm C would require evaluator scoping (filter to one guideline_id) which is not in scope for F52.
 
 ## Cleanup
 

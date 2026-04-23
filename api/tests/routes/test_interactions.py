@@ -63,8 +63,8 @@ async def test_interactions_response_shape(client):
     resp = await client.get("/interactions")
     data = resp.json()
 
-    # Guidelines should still be present (all three domains).
-    assert len(data["guidelines"]) == 3
+    # Guidelines should still be present (all four domains).
+    assert len(data["guidelines"]) == 4
     for g in data["guidelines"]:
         assert "id" in g
         assert "domain" in g

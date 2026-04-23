@@ -51,4 +51,4 @@ async def test_fetch_interactions_all_guidelines_present(client):
 @pytest.mark.anyio
 async def test_valid_domains():
     """VALID_DOMAINS matches the expected set."""
-    assert VALID_DOMAINS == {"USPSTF", "ACC_AHA", "KDIGO"}
+    assert VALID_DOMAINS == {"USPSTF", "ACC_AHA", "KDIGO", "ADA"}

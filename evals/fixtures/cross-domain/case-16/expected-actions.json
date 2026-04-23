@@ -1,0 +1,45 @@
+{
+  "description": "48M with well-controlled T2DM on metformin, A1C 6.5%, no CVD, no CKD, eGFR 95, LDL 110, ASCVD 5.2%. The 'boring' patient — tests correct non-activation of most guidelines. ADA R5 (statin for diabetes 40-75) fires for moderate-intensity statin. ACC/AHA R3 (diabetes statin) also fires — convergence. ACC/AHA R4 does not fire (requires no diabetes). USPSTF does not fire (ASCVD 5.2% < 7.5% for Grade C, < 10% for Grade B). KDIGO does not fire (eGFR 95, no CKD). ADA R2/R3 do not fire (no ASCVD/HF/CKD). ADA R4 does not fire (A1C < 7%). ADA R1 does not fire (already on metformin).",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy for diabetes",
+      "rationale": "ADA R5 (ADA-A): moderate-intensity statin for all diabetic adults 40-75 regardless of ASCVD risk score. ACC/AHA R3 (COR I, LOE A) converges: moderate-intensity statin for diabetes 40-75. ASCVD 5.2% is below the 7.5% threshold for high-intensity consideration, so moderate-intensity is appropriate. No diabetes-specific risk enhancers beyond diabetes itself (LDL 110 < 100 threshold, no HTN, no smoking).",
+      "source_rec_id": "rec:ada-statin-for-diabetes",
+      "priority": 1
+    },
+    {
+      "id": "continue-metformin",
+      "label": "Continue metformin and diabetes monitoring",
+      "rationale": "A1C 6.5% — at or below 7% target. Well-controlled on metformin monotherapy. eGFR 95 — no dose adjustment needed. Continue current regimen with routine A1C monitoring.",
+      "priority": 2
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-uspstf-statin",
+      "label": "Do not recommend statin based on USPSTF guidance",
+      "rationale": "ASCVD 5.2% is below both USPSTF Grade B (>=10%) and Grade C (7.5-<10%) thresholds. USPSTF statin recommendations do not fire for this patient."
+    },
+    {
+      "id": "no-high-intensity-statin",
+      "label": "Do not prescribe high-intensity statin",
+      "rationale": "No diabetes-specific risk enhancers (LDL 110, no HTN, no smoking, ASCVD 5.2%). ACC/AHA R3 COR IIa high-intensity escalation requires ASCVD >=7.5% or multiple risk factors. Moderate-intensity is the guideline-concordant choice."
+    },
+    {
+      "id": "no-sglt2i",
+      "label": "Do not recommend SGLT2i",
+      "rationale": "No ASCVD, no HF, no CKD (eGFR 95). ADA R2 criteria not met. KDIGO not applicable. A1C at target — no glycemic intensification needed (R4 ineligible)."
+    },
+    {
+      "id": "no-glp1ra",
+      "label": "Do not recommend GLP-1 RA",
+      "rationale": "No established ASCVD. Age 48 — below 55 threshold for ADA R3 high-risk path. A1C at target — no glycemic intensification needed. No indication for GLP-1 RA."
+    },
+    {
+      "id": "no-glycemic-intensification",
+      "label": "Do not recommend adding a second glucose-lowering agent",
+      "rationale": "ADA R4 requires A1C >=7% on metformin. A1C 6.5% is below target. Patient is at goal on monotherapy."
+    }
+  ]
+}

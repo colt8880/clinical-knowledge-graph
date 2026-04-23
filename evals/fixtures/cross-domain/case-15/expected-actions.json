@@ -1,0 +1,70 @@
+{
+  "description": "72F with T2DM on metformin + glargine, A1C 7.8%, CKD 4 (eGFR 22), ACR 250, HF. Hardest eGFR boundary case. Metformin contraindicated (eGFR < 30) — expected action is discontinue. ADA R2 SGLT2i: eGFR 22 >= 20 technically eligible, but borderline — can continue if already on, but risky to initiate at this eGFR. ADA R4 intensification fires (A1C 7.8% on metformin). KDIGO R1-R4 all fire. KDIGO R3 statin converges with ADA R5. Age 72 — within ADA R5 range (40-75) and KDIGO R3 range (>=50).",
+  "actions": [
+    {
+      "id": "discontinue-metformin",
+      "label": "Discontinue metformin (eGFR < 30 — contraindicated)",
+      "rationale": "ADA R1 none_of: eGFR < 30 contraindicates metformin. eGFR 22 is below the 30 threshold. Risk of lactic acidosis. KDIGO monitoring (M1 cross-edge) reinforces this via eGFR data. Must identify alternative glucose-lowering strategy.",
+      "source_rec_id": "rec:ada-metformin-first-line",
+      "priority": 1
+    },
+    {
+      "id": "initiate-statin-moderate-intensity",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "ADA R5 (ADA-A): moderate-intensity statin for diabetic adults 40-75 (age 72, eligible). KDIGO R3 (1A): moderate-intensity statin for CKD patients >=50 (eGFR 15-59). Convergence — both agree on moderate-intensity. CKD 4 reinforces moderate over high-intensity.",
+      "source_rec_id": "rec:ada-statin-for-diabetes",
+      "priority": 2
+    },
+    {
+      "id": "ada-intensification",
+      "label": "Intensify glycemic therapy (A1C above target, metformin being discontinued)",
+      "rationale": "ADA R4 (ADA-A): A1C 7.8% >= 7% on metformin (technically eligible while still active). With metformin discontinuation, need alternative agents. Already on glargine. SGLT2i for CKD/HF benefit (R2) if eGFR tolerates. Consider less-stringent A1C target (<8%) given CKD 4 + age + comorbidities per ADA clinical_nuance.",
+      "source_rec_id": "rec:ada-intensification",
+      "priority": 3
+    },
+    {
+      "id": "sglt2i-assessment",
+      "label": "Assess SGLT2i initiation (eGFR 22 — borderline for new start)",
+      "rationale": "ADA R2 (ADA-A): SGLT2i for T2DM with HF + CKD. eGFR 22 >= 20 threshold — technically eligible for initiation. KDIGO R2: SGLT2i for CKD with diabetes, eGFR >= 20. However, eGFR 22 is very close to the 20 floor — initiation requires careful clinical judgment. If initiated, both guidelines agree on empagliflozin or dapagliflozin.",
+      "source_rec_id": "rec:ada-sglt2-cardiorenal",
+      "priority": 4
+    },
+    {
+      "id": "ckd-monitoring-high-frequency",
+      "label": "Monitor eGFR and urine ACR at high frequency (CKD 4 + A2 albuminuria)",
+      "rationale": "KDIGO R1 (1B): CKD G4 (eGFR 22) with A2 albuminuria (ACR 250) — very high risk. Monitor at least every 1-3 months. Approaching dialysis threshold. KDIGO monitoring (M1 cross-edge) also drives metformin discontinuation.",
+      "source_rec_id": "rec:kdigo-ckd-monitoring",
+      "priority": 5
+    },
+    {
+      "id": "continue-arb",
+      "label": "Continue losartan (ARB) for albuminuric CKD",
+      "rationale": "KDIGO R4 (1B): ACEi/ARB for CKD with albuminuria (ACR >=30). Patient on losartan — R4 satisfied. ACR 250 (A2) supports continued use. Monitor potassium closely given CKD 4.",
+      "source_rec_id": "rec:kdigo-acei-arb-for-ckd",
+      "priority": 6
+    },
+    {
+      "id": "continue-insulin",
+      "label": "Continue and potentially titrate insulin glargine",
+      "rationale": "On basal insulin (glargine) since 2019. With metformin discontinuation, insulin becomes the primary glucose-lowering agent. May need dose titration upward. ADA insulin intensification strategy addresses this.",
+      "priority": 7
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-continue-metformin",
+      "label": "Do not continue metformin at any dose",
+      "rationale": "eGFR 22 is below the absolute contraindication threshold of 30 per ADA R1. Even reduced-dose metformin (allowed at eGFR 30-45) is contraindicated here. Lactic acidosis risk."
+    },
+    {
+      "id": "no-high-intensity-statin",
+      "label": "Do not prescribe high-intensity statin",
+      "rationale": "CKD 4 (eGFR 22) — KDIGO R3 specifically recommends moderate-intensity in CKD G3-G5. Altered pharmacokinetics and increased myopathy risk with high-intensity in advanced CKD."
+    },
+    {
+      "id": "no-canagliflozin",
+      "label": "Do not initiate canagliflozin",
+      "rationale": "KDIGO R2 recommends empagliflozin or dapagliflozin specifically (canagliflozin not in KDIGO eligible medications). At this borderline eGFR, the strongest evidence base (EMPA-KIDNEY, DAPA-CKD) favors empagliflozin or dapagliflozin."
+    }
+  ]
+}

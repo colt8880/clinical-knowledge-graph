@@ -1,0 +1,59 @@
+{
+  "description": "50M with newly diagnosed T2DM, A1C 8.8%, HTN, current smoker, ASCVD 18%, LDL 175, eGFR 72, no CKD. High-risk diabetes with multiple guideline-concordant actions. ACC/AHA R3 (diabetes statin) preempts USPSTF Grade B (P1) and Grade C (P2). With ASCVD risk >=7.5% + HTN + smoking, high-intensity statin reasonable per ACC/AHA. ADA R1 (metformin first-line) fires — newly diagnosed, no metformin yet. ADA R4 won't fire (requires metformin already active). ADA R3 (GLP-1 RA CVD) fires — age 50, not >=55 for high-risk path, and no established ASCVD, so R3 does NOT fire. ADA R2 (SGLT2i) does NOT fire — no ASCVD/HF/CKD.",
+  "actions": [
+    {
+      "id": "initiate-statin-high-intensity",
+      "label": "Initiate high-intensity statin therapy for diabetes with multiple risk factors",
+      "rationale": "ACC/AHA R3 (COR I, LOE A): moderate-intensity statin for diabetes 40-75. With ASCVD risk 18% (>=7.5%), HTN, smoking, and LDL 175 (>=100) as diabetes-specific risk enhancers, high-intensity is reasonable (COR IIa, LOE B-NR). ADA R5 (ADA-A) converges on statin for diabetes. USPSTF Grade B (ASCVD >=10%) matched but preempted by ACC/AHA R3 (P1). USPSTF Grade C also preempted (P2).",
+      "source_rec_id": "rec:accaha-statin-diabetes",
+      "priority": 1
+    },
+    {
+      "id": "initiate-metformin",
+      "label": "Initiate metformin as first-line diabetes therapy",
+      "rationale": "ADA R1 (ADA-A): metformin first-line for T2DM at diagnosis. eGFR 72 — no contraindication (>=30) and no dose adjustment needed (>=45). Newly diagnosed, not yet on any glucose-lowering agent.",
+      "source_rec_id": "rec:ada-metformin-first-line",
+      "priority": 2
+    },
+    {
+      "id": "smoking-cessation",
+      "label": "Smoking cessation counseling and pharmacotherapy",
+      "rationale": "Current every-day smoker. Smoking is a major modifiable CVD risk factor, a diabetes-specific statin risk enhancer per ACC/AHA, and compounds the already-high ASCVD risk (18%). Cessation would reduce CVD risk across all guideline pathways.",
+      "priority": 3
+    },
+    {
+      "id": "blood-pressure-optimization",
+      "label": "Optimize blood pressure management",
+      "rationale": "BP 140/90 on amlodipine alone. ADA target <130/80 for diabetes. HTN is a modifiable CVD risk factor. Consider adding ACEi/ARB (preferred in diabetes for renoprotection) and/or dose adjustment.",
+      "priority": 4
+    },
+    {
+      "id": "plan-intensification",
+      "label": "Plan for glycemic intensification once metformin is established",
+      "rationale": "A1C 8.8% will likely remain above 7% target after metformin initiation (expected A1C reduction 1.0-1.5%). ADA R4 will become eligible once metformin is active and A1C remains >=7%. With ASCVD risk 18% and HTN, GLP-1 RA or SGLT2i would be preferred second-line agents.",
+      "priority": 5
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "no-uspstf-statin",
+      "label": "Do not recommend statin based solely on USPSTF guidance",
+      "rationale": "USPSTF Grade B is preempted by ACC/AHA diabetes-specific rec (P1). USPSTF Grade C also preempted (P2). ACC/AHA provides more specific intensity guidance for the diabetes population."
+    },
+    {
+      "id": "no-ada-intensification-yet",
+      "label": "Do not recommend glycemic intensification before starting metformin",
+      "rationale": "ADA R4 requires has_medication_active metformin. Patient is newly diagnosed and not yet on metformin. Intensification is premature — start metformin first, reassess A1C in 3 months."
+    },
+    {
+      "id": "no-sglt2i-cardiorenal",
+      "label": "Do not recommend SGLT2i for cardiorenal indication",
+      "rationale": "ADA R2 requires established ASCVD, HF, or CKD (eGFR <=60 or ACR >=30). Patient has none — eGFR 72, no ASCVD, no HF. SGLT2i may be appropriate later as intensification (R4) but not for cardiorenal benefit."
+    },
+    {
+      "id": "no-moderate-intensity-statin-alone",
+      "label": "Do not prescribe only moderate-intensity statin",
+      "rationale": "Multiple risk enhancers (ASCVD 18%, HTN, smoking, LDL 175) strongly support high-intensity statin per ACC/AHA R3 (COR IIa). Moderate-intensity alone would undertreat this high-risk diabetic patient."
+    }
+  ]
+}

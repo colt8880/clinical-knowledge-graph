@@ -88,7 +88,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher", "graph/seeds/cross-edges-uspstf-accaha.cypher", "graph/seeds/cross-edges-kdigo.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher", "graph/seeds/ada-diabetes.cypher", "graph/seeds/cross-edges-uspstf-accaha.cypher", "graph/seeds/cross-edges-kdigo.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons
@@ -268,7 +268,7 @@ jobs:
                   stmts.append(s)
               return stmts
 
-          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher", "graph/seeds/cross-edges-uspstf-accaha.cypher", "graph/seeds/cross-edges-kdigo.cypher"]:
+          for cypher_file in ["graph/constraints.cypher", "graph/seeds/clinical-entities.cypher", "graph/seeds/statins.cypher", "graph/seeds/cholesterol.cypher", "graph/seeds/kdigo-ckd.cypher", "graph/seeds/ada-diabetes.cypher", "graph/seeds/cross-edges-uspstf-accaha.cypher", "graph/seeds/cross-edges-kdigo.cypher"]:
               with open(cypher_file) as f:
                   lines = f.readlines()
               # Strip comment lines, then split on unquoted semicolons
@@ -290,11 +290,11 @@ jobs:
 
           driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "password123"))
 
-          # Expected counts from all seeds (statins + cholesterol + KDIGO CKD):
-          # Nodes: 3 Guideline + 11 Recommendation + 8 Strategy + 6 Condition + 6 Observation + 15 Medication + 1 Procedure = 50
-          # Edges: 11 FROM_GUIDELINE + 13 OFFERS_STRATEGY + 26 INCLUDES_ACTION + 4 FOR_CONDITION + 8 EXCLUDED_BY + 6 PREEMPTED_BY + 2 MODIFIES = 70
-          EXPECTED_NODES = 50
-          EXPECTED_EDGES = 70
+          # Expected counts from all seeds (statins + cholesterol + KDIGO CKD + ADA diabetes):
+          # Nodes: 4 Guideline + 16 Recommendation + 16 Strategy + 7 Condition + 8 Observation + 22 Medication + 1 Procedure = 74
+          # Edges: 16 FROM_GUIDELINE + 21 OFFERS_STRATEGY + 58 INCLUDES_ACTION + 9 FOR_CONDITION + 6 PREEMPTED_BY + 2 MODIFIES = 112
+          EXPECTED_NODES = 74
+          EXPECTED_EDGES = 112
 
           with driver.session() as session:
               actual_nodes = session.run("MATCH (n) RETURN count(n) AS c").single()["c"]

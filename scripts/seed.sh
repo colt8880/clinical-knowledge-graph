@@ -13,6 +13,7 @@
 #   6. ada-diabetes.cypher     — ADA 2024 Diabetes subgraph
 #   7. cross-edges-uspstf-accaha.cypher — PREEMPTED_BY edges (F25)
 #   8. cross-edges-kdigo.cypher — MODIFIES edges (F26)
+#   9. cross-edges-ada.cypher — MODIFIES edges (F53)
 #
 # Expected environment:
 #   NEO4J_URI       bolt://neo4j:7687
@@ -45,6 +46,9 @@ cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seed
 echo "==> Applying cross-edges KDIGO → USPSTF/ACC-AHA..."
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/cross-edges-kdigo.cypher
 
+echo "==> Applying cross-edges KDIGO → ADA..."
+cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < /graph/seeds/cross-edges-ada.cypher
+
 echo "==> Verifying node count..."
 NODE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH (n) RETURN count(n) AS c" | tail -1 | tr -d '[:space:]')
@@ -60,10 +64,10 @@ echo "==> Verifying edge count..."
 EDGE_COUNT=$(cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" \
   --format plain "MATCH ()-[r]->() RETURN count(r) AS c" | tail -1 | tr -d '[:space:]')
 
-# 70 (previous) + 42 ADA edges (5 FROM_GUIDELINE + 5 FOR_CONDITION + 8 OFFERS_STRATEGY + 24 INCLUDES_ACTION) = 112
-echo "    Edge count: $EDGE_COUNT (expected 112)"
-if [ "$EDGE_COUNT" -ne 112 ]; then
-  echo "ERROR: Expected 112 edges, got $EDGE_COUNT"
+# 70 (previous) + 42 ADA edges + 1 ADA cross-edge (MODIFIES) = 113
+echo "    Edge count: $EDGE_COUNT (expected 113)"
+if [ "$EDGE_COUNT" -ne 113 ]; then
+  echo "ERROR: Expected 113 edges, got $EDGE_COUNT"
   exit 1
 fi
 
@@ -157,4 +161,4 @@ if [ "$ORPHAN_MEDS" -ne 0 ]; then
   exit 1
 fi
 
-echo "==> Seed complete. 74 nodes, 112 edges. All checks passed."
+echo "==> Seed complete. 74 nodes, 113 edges. All checks passed."

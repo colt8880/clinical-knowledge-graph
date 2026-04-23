@@ -931,7 +931,7 @@ def _therapeutic_domain(rec: RecInfo) -> str:
     entities = set(rec.action_entity_ids)
     if entities & _STATIN_IDS:
         return "lipid management"
-    if entities & {"med:empagliflozin", "med:dapagliflozin"}:
+    if entities & {"med:empagliflozin", "med:dapagliflozin", "med:canagliflozin"}:
         return "SGLT2i / renal protection"
     if entities & {"med:lisinopril", "med:enalapril", "med:ramipril",
                    "med:losartan", "med:valsartan", "med:irbesartan"}:
@@ -1077,6 +1077,7 @@ _GUIDELINE_PRIORITY = {
     "guideline:uspstf-statin-2022": 100,
     "guideline:acc-aha-cholesterol-2018": 200,
     "guideline:kdigo-ckd-2024": 200,
+    "guideline:ada-diabetes-2024": 200,
 }
 
 
@@ -1115,6 +1116,7 @@ def _short_guideline(guideline_id: str) -> str:
         "guideline:uspstf-statin-2022": "USPSTF",
         "guideline:acc-aha-cholesterol-2018": "ACC/AHA",
         "guideline:kdigo-ckd-2024": "KDIGO",
+        "guideline:ada-diabetes-2024": "ADA",
     }.get(guideline_id, guideline_id)
 
 

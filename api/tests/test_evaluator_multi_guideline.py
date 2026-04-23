@@ -43,7 +43,8 @@ FIXTURE_CASES = sorted([
 STATIN_GUIDELINE_ID = "guideline:uspstf-statin-2022"
 CHOLESTEROL_GUIDELINE_ID = "guideline:acc-aha-cholesterol-2018"
 KDIGO_GUIDELINE_ID = "guideline:kdigo-ckd-2024"
-KNOWN_GUIDELINE_IDS = {STATIN_GUIDELINE_ID, CHOLESTEROL_GUIDELINE_ID, KDIGO_GUIDELINE_ID}
+ADA_GUIDELINE_ID = "guideline:ada-diabetes-2024"
+KNOWN_GUIDELINE_IDS = {STATIN_GUIDELINE_ID, CHOLESTEROL_GUIDELINE_ID, KDIGO_GUIDELINE_ID, ADA_GUIDELINE_ID}
 
 
 # ---------------------------------------------------------------------------
@@ -198,12 +199,13 @@ class TestGuidelineIdOnV0Fixtures:
 
         events = resp.json()["events"]
         exited_events = [e for e in events if e["type"] == "guideline_exited"]
-        # With three guidelines loaded, expect 3 guideline_exited events
-        assert len(exited_events) == 3, f"Expected 3 guideline_exited, got {len(exited_events)}"
+        # With four guidelines loaded, expect 4 guideline_exited events
+        assert len(exited_events) == len(KNOWN_GUIDELINE_IDS), (
+            f"Expected {len(KNOWN_GUIDELINE_IDS)} guideline_exited, got {len(exited_events)}"
+        )
         exited_ids = {e["guideline_id"] for e in exited_events}
-        assert STATIN_GUIDELINE_ID in exited_ids
-        assert CHOLESTEROL_GUIDELINE_ID in exited_ids
-        assert KDIGO_GUIDELINE_ID in exited_ids
+        for gid in KNOWN_GUIDELINE_IDS:
+            assert gid in exited_ids
 
     @pytest.mark.asyncio
     async def test_recommendations_have_guideline_id(self, client, case_name: str):

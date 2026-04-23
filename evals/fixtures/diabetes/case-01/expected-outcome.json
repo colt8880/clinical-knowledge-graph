@@ -1,0 +1,43 @@
+{
+  "description": "52M, newly diagnosed T2DM, A1C 7.8%, no CVD, no CKD, eGFR 85. Metformin first-line (R1) and statin for diabetes (R5) fire. Not on metformin, so R4 (intensification) does not fire. No ASCVD/HF/CKD, so R2 (SGLT2i) ineligible. No established ASCVD or high CVD risk, so R3 (GLP-1 RA) ineligible.",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:ada-metformin-first-line",
+      "status": "due",
+      "evidence_grade": "ADA-A",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    },
+    {
+      "recommendation_id": "rec:ada-statin-for-diabetes",
+      "status": "due",
+      "evidence_grade": "ADA-A",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "guideline_entered",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-metformin-first-line",
+      "status": "due"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-statin-for-diabetes",
+      "status": "due"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-intensification"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-sglt2-cardiorenal"
+    }
+  ]
+}

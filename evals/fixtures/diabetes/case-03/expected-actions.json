@@ -1,0 +1,33 @@
+{
+  "description": "58M, T2DM on metformin, A1C 9.1%, CKD 3a (eGFR 50), albuminuria A2 (ACR 120), heart failure. SGLT2i cardiorenal (R2). Intensification (R4, A1C ≥7%). Statin (R5).",
+  "actions": [
+    {
+      "id": "initiate-sglt2i",
+      "label": "Initiate SGLT2 inhibitor for cardiorenal benefit",
+      "rationale": "ADA-A: Patient has T2DM with heart failure, CKD (eGFR 50), and albuminuria (ACR 120 ≥30). SGLT2i recommended independent of A1C. eGFR 50 is above the 20 threshold for initiation. Empagliflozin or dapagliflozin preferred given DAPA-CKD and EMPA-KIDNEY evidence.",
+      "source_rec_id": "rec:ada-sglt2-cardiorenal",
+      "priority": 1
+    },
+    {
+      "id": "intensify-glycemic-therapy",
+      "label": "Intensify glycemic therapy (A1C 9.1%, well above target)",
+      "rationale": "ADA-A: A1C 9.1% on metformin alone is significantly above the 7% target. SGLT2i addresses both glycemic and cardiorenal needs. Consider adding GLP-1 RA or insulin if A1C remains elevated after SGLT2i initiation.",
+      "source_rec_id": "rec:ada-intensification",
+      "priority": 2
+    },
+    {
+      "id": "initiate-statin-moderate",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "ADA-A: Diabetic adult age 40-75 should receive at least moderate-intensity statin. Multiple risk factors (CKD, HF) support consideration of high-intensity, but CKD eGFR 50 may warrant caution per KDIGO (moderate preferred in CKD G3-G5). Patient is statin-naive.",
+      "source_rec_id": "rec:ada-statin-for-diabetes",
+      "priority": 3
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "continue-metformin-only",
+      "label": "Continue metformin alone without adding SGLT2i",
+      "rationale": "ADA-A: With HF, CKD, and albuminuria, SGLT2i has proven cardiorenal benefit independent of glycemic control. Deferral would miss renal and cardiac protection."
+    }
+  ]
+}

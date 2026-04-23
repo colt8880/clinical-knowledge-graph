@@ -10,23 +10,25 @@ from typing import Any
 
 from app.db import get_driver
 
-VALID_DOMAINS = {"USPSTF", "ACC_AHA", "KDIGO"}
+VALID_DOMAINS = {"USPSTF", "ACC_AHA", "KDIGO", "ADA"}
 
 # Domain slug and human-readable label mappings (shared with guidelines_query).
 _DOMAIN_SLUGS: dict[str, str] = {
     "USPSTF": "uspstf-statin-2022",
     "ACC_AHA": "acc-aha-cholesterol-2018",
     "KDIGO": "kdigo-ckd-2024",
+    "ADA": "ada-diabetes-2024",
 }
 _DOMAIN_LABELS: dict[str, str] = {
     "USPSTF": "USPSTF",
     "ACC_AHA": "ACC/AHA",
     "KDIGO": "KDIGO",
+    "ADA": "ADA",
 }
 
 
 def _extract_domain(labels: frozenset[str] | set[str]) -> str | None:
-    for d in ("USPSTF", "ACC_AHA", "KDIGO"):
+    for d in ("USPSTF", "ACC_AHA", "KDIGO", "ADA"):
         if d in labels:
             return d
     return None

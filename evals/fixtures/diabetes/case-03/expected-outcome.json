@@ -1,0 +1,50 @@
+{
+  "description": "58M, T2DM on metformin, A1C 9.1%, CKD 3a (eGFR 50), albuminuria A2 (ACR 120), heart failure. R2 (SGLT2i cardiorenal), R4 (intensification), R5 (statin) fire. Already on metformin, so R1 ineligible.",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:ada-sglt2-cardiorenal",
+      "status": "due",
+      "evidence_grade": "ADA-A",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    },
+    {
+      "recommendation_id": "rec:ada-intensification",
+      "status": "due",
+      "evidence_grade": "ADA-A",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    },
+    {
+      "recommendation_id": "rec:ada-statin-for-diabetes",
+      "status": "due",
+      "evidence_grade": "ADA-A",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "guideline_entered",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-sglt2-cardiorenal",
+      "status": "due"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-intensification",
+      "status": "due"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-statin-for-diabetes",
+      "status": "due"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-metformin-first-line"
+    }
+  ]
+}

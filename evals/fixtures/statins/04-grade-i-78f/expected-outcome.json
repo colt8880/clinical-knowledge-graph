@@ -1,11 +1,23 @@
 {
-  "description": "78F with HTN and T2DM, on lisinopril+metformin. No established ASCVD. Age >= 76 hits Grade I (insufficient evidence). USPSTF does not recommend for or against initiating a statin in this age band.",
+  "description": "78F with HTN and T2DM, on lisinopril+metformin. No established ASCVD. Age >= 76 hits USPSTF Grade I (insufficient evidence). ADA R1 (metformin) satisfied (already on metformin). ADA R3 (GLP-1 RA) fires (age >=55 with HTN + diabetes = high CVD risk). ADA R5 (statin) does not fire (age 78 > 75 upper bound).",
   "expected_recommendations": [
     {
       "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
       "status": "insufficient_evidence",
       "evidence_grade": "I",
       "guideline_id": "guideline:uspstf-statin-2022"
+    },
+    {
+      "recommendation_id": "rec:ada-metformin-first-line",
+      "status": "up_to_date",
+      "evidence_grade": "ADA-A",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    },
+    {
+      "recommendation_id": "rec:ada-glp1ra-cvd-benefit",
+      "status": "due",
+      "evidence_grade": "ADA-A",
+      "guideline_id": "guideline:ada-diabetes-2024"
     }
   ],
   "expected_trace_contains": [
@@ -14,6 +26,11 @@
       "recommendation_id": "rec:statin-insufficient-evidence-grade-i",
       "status": "insufficient_evidence",
       "evidence_grade": "I"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-glp1ra-cvd-benefit",
+      "status": "due"
     }
   ],
   "must_not_contain": [

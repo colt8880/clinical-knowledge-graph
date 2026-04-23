@@ -13,11 +13,11 @@ async def test_guidelines_returns_list(client):
 
 
 @pytest.mark.anyio
-async def test_guidelines_returns_three(client):
-    """The seeded graph has three guidelines (USPSTF, ACC/AHA, KDIGO)."""
+async def test_guidelines_returns_four(client):
+    """The seeded graph has four guidelines (USPSTF, ACC/AHA, KDIGO, ADA)."""
     resp = await client.get("/guidelines")
     data = resp.json()
-    assert len(data) == 3
+    assert len(data) == 4
 
 
 @pytest.mark.anyio

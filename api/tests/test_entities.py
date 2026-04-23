@@ -56,7 +56,7 @@ class TestMedicationPrimaryKeys:
         rows = await read_tx(
             "MATCH (m:Medication) RETURN count(m) AS c",
         )
-        assert rows[0]["c"] == 15, f"Expected 15 Medications, got {rows[0]['c']}"
+        assert rows[0]["c"] == 22, f"Expected 22 Medications, got {rows[0]['c']}"
 
 
 # ---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ class TestObservationPrimaryKeys:
         rows = await read_tx(
             "MATCH (o:Observation) RETURN count(o) AS c",
         )
-        assert rows[0]["c"] == 6, f"Expected 6 Observations, got {rows[0]['c']}"
+        assert rows[0]["c"] == 8, f"Expected 8 Observations, got {rows[0]['c']}"
 
 
 # ---------------------------------------------------------------------------
@@ -213,7 +213,7 @@ class TestConditionCodings:
         rows = await read_tx(
             "MATCH (c:Condition) RETURN count(c) AS c",
         )
-        assert rows[0]["c"] == 6, f"Expected 6 Conditions, got {rows[0]['c']}"
+        assert rows[0]["c"] == 7, f"Expected 7 Conditions, got {rows[0]['c']}"
 
 
 # ---------------------------------------------------------------------------
@@ -221,26 +221,26 @@ class TestConditionCodings:
 # ---------------------------------------------------------------------------
 
 class TestDomainLabels:
-    """Guideline-scoped nodes carry a domain label (:USPSTF, :ACC_AHA, or :KDIGO); shared entities do not."""
+    """Guideline-scoped nodes carry a domain label (:USPSTF, :ACC_AHA, :KDIGO, or :ADA); shared entities do not."""
 
     @pytest.mark.asyncio
     async def test_all_recommendations_labeled(self, client):
         rows = await read_tx(
-            "MATCH (r:Recommendation) WHERE NOT r:USPSTF AND NOT r:ACC_AHA AND NOT r:KDIGO RETURN count(r) AS c",
+            "MATCH (r:Recommendation) WHERE NOT r:USPSTF AND NOT r:ACC_AHA AND NOT r:KDIGO AND NOT r:ADA RETURN count(r) AS c",
         )
         assert rows[0]["c"] == 0, "Found Recommendation nodes without a domain label"
 
     @pytest.mark.asyncio
     async def test_all_strategies_labeled(self, client):
         rows = await read_tx(
-            "MATCH (s:Strategy) WHERE NOT s:USPSTF AND NOT s:ACC_AHA AND NOT s:KDIGO RETURN count(s) AS c",
+            "MATCH (s:Strategy) WHERE NOT s:USPSTF AND NOT s:ACC_AHA AND NOT s:KDIGO AND NOT s:ADA RETURN count(s) AS c",
         )
         assert rows[0]["c"] == 0, "Found Strategy nodes without a domain label"
 
     @pytest.mark.asyncio
     async def test_guideline_labeled(self, client):
         rows = await read_tx(
-            "MATCH (g:Guideline) WHERE NOT g:USPSTF AND NOT g:ACC_AHA AND NOT g:KDIGO RETURN count(g) AS c",
+            "MATCH (g:Guideline) WHERE NOT g:USPSTF AND NOT g:ACC_AHA AND NOT g:KDIGO AND NOT g:ADA RETURN count(g) AS c",
         )
         assert rows[0]["c"] == 0, "Found Guideline nodes without a domain label"
 
@@ -251,7 +251,7 @@ class TestDomainLabels:
             """
             MATCH (n)
             WHERE (n:Medication OR n:Condition OR n:Observation OR n:Procedure)
-              AND (n:USPSTF OR n:ACC_AHA OR n:KDIGO)
+              AND (n:USPSTF OR n:ACC_AHA OR n:KDIGO OR n:ADA)
             RETURN count(n) AS c
             """,
         )

@@ -1,0 +1,59 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1974-03-12",
+    "administrative_sex": "male",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-t2dm",
+      "codes": [
+        { "system": "snomed", "code": "73211009", "display": "Diabetes mellitus" },
+        { "system": "icd10", "code": "E11.9", "display": "Type 2 diabetes mellitus without complications" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2026-02-01"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-hba1c-2026-03",
+      "codes": [{ "system": "loinc", "code": "4548-4", "display": "Hemoglobin A1c" }],
+      "status": "final",
+      "effective_date": "2026-03-10T09:00:00Z",
+      "value": { "value_quantity": { "value": 7.8, "unit": "%" } }
+    },
+    {
+      "id": "obs-egfr-2026-03",
+      "codes": [{ "system": "loinc", "code": "48642-3", "display": "eGFR" }],
+      "status": "final",
+      "effective_date": "2026-03-10T09:00:00Z",
+      "value": { "value_quantity": { "value": 85, "unit": "mL/min/1.73m2" } }
+    },
+    {
+      "id": "obs-fpg-2026-02",
+      "codes": [{ "system": "loinc", "code": "1558-6", "display": "Fasting plasma glucose" }],
+      "status": "final",
+      "effective_date": "2026-02-01T08:00:00Z",
+      "value": { "value_quantity": { "value": 162, "unit": "mg/dL" } }
+    }
+  ],
+  "medications": [],
+  "social_history": {
+    "tobacco": { "status": "never", "as_of": "2026-03-10" }
+  },
+  "risk_scores": {
+    "ascvd_10yr": {
+      "name": "ascvd_10yr",
+      "value": 6.5,
+      "computed_date": "2026-03-10",
+      "method_version": "pooled_cohort_equations_2013_goff"
+    }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

@@ -44,6 +44,7 @@ SEED_FILE_GUIDELINE_MAP = {
     "statins.cypher": "guideline:uspstf-statin-2022",
     "cholesterol.cypher": "guideline:acc-aha-cholesterol-2018",
     "kdigo-ckd.cypher": "guideline:kdigo-ckd-2024",
+    "ada-diabetes.cypher": "guideline:ada-diabetes-2024",
 }
 
 # Friendly guideline display names
@@ -51,6 +52,7 @@ GUIDELINE_DISPLAY = {
     "guideline:uspstf-statin-2022": "USPSTF 2022 Statin Primary Prevention",
     "guideline:acc-aha-cholesterol-2018": "ACC/AHA 2018 Blood Cholesterol Management",
     "guideline:kdigo-ckd-2024": "KDIGO 2024 Chronic Kidney Disease",
+    "guideline:ada-diabetes-2024": "ADA 2024 Diabetes Management",
 }
 
 # --guidelines flag values map to seed filenames
@@ -58,6 +60,7 @@ GUIDELINE_FLAG_MAP = {
     "statins": "statins.cypher",
     "cholesterol": "cholesterol.cypher",
     "kdigo": "kdigo-ckd.cypher",
+    "diabetes": "ada-diabetes.cypher",
 }
 
 

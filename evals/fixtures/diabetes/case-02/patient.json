@@ -1,0 +1,77 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1966-07-22",
+    "administrative_sex": "female",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-t2dm",
+      "codes": [
+        { "system": "snomed", "code": "73211009", "display": "Diabetes mellitus" },
+        { "system": "icd10", "code": "E11.9", "display": "Type 2 diabetes mellitus without complications" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2018-06-15"
+    },
+    {
+      "id": "cond-ascvd",
+      "codes": [
+        { "system": "snomed", "code": "22298006", "display": "Myocardial infarction" },
+        { "system": "icd10", "code": "I21.9", "display": "Acute myocardial infarction, unspecified" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2023-11-10"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-hba1c-2026-02",
+      "codes": [{ "system": "loinc", "code": "4548-4", "display": "Hemoglobin A1c" }],
+      "status": "final",
+      "effective_date": "2026-02-15T09:00:00Z",
+      "value": { "value_quantity": { "value": 8.2, "unit": "%" } }
+    },
+    {
+      "id": "obs-egfr-2026-02",
+      "codes": [{ "system": "loinc", "code": "48642-3", "display": "eGFR" }],
+      "status": "final",
+      "effective_date": "2026-02-15T09:00:00Z",
+      "value": { "value_quantity": { "value": 62, "unit": "mL/min/1.73m2" } }
+    },
+    {
+      "id": "obs-ldl-2026-02",
+      "codes": [{ "system": "loinc", "code": "2089-1" }],
+      "status": "final",
+      "effective_date": "2026-02-15T09:00:00Z",
+      "value": { "value_quantity": { "value": 128, "unit": "mg/dL" } }
+    }
+  ],
+  "medications": [
+    {
+      "id": "med-metformin",
+      "codes": [{ "system": "rxnorm", "code": "6809", "display": "Metformin" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2018-07-01"
+    }
+  ],
+  "social_history": {
+    "tobacco": { "status": "never", "as_of": "2026-02-15" }
+  },
+  "risk_scores": {
+    "ascvd_10yr": {
+      "name": "ascvd_10yr",
+      "value": 22.5,
+      "computed_date": "2026-02-15",
+      "method_version": "pooled_cohort_equations_2013_goff"
+    }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

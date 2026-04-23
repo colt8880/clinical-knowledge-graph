@@ -65,6 +65,10 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 - Care plans, goals, advance directives, code status.
 - Adherence / refill-gap signals.
 
+## v2 deferred verification (F52)
+
+- **Single-guideline eval harness gate for ADA diabetes.** Docker seed verification passes (74 nodes, 112 edges). Eval harness runs complete but composite scores are below the 4.0 threshold (completeness 3.44/5, composite 3.75/5). Root cause: the Arm C evaluator runs all 4 guidelines simultaneously — ADA fixture expected-actions are ADA-only, but the LLM output includes cross-guideline actions from ACC/AHA and USPSTF that subsume ADA statin recs. The judge penalizes for "missing" ADA-specific actions covered by equivalent cross-guideline recs. This is a multi-guideline interaction issue, not an ADA subgraph defect. Resolution: F53 (cross-guideline edges) + F54 (multi-morbidity fixtures) will produce fixtures designed for multi-guideline evaluation. Single-guideline isolation mode for Arm C would require evaluator scoping (filter to one guideline_id) which is not in scope for F52.
+
 ## Cleanup
 
 - Delete `/diagrams/crc-graph.html` and the `/diagrams` directory once UI Explore tab ships (backlog #05). Interim artifact superseded by live Explore.

@@ -1,0 +1,25 @@
+{
+  "description": "45F, T2DM on metformin + empagliflozin, A1C 6.8%, no CVD, eGFR 92. At target — only statin for diabetes (R5, moderate-intensity) fires.",
+  "actions": [
+    {
+      "id": "initiate-statin-moderate",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "ADA-A: All adults aged 40-75 with diabetes should receive at least moderate-intensity statin regardless of ASCVD risk score. Patient is 45, diabetic, statin-naive. No additional risk factors suggesting high-intensity escalation.",
+      "source_rec_id": "rec:ada-statin-for-diabetes",
+      "priority": 1
+    },
+    {
+      "id": "continue-current-therapy",
+      "label": "Continue metformin and empagliflozin",
+      "rationale": "A1C 6.8% is at target (<7%). Current dual therapy is effective. No indication for intensification.",
+      "priority": 2
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "add-insulin-unnecessarily",
+      "label": "Add insulin or additional glucose-lowering agent",
+      "rationale": "A1C 6.8% is below the 7% target. Adding insulin would risk hypoglycemia without benefit. No glycemic indication for intensification."
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "description": "45F, T2DM on metformin + empagliflozin, A1C 6.8%, no CVD, eGFR 92. Only R5 (statin) fires. Already on metformin (R1 ineligible). Already on empagliflozin (R2 ineligible). A1C < 7% (R4 ineligible). No ASCVD/high risk (R3 ineligible).",
+  "expected_recommendations": [
+    {
+      "recommendation_id": "rec:ada-statin-for-diabetes",
+      "status": "due",
+      "evidence_grade": "ADA-A",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    }
+  ],
+  "expected_trace_contains": [
+    {
+      "type": "guideline_entered",
+      "guideline_id": "guideline:ada-diabetes-2024"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-statin-for-diabetes",
+      "status": "due"
+    }
+  ],
+  "must_not_contain": [
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-metformin-first-line"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-sglt2-cardiorenal"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-glp1ra-cvd-benefit"
+    },
+    {
+      "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-intensification"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "evaluation_time": "2026-04-15T10:00:00Z",
+  "patient": {
+    "date_of_birth": "1968-01-05",
+    "administrative_sex": "male",
+    "ancestry": ["non_hispanic_white"]
+  },
+  "conditions": [
+    {
+      "id": "cond-t2dm",
+      "codes": [
+        { "system": "snomed", "code": "73211009", "display": "Diabetes mellitus" },
+        { "system": "icd10", "code": "E11.65", "display": "Type 2 diabetes mellitus with hyperglycemia" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2016-03-20"
+    },
+    {
+      "id": "cond-hf",
+      "codes": [
+        { "system": "snomed", "code": "84114007", "display": "Heart failure" },
+        { "system": "icd10", "code": "I50.9", "display": "Heart failure, unspecified" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2024-08-15"
+    },
+    {
+      "id": "cond-ckd",
+      "codes": [
+        { "system": "snomed", "code": "709044004", "display": "Chronic kidney disease" },
+        { "system": "icd10", "code": "N18.31", "display": "Chronic kidney disease, stage 3a" }
+      ],
+      "clinical_status": "active",
+      "verification_status": "confirmed",
+      "onset_date": "2022-06-10"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs-hba1c-2026-03",
+      "codes": [{ "system": "loinc", "code": "4548-4", "display": "Hemoglobin A1c" }],
+      "status": "final",
+      "effective_date": "2026-03-01T09:00:00Z",
+      "value": { "value_quantity": { "value": 9.1, "unit": "%" } }
+    },
+    {
+      "id": "obs-egfr-2026-03",
+      "codes": [{ "system": "loinc", "code": "48642-3", "display": "eGFR" }],
+      "status": "final",
+      "effective_date": "2026-03-01T09:00:00Z",
+      "value": { "value_quantity": { "value": 50, "unit": "mL/min/1.73m2" } }
+    },
+    {
+      "id": "obs-acr-2026-03",
+      "codes": [{ "system": "loinc", "code": "9318-7", "display": "Urine ACR" }],
+      "status": "final",
+      "effective_date": "2026-03-01T09:00:00Z",
+      "value": { "value_quantity": { "value": 120, "unit": "mg/g" } }
+    }
+  ],
+  "medications": [
+    {
+      "id": "med-metformin",
+      "codes": [{ "system": "rxnorm", "code": "6809", "display": "Metformin" }],
+      "status": "active",
+      "intent": "order",
+      "start_date": "2016-04-01"
+    }
+  ],
+  "social_history": {
+    "tobacco": { "status": "never", "as_of": "2026-03-01" }
+  },
+  "risk_scores": {
+    "ascvd_10yr": {
+      "name": "ascvd_10yr",
+      "value": 14.3,
+      "computed_date": "2026-03-01",
+      "method_version": "pooled_cohort_equations_2013_goff"
+    }
+  },
+  "completeness": {
+    "medications": "populated",
+    "social_history": "populated"
+  }
+}

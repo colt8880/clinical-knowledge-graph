@@ -1,0 +1,26 @@
+{
+  "description": "52M, newly diagnosed T2DM, A1C 7.8%, no CVD, no CKD, eGFR 85. Metformin first-line (R1). Statin for diabetes (R5, moderate-intensity). Not on metformin yet so R4 (intensification) does not fire.",
+  "actions": [
+    {
+      "id": "initiate-metformin",
+      "label": "Initiate metformin therapy",
+      "rationale": "ADA-A: Metformin is the preferred initial pharmacologic agent for T2DM. Patient is newly diagnosed, not on any glucose-lowering therapy. eGFR 85 is well above the contraindication threshold of 30.",
+      "source_rec_id": "rec:ada-metformin-first-line",
+      "priority": 1
+    },
+    {
+      "id": "initiate-statin-moderate",
+      "label": "Initiate moderate-intensity statin therapy",
+      "rationale": "ADA-A: All adults aged 40-75 with diabetes should receive at least moderate-intensity statin regardless of ASCVD risk score. Patient is 52, diabetic, statin-naive.",
+      "source_rec_id": "rec:ada-statin-for-diabetes",
+      "priority": 2
+    }
+  ],
+  "contraindications": [
+    {
+      "id": "defer-metformin-for-lifestyle-only",
+      "label": "Defer metformin in favor of lifestyle modifications alone",
+      "rationale": "ADA-A recommends pharmacologic therapy (metformin) at diagnosis of T2DM. Lifestyle alone is not first-line per current guidelines."
+    }
+  ]
+}

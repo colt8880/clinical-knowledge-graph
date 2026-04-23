@@ -30,6 +30,10 @@
     },
     {
       "type": "recommendation_emitted",
+      "recommendation_id": "rec:ada-glp1ra-cvd-benefit"
+    },
+    {
+      "type": "recommendation_emitted",
       "recommendation_id": "rec:ada-intensification"
     }
   ]

@@ -65,6 +65,11 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 - Care plans, goals, advance directives, code status.
 - Adherence / refill-gap signals.
 
+## v2 deferred verification (F52)
+
+- **Single-guideline eval harness gate for ADA diabetes.** The spec calls for `cd evals && uv run python -m harness --guideline diabetes --arm c` with judge scores ≥ 4.0. Requires Docker (Neo4j + API) to load the ADA seed and run the evaluator. Deferred to F53 integration or a dedicated verification pass once Docker compose is rebuilt with the ADA seed.
+- **Docker compose seed verification.** Updated seed.sh expects 74 nodes and 113 edges. Requires `docker compose up --build` to verify. Deferred to next Docker compose rebuild.
+
 ## Cleanup
 
 - Delete `/diagrams/crc-graph.html` and the `/diagrams` directory once UI Explore tab ships (backlog #05). Interim artifact superseded by live Explore.

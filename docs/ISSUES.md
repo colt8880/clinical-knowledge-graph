@@ -73,9 +73,13 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 
 `graph/seeds/cross-edges-ada.cypher` used SQL-style `''` escaping for apostrophes in a Cypher string literal, which is not valid Cypher. This was merged in PR #51 (F53) and blocked `docker compose up` from completing the seed step. Fixed in F55 by removing possessives from the note text. Future seed files should use double-quoted strings or avoid apostrophes in Cypher string literals.
 
-## F55 eval harness missing data points
+## F55 eval harness missing data points — diagnosed
 
-The v2-phase2 thesis run had 15 missing fixture/arm entries out of 96 expected (15.6% missingness). Arm C was worst affected (7 missing). Root cause is likely API errors or timeouts during the Braintrust run. The harness has no retry logic — a failed fixture/arm combination is silently dropped. This makes aggregate comparisons unreliable when arms have different missing sets. Future runs should add retry logic or at minimum log which entries failed and why.
+The v2-phase2 thesis run appeared to have 15 missing entries but post-run diagnosis found two distinct issues:
+
+1. **Stale rows in `fetch_from_braintrust()` (cosmetic).** `init_experiment(open=True)` returns rows from prior experiment versions with the same name. Each arm experiment had 96 rows (3 versions x 32 fixtures) but only 32 were from the current run. The `if not scores: continue` filter correctly drops stale rows, but the N counts were misleading.
+
+2. **Judge API 500 errors (real data loss, ~9 entries / ~9.4%).** The `clinical_scorer` in `judge.py` calls Anthropic's API with no retry logic. When the API returns HTTP 500 during concurrent scoring, the scorer throws and Braintrust records the row without scores. The arm task functions succeeded for all 32 fixtures in all 3 arms — only the judge scoring failed. Fix: add retry with exponential backoff to `judge.py`'s `score()` function (F56).
 
 ## F55 serialization scaling with 4+ guidelines
 

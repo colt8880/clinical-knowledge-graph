@@ -384,6 +384,132 @@ ON CREATE SET
   m.provenance_publication_date = date('2024-03-14');
 
 // ---------------------------------------------------------------------------
+// Conditions — ADA 2024 Diabetes
+// ---------------------------------------------------------------------------
+
+MERGE (c:Condition {id: 'cond:heart-failure'})
+ON CREATE SET
+  c.display_name = 'Heart failure',
+  c.codings = ['SNOMED:84114007', 'ICD10:I50', 'ICD10:I50.9', 'ICD10:I50.2', 'ICD10:I50.4'],
+  c.snomed_codes = ['84114007'],
+  c.icd10_codes = ['I50', 'I50.9', 'I50.2', 'I50.4'],
+  c.provenance_guideline = 'guideline:ada-diabetes-2024',
+  c.provenance_version = '2024-01-01',
+  c.provenance_source_section = 'Clinical entity layer',
+  c.provenance_publication_date = date('2024-01-01');
+
+// ---------------------------------------------------------------------------
+// Observations — ADA 2024 Diabetes
+// ---------------------------------------------------------------------------
+
+MERGE (o:Observation {id: 'obs:hba1c'})
+ON CREATE SET
+  o.display_name = 'Hemoglobin A1c (HbA1c)',
+  o.code = '4548-4',
+  o.code_system = 'LOINC',
+  o.loinc_codes = ['4548-4', '17856-6'],
+  o.unit = '%',
+  o.provenance_guideline = 'guideline:ada-diabetes-2024',
+  o.provenance_version = '2024-01-01',
+  o.provenance_source_section = 'Glycemic management — A1C target',
+  o.provenance_publication_date = date('2024-01-01');
+
+MERGE (o:Observation {id: 'obs:fasting-plasma-glucose'})
+ON CREATE SET
+  o.display_name = 'Fasting plasma glucose',
+  o.code = '1558-6',
+  o.code_system = 'LOINC',
+  o.loinc_codes = ['1558-6'],
+  o.unit = 'mg/dL',
+  o.provenance_guideline = 'guideline:ada-diabetes-2024',
+  o.provenance_version = '2024-01-01',
+  o.provenance_source_section = 'Diagnostic criteria',
+  o.provenance_publication_date = date('2024-01-01');
+
+// ---------------------------------------------------------------------------
+// Medications — ADA 2024 Diabetes (metformin, GLP-1 RAs, insulins)
+// SGLT2 inhibitors (empagliflozin, dapagliflozin) already defined above.
+// Canagliflozin added here for ADA coverage.
+// ---------------------------------------------------------------------------
+
+MERGE (m:Medication {id: 'med:metformin'})
+ON CREATE SET
+  m.display_name = 'Metformin',
+  m.code = '6809',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['6809'],
+  m.provenance_guideline = 'guideline:ada-diabetes-2024',
+  m.provenance_version = '2024-01-01',
+  m.provenance_source_section = 'Chapter 9 — Pharmacologic Approaches to Glycemic Treatment',
+  m.provenance_publication_date = date('2024-01-01');
+
+MERGE (m:Medication {id: 'med:canagliflozin'})
+ON CREATE SET
+  m.display_name = 'Canagliflozin',
+  m.code = '1373458',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['1373458'],
+  m.provenance_guideline = 'guideline:ada-diabetes-2024',
+  m.provenance_version = '2024-01-01',
+  m.provenance_source_section = 'Chapter 9 — SGLT2 inhibitors',
+  m.provenance_publication_date = date('2024-01-01');
+
+MERGE (m:Medication {id: 'med:semaglutide'})
+ON CREATE SET
+  m.display_name = 'Semaglutide',
+  m.code = '1991302',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['1991302'],
+  m.provenance_guideline = 'guideline:ada-diabetes-2024',
+  m.provenance_version = '2024-01-01',
+  m.provenance_source_section = 'Chapter 9 — GLP-1 receptor agonists',
+  m.provenance_publication_date = date('2024-01-01');
+
+MERGE (m:Medication {id: 'med:liraglutide'})
+ON CREATE SET
+  m.display_name = 'Liraglutide',
+  m.code = '475968',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['475968'],
+  m.provenance_guideline = 'guideline:ada-diabetes-2024',
+  m.provenance_version = '2024-01-01',
+  m.provenance_source_section = 'Chapter 9 — GLP-1 receptor agonists',
+  m.provenance_publication_date = date('2024-01-01');
+
+MERGE (m:Medication {id: 'med:dulaglutide'})
+ON CREATE SET
+  m.display_name = 'Dulaglutide',
+  m.code = '1551291',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['1551291'],
+  m.provenance_guideline = 'guideline:ada-diabetes-2024',
+  m.provenance_version = '2024-01-01',
+  m.provenance_source_section = 'Chapter 9 — GLP-1 receptor agonists',
+  m.provenance_publication_date = date('2024-01-01');
+
+MERGE (m:Medication {id: 'med:insulin-glargine'})
+ON CREATE SET
+  m.display_name = 'Insulin glargine',
+  m.code = '274783',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['274783'],
+  m.provenance_guideline = 'guideline:ada-diabetes-2024',
+  m.provenance_version = '2024-01-01',
+  m.provenance_source_section = 'Chapter 9 — Insulin therapy',
+  m.provenance_publication_date = date('2024-01-01');
+
+MERGE (m:Medication {id: 'med:insulin-lispro'})
+ON CREATE SET
+  m.display_name = 'Insulin lispro',
+  m.code = '86009',
+  m.code_system = 'RxNorm',
+  m.rxnorm_codes = ['86009'],
+  m.provenance_guideline = 'guideline:ada-diabetes-2024',
+  m.provenance_version = '2024-01-01',
+  m.provenance_source_section = 'Chapter 9 — Insulin therapy',
+  m.provenance_publication_date = date('2024-01-01');
+
+// ---------------------------------------------------------------------------
 // Seed-time uniqueness check: Condition codings
 //
 // Neo4j cannot enforce native uniqueness on list-element contents.

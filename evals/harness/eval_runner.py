@@ -107,14 +107,18 @@ def run_eval(
         print()
 
 
-def run_scorecard(run_name: str, output_dir: Path | None = None) -> None:
+def run_scorecard(
+    run_name: str,
+    output_dir: Path | None = None,
+    verbose: bool = False,
+) -> None:
     """Generate scorecard from Braintrust experiment results."""
     from harness.scorecard import build_scorecard, fetch_from_braintrust
     from harness.report import write_report, write_readme
 
     import subprocess
 
-    all_run_results = fetch_from_braintrust(run_name)
+    all_run_results = fetch_from_braintrust(run_name, verbose=verbose)
     if not all_run_results or not any(all_run_results):
         print("No results found for run name:", run_name, file=sys.stderr)
         sys.exit(1)
@@ -175,12 +179,14 @@ def main() -> None:
                         help="Generate scorecard from existing Braintrust results (no new runs)")
     parser.add_argument("--output-dir", type=str, default=None,
                         help="Output directory for scorecard files")
+    parser.add_argument("--verbose", action="store_true",
+                        help="Show fetch diagnostics (total/scored/dropped row counts)")
 
     args = parser.parse_args()
 
     if args.scorecard:
         output_dir = Path(args.output_dir) if args.output_dir else None
-        run_scorecard(args.run, output_dir)
+        run_scorecard(args.run, output_dir, verbose=args.verbose)
         return
 
     if not args.all and not args.fixture and not args.guideline:

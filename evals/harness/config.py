@@ -34,6 +34,10 @@ FIXTURES_ROOT = EVALS_ROOT / "fixtures"
 RESULTS_ROOT = EVALS_ROOT / "results"
 GUIDELINES_ROOT = EVALS_ROOT.parent / "docs" / "reference" / "guidelines"
 
+# Judge retry settings — only retries on transient API errors (500, 502, 503, 529)
+JUDGE_MAX_RETRIES = 3
+JUDGE_RETRY_DELAY_SECONDS = 5  # base delay; actual = base * 2^attempt
+
 # Arm IDs
 ARM_IDS = ("a", "b", "c")
 

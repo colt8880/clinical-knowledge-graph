@@ -8,11 +8,19 @@ and are logged alongside but not combined into the composite.
 from __future__ import annotations
 
 import json
+import sys
+import time
 from typing import Any
 
-from anthropic import Anthropic
+from anthropic import Anthropic, APIStatusError
 
-from harness.config import JUDGE_MODEL, RUBRIC_VERSION, TEMPERATURE
+from harness.config import (
+    JUDGE_MAX_RETRIES,
+    JUDGE_MODEL,
+    JUDGE_RETRY_DELAY_SECONDS,
+    RUBRIC_VERSION,
+    TEMPERATURE,
+)
 
 
 JUDGE_PROMPT = """\
@@ -207,12 +215,30 @@ def score(
 
     client = Anthropic(api_key=api_key) if api_key else Anthropic()
 
-    response = client.messages.create(
-        model=JUDGE_MODEL,
-        max_tokens=1024,
-        temperature=TEMPERATURE,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    # Retry with exponential backoff on transient API errors
+    RETRYABLE_STATUS_CODES = {500, 502, 503, 529}
+    response = None
+    for attempt in range(JUDGE_MAX_RETRIES + 1):
+        try:
+            response = client.messages.create(
+                model=JUDGE_MODEL,
+                max_tokens=1024,
+                temperature=TEMPERATURE,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            break
+        except APIStatusError as e:
+            if e.status_code not in RETRYABLE_STATUS_CODES:
+                raise
+            if attempt == JUDGE_MAX_RETRIES:
+                raise
+            delay = JUDGE_RETRY_DELAY_SECONDS * (2 ** attempt)
+            print(
+                f"[judge] API {e.status_code} on attempt {attempt + 1}/{JUDGE_MAX_RETRIES + 1}, "
+                f"retrying in {delay}s...",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
 
     raw_text = response.content[0].text
 

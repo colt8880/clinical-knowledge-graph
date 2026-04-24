@@ -80,7 +80,7 @@ def _get_eval_trace(
     api_base: str = DEFAULT_API_BASE,
 ) -> dict[str, Any]:
     """Call the /evaluate endpoint to get the EvalTrace for this patient."""
-    with httpx.Client(timeout=30.0) as client:
+    with httpx.Client(timeout=60.0) as client:
         response = client.post(
             f"{api_base}/evaluate",
             json={"patient_context": patient_context},

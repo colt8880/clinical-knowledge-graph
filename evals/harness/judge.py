@@ -217,7 +217,7 @@ def score(
 
     # Retry with exponential backoff on transient API errors
     RETRYABLE_STATUS_CODES = {500, 502, 503, 529}
-    response = None
+    last_error: APIStatusError | None = None
     for attempt in range(JUDGE_MAX_RETRIES + 1):
         try:
             response = client.messages.create(
@@ -228,6 +228,7 @@ def score(
             )
             break
         except APIStatusError as e:
+            last_error = e
             if e.status_code not in RETRYABLE_STATUS_CODES:
                 raise
             if attempt == JUDGE_MAX_RETRIES:
@@ -239,6 +240,10 @@ def score(
                 file=sys.stderr,
             )
             time.sleep(delay)
+    else:
+        # All attempts exhausted without success or re-raise — should not happen,
+        # but guard against it.
+        raise RuntimeError("Judge API call failed after all retries") from last_error
 
     raw_text = response.content[0].text
 

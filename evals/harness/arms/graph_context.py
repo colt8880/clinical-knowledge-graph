@@ -38,6 +38,7 @@ strategies as structured nodes and edges.
 ### Matched Recommendations
 
 {matched_recs}
+{strategy_summary_section}\
 {satisfied_strategies_section}\
 {cross_guideline_interactions}\
 {negative_evidence_section}\
@@ -108,6 +109,10 @@ def get_prompt(
     else:
         matched_recs_text = json.dumps(trace_summary.get("matched_recs", []), indent=2)
 
+    # Build strategy summary section (F59: compressed mode only)
+    strategy_summary = graph_context.get("strategy_summary", "")
+    strategy_summary_section = f"\n{strategy_summary}\n" if strategy_summary else ""
+
     # Build satisfied strategies section
     satisfied_strategies = graph_context.get("satisfied_strategies", [])
     satisfied_strategies_section = _build_satisfied_strategies_section(satisfied_strategies)
@@ -148,6 +153,7 @@ def get_prompt(
         patient_context=pc_text,
         rendered_prose=rendered_prose,
         matched_recs=matched_recs_text,
+        strategy_summary_section=strategy_summary_section,
         satisfied_strategies_section=satisfied_strategies_section,
         cross_guideline_interactions=cross_guideline_interactions,
         negative_evidence_section=negative_evidence_section,

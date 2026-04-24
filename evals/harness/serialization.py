@@ -80,6 +80,20 @@ def serialize_trace_summary(trace: dict[str, Any]) -> dict[str, Any]:
                 "note": event.get("note", ""),
             })
 
+    # Build strategy_names lookup from strategy_considered events
+    strategy_names: dict[str, str] = {}
+    # Build rec_intents lookup from recommendation_considered events
+    rec_intents: dict[str, str] = {}
+
+    for event in events:
+        event_type = event.get("type")
+        if event_type == "strategy_considered":
+            strategy_names[event["strategy_id"]] = event.get(
+                "strategy_name", event["strategy_id"]
+            )
+        elif event_type == "recommendation_considered":
+            rec_intents[event["recommendation_id"]] = event.get("intent", "")
+
     return {
         "matched_recs": matched_recs,
         "exit_conditions": exit_conditions,
@@ -87,6 +101,8 @@ def serialize_trace_summary(trace: dict[str, Any]) -> dict[str, Any]:
         "modifier_events": modifier_events,
         "preemption_prose": _render_preemption_prose(preemption_events),
         "modifier_prose": _render_modifier_prose(modifier_events),
+        "strategy_names": strategy_names,
+        "rec_intents": rec_intents,
     }
 
 
@@ -872,35 +888,170 @@ def _render_compressed_prose(trace: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+INTENT_PRIORITY: dict[str, int] = {
+    "secondary_prevention": 0,
+    "primary_prevention": 1,
+    "treatment": 2,
+    "monitoring": 3,
+}
+
+EVIDENCE_GRADE_SORT: dict[str, int] = {
+    "COR I, LOE A": 0,
+    "A": 1,
+    "1A": 2,
+    "B": 3,
+    "1B": 4,
+    "COR I, LOE B-R": 5,
+    "COR IIa, LOE B-R": 6,
+    "C": 7,
+    "1C": 8,
+    "2A": 9,
+    "2B": 10,
+    "2C": 11,
+}
+
+
 def render_compressed_matched_recs(
     trace_summary: dict[str, Any],
 ) -> str:
-    """Render matched recs as a markdown table instead of JSON.
+    """Render matched recs as a priority-ordered markdown table.
 
-    ~60% shorter than JSON while preserving the information the LLM
-    needs for action enumeration.
+    Fix 1 (F59): Key Action column shows strategy name instead of reason.
+    Fix 2 (F59): Recs sorted by clinical priority with explicit # column.
     """
     recs = trace_summary.get("matched_recs", [])
     if not recs:
         return "No matched recommendations."
 
+    strategy_names = trace_summary.get("strategy_names", {})
+    rec_intents = trace_summary.get("rec_intents", {})
+    preempted_rec_ids = {
+        pe["preempted_recommendation_id"]
+        for pe in trace_summary.get("preemption_events", [])
+    }
+
+    # Sort by (is_preempted ASC, intent_priority ASC, evidence_grade_sort ASC)
+    def sort_key(rec: dict[str, Any]) -> tuple[int, int, int]:
+        rec_id = rec["recommendation_id"]
+        is_preempted = 1 if rec_id in preempted_rec_ids else 0
+        intent = rec_intents.get(rec_id, "")
+        intent_order = INTENT_PRIORITY.get(intent, 99)
+        grade = rec.get("evidence_grade", "")
+        grade_order = EVIDENCE_GRADE_SORT.get(grade, 50)
+        return (is_preempted, intent_order, grade_order)
+
+    sorted_recs = sorted(recs, key=sort_key)
+
     lines = [
-        "| Guideline | Rec | Grade | Status | Key Action |",
-        "|-----------|-----|-------|--------|------------|",
+        "| # | Guideline | Rec | Grade | Status | Key Action |",
+        "|---|-----------|-----|-------|--------|------------|",
     ]
-    for rec in recs:
+    for i, rec in enumerate(sorted_recs, 1):
         guideline = _guideline_label(rec.get("guideline_id", ""))
         rec_id = rec["recommendation_id"]
-        # Shorten rec_id: "rec:statin-initiate-grade-b" → "statin-initiate-grade-b"
         short_id = rec_id.replace("rec:", "") if rec_id.startswith("rec:") else rec_id
         grade = rec.get("evidence_grade", "")
-        status = rec.get("status", "")
-        reason = rec.get("reason", "")
-        # Truncate reason to keep table compact
-        if len(reason) > 50:
-            reason = reason[:47] + "..."
-        lines.append(f"| {guideline} | {short_id} | {grade} | {status} | {reason} |")
 
+        if rec_id in preempted_rec_ids:
+            status = "preempted"
+        else:
+            status = rec.get("status", "")
+
+        # Key Action: strategy name (not evaluator reason)
+        key_action = ""
+        offered = rec.get("offered_strategies", [])
+        if offered:
+            key_action = strategy_names.get(offered[0], "")
+        if not key_action:
+            reason = rec.get("reason", "")
+            key_action = reason[:47] + "..." if len(reason) > 50 else reason
+
+        lines.append(
+            f"| {i} | {guideline} | {short_id} | {grade} | {status} | {key_action} |"
+        )
+
+    return "\n".join(lines)
+
+
+def render_compact_strategy_summary(trace: dict[str, Any]) -> str:
+    """Render a compact strategy summary for compressed mode (F59).
+
+    One line per indicated (non-preempted) rec showing strategy name and
+    top 3 action options. Adds ~3-5 lines vs ~20+ in uncompressed format.
+    """
+    events = trace.get("events", [])
+
+    # Build lookups
+    strategy_names: dict[str, str] = {}
+    rec_intents: dict[str, str] = {}
+    for event in events:
+        etype = event.get("type")
+        if etype == "strategy_considered":
+            strategy_names[event["strategy_id"]] = event.get(
+                "strategy_name", event["strategy_id"]
+            )
+        elif etype == "recommendation_considered":
+            rec_intents[event["recommendation_id"]] = event.get("intent", "")
+
+    # Collect preempted rec IDs
+    preempted_rec_ids: set[str] = set()
+    for event in events:
+        if event.get("type") == "preemption_resolved":
+            preempted_rec_ids.add(event["preempted_recommendation_id"])
+
+    # Collect actions per strategy (deduplicated, preserving order)
+    strategy_actions: dict[str, list[str]] = {}
+    for event in events:
+        if event.get("type") == "action_checked":
+            sid = event["strategy_id"]
+            if sid not in strategy_actions:
+                strategy_actions[sid] = []
+            action_id = event["action_node_id"]
+            if action_id not in strategy_actions[sid]:
+                strategy_actions[sid].append(action_id)
+
+    # Collect indicated recs (not not_applicable, not preempted)
+    indicated_recs: list[dict[str, Any]] = []
+    for event in events:
+        if event.get("type") == "recommendation_emitted":
+            rec_id = event["recommendation_id"]
+            if event.get("status") == "not_applicable":
+                continue
+            if rec_id in preempted_rec_ids:
+                continue
+            indicated_recs.append(event)
+
+    if not indicated_recs:
+        return ""
+
+    # Sort by priority (same order as the recs table)
+    def sort_key(rec_event: dict[str, Any]) -> tuple[int, int]:
+        intent = rec_intents.get(rec_event["recommendation_id"], "")
+        intent_order = INTENT_PRIORITY.get(intent, 99)
+        grade = rec_event.get("evidence_grade", "")
+        grade_order = EVIDENCE_GRADE_SORT.get(grade, 50)
+        return (intent_order, grade_order)
+
+    indicated_recs.sort(key=sort_key)
+
+    lines: list[str] = ["### Key Therapies", ""]
+    for i, rec in enumerate(indicated_recs, 1):
+        offered = rec.get("offered_strategies", [])
+        if not offered:
+            continue
+        strategy_name = strategy_names.get(offered[0], offered[0])
+        guideline = _guideline_label(rec.get("guideline_id", ""))
+        grade = rec.get("evidence_grade", "")
+
+        # Top 3 actions from the first offered strategy
+        actions = strategy_actions.get(offered[0], [])[:3]
+        action_str = ", ".join(actions) if actions else "see strategy"
+
+        lines.append(
+            f"{i}. **{strategy_name}** ({guideline}, {grade}): {action_str}"
+        )
+
+    lines.append("")
     return "\n".join(lines)
 
 
@@ -928,8 +1079,11 @@ def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
     trace_summary = serialize_trace_summary(scoped_trace)
 
     # In compressed mode, replace rendered_prose with one-line-per-guideline
+    # and build a compact strategy summary (F59)
+    strategy_summary = ""
     if compressed:
         subgraph["rendered_prose"] = _render_compressed_prose(scoped_trace)
+        strategy_summary = render_compact_strategy_summary(scoped_trace)
 
     return {
         "trace_summary": trace_summary,
@@ -938,4 +1092,5 @@ def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
         "satisfied_strategies": serialize_satisfied_strategies(scoped_trace),
         "negative_evidence": serialize_negative_evidence(scoped_trace),
         "compressed": compressed,
+        "strategy_summary": strategy_summary,
     }

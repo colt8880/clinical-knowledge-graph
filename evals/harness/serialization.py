@@ -780,6 +780,130 @@ def _filter_trace_by_relevance(
     return {**trace, "events": filtered_events}
 
 
+def _count_relevant_guidelines(trace: dict[str, Any]) -> int:
+    """Count distinct relevant guidelines in a (scoped) trace.
+
+    Counts guideline_entered events, which survive scoping only for
+    relevant guidelines.
+    """
+    return sum(
+        1
+        for event in trace.get("events", [])
+        if event.get("type") == "guideline_entered"
+    )
+
+
+# Compression threshold: >= 3 relevant guidelines triggers compressed format.
+COMPRESSION_THRESHOLD = 3
+
+
+def _render_compressed_prose(trace: dict[str, Any]) -> str:
+    """Render a one-line-per-guideline prose summary for compressed mode.
+
+    Replaces the multi-line trace walk with a compact summary:
+    one sentence per guideline with rec count, status, and key detail.
+    """
+    events = trace.get("events", [])
+
+    # Gather per-guideline info
+    guideline_info: dict[str, dict[str, Any]] = {}
+    for event in events:
+        gid = event.get("guideline_id", "")
+        etype = event.get("type", "")
+
+        if etype == "guideline_entered" and gid:
+            guideline_info.setdefault(gid, {
+                "title": event.get("guideline_title", gid),
+                "recs": [],
+                "exits": [],
+                "risk_scores": [],
+            })
+
+        elif etype == "recommendation_emitted" and gid:
+            info = guideline_info.get(gid)
+            if info:
+                info["recs"].append({
+                    "status": event.get("status", ""),
+                    "grade": event.get("evidence_grade", ""),
+                    "reason": event.get("reason", ""),
+                })
+
+        elif etype == "exit_condition_triggered" and gid:
+            info = guideline_info.get(gid)
+            if info:
+                info["exits"].append(event.get("exit", ""))
+
+        elif etype == "risk_score_lookup" and gid:
+            info = guideline_info.get(gid)
+            if info:
+                value = event.get("supplied_value") or event.get("computed_value")
+                if value is not None:
+                    info["risk_scores"].append(
+                        f"{event['score_name']} {value}%"
+                    )
+
+    lines: list[str] = []
+    for gid, info in guideline_info.items():
+        title = info["title"]
+        recs = info["recs"]
+        exits = info["exits"]
+
+        if exits and not recs:
+            lines.append(f"{title}: exited ({', '.join(exits)}).")
+            continue
+
+        # Count by status
+        indicated = [r for r in recs if r["status"] in ("due", "indicated")]
+        up_to_date = [r for r in recs if r["status"] == "up_to_date"]
+
+        parts: list[str] = []
+        if indicated:
+            grades = ", ".join(f"Grade {r['grade']}" for r in indicated)
+            parts.append(f"{len(indicated)} rec{'s' if len(indicated) != 1 else ''} indicated ({grades})")
+        if up_to_date:
+            parts.append(f"{len(up_to_date)} satisfied")
+
+        risk_str = ""
+        if info["risk_scores"]:
+            risk_str = f", {', '.join(info['risk_scores'])}"
+
+        lines.append(f"{title}: {', '.join(parts)}{risk_str}.")
+
+    return "\n".join(lines)
+
+
+def render_compressed_matched_recs(
+    trace_summary: dict[str, Any],
+) -> str:
+    """Render matched recs as a markdown table instead of JSON.
+
+    ~60% shorter than JSON while preserving the information the LLM
+    needs for action enumeration.
+    """
+    recs = trace_summary.get("matched_recs", [])
+    if not recs:
+        return "No matched recommendations."
+
+    lines = [
+        "| Guideline | Rec | Grade | Status | Key Action |",
+        "|-----------|-----|-------|--------|------------|",
+    ]
+    for rec in recs:
+        guideline = _guideline_label(rec.get("guideline_id", ""))
+        rec_id = rec["recommendation_id"]
+        # Shorten rec_id: "rec:statin-initiate-grade-b" → "statin-initiate-grade-b"
+        short_id = rec_id.replace("rec:", "") if rec_id.startswith("rec:") else rec_id
+        grade = rec.get("evidence_grade", "")
+        status = rec.get("status", "")
+        reason = rec.get("reason", "")
+        # Truncate reason to keep table compact
+        if len(reason) > 50:
+            reason = reason[:47] + "..."
+        lines.append(f"| {guideline} | {short_id} | {grade} | {status} | {reason} |")
+
+    return "\n".join(lines)
+
+
 def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
     """Build the full Arm C context object from an EvalTrace.
 
@@ -789,15 +913,29 @@ def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
     Applies serialization scoping (F57): classifies each guideline as
     relevant or irrelevant based on trace events, then filters irrelevant
     guidelines from the serialized context to reduce noise.
+
+    Applies serialization compression (F58): when 3+ relevant guidelines
+    remain after scoping, switches to a compressed format that reduces
+    per-guideline verbosity while preserving cross-guideline signal.
     """
     relevance = classify_guideline_relevance(trace)
     scoped_trace = _filter_trace_by_relevance(trace, relevance["irrelevant"])
 
+    n_guidelines = _count_relevant_guidelines(scoped_trace)
+    compressed = n_guidelines >= COMPRESSION_THRESHOLD
+
     subgraph = serialize_subgraph(scoped_trace)
+    trace_summary = serialize_trace_summary(scoped_trace)
+
+    # In compressed mode, replace rendered_prose with one-line-per-guideline
+    if compressed:
+        subgraph["rendered_prose"] = _render_compressed_prose(scoped_trace)
+
     return {
-        "trace_summary": serialize_trace_summary(scoped_trace),
+        "trace_summary": trace_summary,
         "subgraph": subgraph,
         "convergence_summary": serialize_convergence_summary(scoped_trace, subgraph),
         "satisfied_strategies": serialize_satisfied_strategies(scoped_trace),
         "negative_evidence": serialize_negative_evidence(scoped_trace),
+        "compressed": compressed,
     }

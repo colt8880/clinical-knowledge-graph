@@ -98,10 +98,15 @@ def get_prompt(
 
     trace_summary = graph_context["trace_summary"]
     subgraph = graph_context["subgraph"]
+    compressed = graph_context.get("compressed", False)
 
     rendered_prose = subgraph.get("rendered_prose", "No evaluation results available.")
 
-    matched_recs_text = json.dumps(trace_summary.get("matched_recs", []), indent=2)
+    if compressed:
+        from harness.serialization import render_compressed_matched_recs
+        matched_recs_text = render_compressed_matched_recs(trace_summary)
+    else:
+        matched_recs_text = json.dumps(trace_summary.get("matched_recs", []), indent=2)
 
     # Build satisfied strategies section
     satisfied_strategies = graph_context.get("satisfied_strategies", [])

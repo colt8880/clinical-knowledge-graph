@@ -1,13 +1,13 @@
 # 55: v2 Phase 2 thesis run
 
-**Status**: pending
+**Status**: shipped
 **Depends on**: 54
 **Components touched**: evals / docs
 **Branch**: `feat/v2-phase2-thesis-run`
 
 ## Context
 
-Phase 2 added ADA Diabetes as a 4th guideline (F52), connected it via clinician-reviewed cross-guideline edges (F53), and created 6 multi-morbidity fixtures exercising 3-4 guidelines simultaneously (F54). This run measures the combined effect on all 28 fixtures (22 existing + 6 new).
+Phase 2 added ADA Diabetes as a 4th guideline (F52), connected it via clinician-reviewed cross-guideline edges (F53), and created 6 multi-morbidity fixtures exercising 3-4 guidelines simultaneously (F54). This run measures the combined effect on all 32 fixtures (22 existing + 4 new diabetes single-guideline + 6 new multi-morbidity).
 
 The v2 Phase 1 thesis run (F51) passed with a C-B margin of +0.775 on 10 multi-guideline fixtures. Phase 2 tests whether:
 

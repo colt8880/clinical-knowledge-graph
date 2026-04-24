@@ -69,6 +69,22 @@ Snapshot of spec gaps, open questions, and intentional deferrals. Move items to 
 
 - **Single-guideline eval harness gate for ADA diabetes.** Docker seed verification passes (74 nodes, 112 edges). Eval harness runs complete but composite scores are below the 4.0 threshold (completeness 3.44/5, composite 3.75/5). Root cause: the Arm C evaluator runs all 4 guidelines simultaneously — ADA fixture expected-actions are ADA-only, but the LLM output includes cross-guideline actions from ACC/AHA and USPSTF that subsume ADA statin recs. The judge penalizes for "missing" ADA-specific actions covered by equivalent cross-guideline recs. This is a multi-guideline interaction issue, not an ADA subgraph defect. Resolution: F53 (cross-guideline edges) + F54 (multi-morbidity fixtures) will produce fixtures designed for multi-guideline evaluation. Single-guideline isolation mode for Arm C would require evaluator scoping (filter to one guideline_id) which is not in scope for F52.
 
+## F53 Cypher quote escaping bug
+
+`graph/seeds/cross-edges-ada.cypher` used SQL-style `''` escaping for apostrophes in a Cypher string literal, which is not valid Cypher. This was merged in PR #51 (F53) and blocked `docker compose up` from completing the seed step. Fixed in F55 by removing possessives from the note text. Future seed files should use double-quoted strings or avoid apostrophes in Cypher string literals.
+
+## F55 eval harness missing data points — diagnosed
+
+The v2-phase2 thesis run appeared to have 15 missing entries but post-run diagnosis found two distinct issues:
+
+1. **Stale rows in `fetch_from_braintrust()` (cosmetic).** `init_experiment(open=True)` returns rows from prior experiment versions with the same name. Each arm experiment had 96 rows (3 versions x 32 fixtures) but only 32 were from the current run. The `if not scores: continue` filter correctly drops stale rows, but the N counts were misleading.
+
+2. **Judge API 500 errors (real data loss, ~9 entries / ~9.4%).** The `clinical_scorer` in `judge.py` calls Anthropic's API with no retry logic. When the API returns HTTP 500 during concurrent scoring, the scorer throws and Braintrust records the row without scores. The arm task functions succeeded for all 32 fixtures in all 3 arms — only the judge scoring failed. Fix: add retry with exponential backoff to `judge.py`'s `score()` function (F56).
+
+## F55 serialization scaling with 4+ guidelines
+
+Adding ADA Diabetes as the 4th guideline degraded Arm C's completeness and prioritization scores even on existing fixtures that don't involve diabetes. The serialization context grows linearly with guideline count, and the ADA subgraph content appears in Arm C's context even for non-diabetic patients. Two potential fixes: (1) scope serialization to only guidelines relevant to the patient's conditions, (2) compress the serialization more aggressively when 4+ guidelines are active.
+
 ## Cleanup
 
 - Delete `/diagrams/crc-graph.html` and the `/diagrams` directory once UI Explore tab ships (backlog #05). Interim artifact superseded by live Explore.

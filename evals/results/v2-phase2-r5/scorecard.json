@@ -1,0 +1,2091 @@
+{
+  "run_name": "v2-phase2-r5",
+  "rubric_version": "v1.1",
+  "n_runs": 1,
+  "n_fixtures": 32,
+  "n_arms": 3,
+  "fixture_scores": [
+    {
+      "fixture": "cholesterol/case-01",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-01",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 5.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 5.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-01",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-02",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-02",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-02",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-03",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-03",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-03",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-04",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-04",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cholesterol/case-04",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-01",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 4.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-01",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-01",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-02",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 3.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-02",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 5.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-02",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-03",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-03",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-03",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-04",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 4.0,
+        "integration": 3.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-04",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 4.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-04",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 5.0,
+        "integration": 4.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-05",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 3.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-05",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 4.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-05",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 4.0,
+        "integration": 3.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-06",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 3.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-06",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 4.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-06",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 5.0,
+        "integration": 4.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-07",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-07",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 5.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 5.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-07",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 5.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 5.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-08",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-08",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 4.0,
+        "integration": 3.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-08",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-09",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 2.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-09",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-09",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-10",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-10",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 4.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-10",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 4.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-11",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 3.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-11",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 4.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-11",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 3.0,
+        "integration": 4.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-12",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-12",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 3.0,
+        "integration": 3.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-12",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-13",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-13",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-13",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 3.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-14",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-14",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 3.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-14",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 4.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-15",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 4.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-15",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 4.0,
+        "integration": 4.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-15",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 1.0,
+        "prioritization": 1.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 1.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-16",
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 2.0,
+        "integration": 2.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-16",
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 5.0,
+        "integration": 3.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "cross-domain/case-16",
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 5.0,
+        "integration": 4.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-01",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-01",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-01",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-02",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-02",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-02",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-03",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-03",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-03",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 1.0,
+        "prioritization": 1.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-04",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-04",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "diabetes/case-04",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-01",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-01",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-01",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 4.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-02",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-02",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-02",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 1.0,
+        "prioritization": 1.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 1.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-03",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-03",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "kdigo/case-03",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 1.0,
+        "prioritization": 1.0,
+        "integration": 1.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 1.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/01-high-risk-55m-smoker",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/01-high-risk-55m-smoker",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 5.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/01-high-risk-55m-smoker",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/02-borderline-55f-sdm",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/02-borderline-55f-sdm",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.5,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/02-borderline-55f-sdm",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 2.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/03-too-young-35m",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/03-too-young-35m",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/03-too-young-35m",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 5.0,
+        "clinical_appropriateness": 4.0,
+        "prioritization": 5.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/04-grade-i-78f",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.75,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/04-grade-i-78f",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 1.0,
+        "prioritization": 1.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 2.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/04-grade-i-78f",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 2.0,
+        "prioritization": 2.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/05-prior-mi-62m",
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 1.0,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 3.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 3.0,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/05-prior-mi-62m",
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    },
+    {
+      "fixture": "statins/05-prior-mi-62m",
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_runs": 1,
+      "dimensions": {
+        "completeness": 3.0,
+        "clinical_appropriateness": 5.0,
+        "prioritization": 4.0,
+        "integration": 5.0
+      },
+      "dimensions_sd": {
+        "completeness": 0.0,
+        "clinical_appropriateness": 0.0,
+        "prioritization": 0.0,
+        "integration": 0.0
+      },
+      "composite_mean": 4.25,
+      "composite_sd": 0.0
+    }
+  ],
+  "arm_subset_summary": [
+    {
+      "arm": "a",
+      "subset": "multi-guideline",
+      "n_fixtures": 16,
+      "dimensions": {
+        "completeness": 2.5,
+        "clinical_appropriateness": 2.875,
+        "prioritization": 3.062,
+        "integration": 1.938
+      },
+      "dimensions_fixture_sd": {
+        "completeness": 0.73,
+        "clinical_appropriateness": 1.088,
+        "prioritization": 0.854,
+        "integration": 0.854
+      },
+      "composite_mean": 2.594,
+      "composite_fixture_sd": 0.763,
+      "composite_self_consistency_sd": 0.0
+    },
+    {
+      "arm": "a",
+      "subset": "single-guideline",
+      "n_fixtures": 16,
+      "dimensions": {
+        "completeness": 2.312,
+        "clinical_appropriateness": 3.0,
+        "prioritization": 2.812,
+        "integration": 5.0
+      },
+      "dimensions_fixture_sd": {
+        "completeness": 0.873,
+        "clinical_appropriateness": 1.095,
+        "prioritization": 0.75,
+        "integration": 0.0
+      },
+      "composite_mean": 3.281,
+      "composite_fixture_sd": 0.507,
+      "composite_self_consistency_sd": 0.0
+    },
+    {
+      "arm": "b",
+      "subset": "multi-guideline",
+      "n_fixtures": 16,
+      "dimensions": {
+        "completeness": 3.188,
+        "clinical_appropriateness": 3.375,
+        "prioritization": 4.0,
+        "integration": 2.938
+      },
+      "dimensions_fixture_sd": {
+        "completeness": 0.75,
+        "clinical_appropriateness": 1.204,
+        "prioritization": 0.73,
+        "integration": 1.289
+      },
+      "composite_mean": 3.375,
+      "composite_fixture_sd": 0.785,
+      "composite_self_consistency_sd": 0.0
+    },
+    {
+      "arm": "b",
+      "subset": "single-guideline",
+      "n_fixtures": 16,
+      "dimensions": {
+        "completeness": 3.25,
+        "clinical_appropriateness": 3.562,
+        "prioritization": 3.438,
+        "integration": 5.0
+      },
+      "dimensions_fixture_sd": {
+        "completeness": 1.125,
+        "clinical_appropriateness": 1.459,
+        "prioritization": 1.209,
+        "integration": 0.0
+      },
+      "composite_mean": 3.812,
+      "composite_fixture_sd": 0.783,
+      "composite_self_consistency_sd": 0.0
+    },
+    {
+      "arm": "c",
+      "subset": "multi-guideline",
+      "n_fixtures": 16,
+      "dimensions": {
+        "completeness": 3.125,
+        "clinical_appropriateness": 3.938,
+        "prioritization": 4.0,
+        "integration": 3.812
+      },
+      "dimensions_fixture_sd": {
+        "completeness": 0.885,
+        "clinical_appropriateness": 1.289,
+        "prioritization": 1.155,
+        "integration": 1.276
+      },
+      "composite_mean": 3.719,
+      "composite_fixture_sd": 1.04,
+      "composite_self_consistency_sd": 0.0
+    },
+    {
+      "arm": "c",
+      "subset": "single-guideline",
+      "n_fixtures": 16,
+      "dimensions": {
+        "completeness": 3.062,
+        "clinical_appropriateness": 3.25,
+        "prioritization": 3.125,
+        "integration": 4.5
+      },
+      "dimensions_fixture_sd": {
+        "completeness": 1.289,
+        "clinical_appropriateness": 1.653,
+        "prioritization": 1.586,
+        "integration": 1.366
+      },
+      "composite_mean": 3.484,
+      "composite_fixture_sd": 1.293,
+      "composite_self_consistency_sd": 0.0
+    }
+  ],
+  "thesis_gate": {
+    "result": "FAIL",
+    "margin": 0.344,
+    "arm_b_composite": 3.375,
+    "arm_c_composite": 3.719,
+    "required_margin": 0.5,
+    "dimension_gaps": {
+      "completeness": -0.063,
+      "clinical_appropriateness": 0.563,
+      "prioritization": 0.0,
+      "integration": 0.874
+    },
+    "single_guideline_comparison": {
+      "arm_b_composite": 3.812,
+      "arm_c_composite": 3.484,
+      "margin": -0.328
+    },
+    "failure_analysis": {
+      "classification": "thesis_signal_below_threshold",
+      "interpretation": "Arm C leads by 0.34 points \u2014 signal present but below the 0.5 threshold. Likely addressable via serialization improvements.",
+      "underperforming_dimensions": [
+        "completeness",
+        "prioritization"
+      ],
+      "hypotheses": [
+        "Retrieval gap: Arm B chunks may be more comprehensive than expected, covering actions the graph context misses.",
+        "Genuine null result: the graph's convergence visibility does not add enough value over flat RAG at this rubric granularity."
+      ],
+      "recommended_next": [
+        "Improve convergence serialization (richer prose, explicit multi-source evidence table)",
+        "Audit Arm B retrieval quality on multi-guideline fixtures",
+        "Add more cross-domain fixtures with stronger convergence signal"
+      ]
+    }
+  },
+  "self_consistency": {
+    "stable": true,
+    "threshold": 0.3,
+    "flags": []
+  }
+}

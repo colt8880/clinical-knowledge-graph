@@ -11,6 +11,7 @@ from harness.arms.graph_context import (
 )
 from harness.serialization import (
     build_arm_c_context,
+    classify_guideline_relevance,
     serialize_convergence_summary,
     serialize_negative_evidence,
     serialize_satisfied_strategies,
@@ -1223,3 +1224,282 @@ class TestPromptIntegration:
         ctx = build_arm_c_context(SATISFIED_STRATEGY_TRACE)
         prompt = get_prompt({"demographics": {"age": 60}}, ctx)
         assert "Currently Satisfied Strategies" in prompt
+
+
+# --- F57: Serialization scoping tests ---
+
+# 4-guideline trace where USPSTF and ACC/AHA are relevant (emit recs),
+# KDIGO has an exit condition (relevant), and ADA is irrelevant
+# (entered, all recs not_applicable, no exit, no cross-match).
+FOUR_GUIDELINE_SCOPING_TRACE = {
+    "envelope": {"spec_tag": "test", "graph_version": "test", "evaluator_version": "test"},
+    "events": [
+        {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+        # USPSTF — relevant (rec emitted with status=due)
+        {
+            "seq": 2,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "guideline_title": "USPSTF 2022 Statin Primary Prevention",
+        },
+        {
+            "seq": 3,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "recommendation_title": "Initiate statin (Grade B)",
+            "evidence_grade": "B",
+            "intent": "primary_prevention",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 4,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "status": "due",
+            "evidence_grade": "B",
+            "reason": "Patient eligible",
+            "offered_strategies": [],
+        },
+        {
+            "seq": 5,
+            "type": "guideline_exited",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendations_emitted": 1,
+        },
+        # ACC/AHA — relevant (rec emitted with status=up_to_date)
+        {
+            "seq": 6,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "guideline_title": "ACC/AHA 2018 Cholesterol",
+        },
+        {
+            "seq": 7,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "status": "up_to_date",
+            "evidence_grade": "COR I, LOE A",
+            "reason": "Already on statin",
+            "satisfying_strategy": "strategy:accaha-moderate-intensity",
+            "offered_strategies": [],
+        },
+        {
+            "seq": 8,
+            "type": "guideline_exited",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendations_emitted": 1,
+        },
+        # KDIGO — relevant (exit condition triggered)
+        {
+            "seq": 9,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "guideline_title": "KDIGO 2024 CKD",
+        },
+        {
+            "seq": 10,
+            "type": "exit_condition_triggered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-statin-for-ckd",
+            "exit": "no_ckd_diagnosis",
+            "rationale": "Patient does not have CKD",
+        },
+        {
+            "seq": 11,
+            "type": "guideline_exited",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendations_emitted": 0,
+        },
+        # ADA — irrelevant (entered, rec not_applicable, no exit, no cross-match)
+        {
+            "seq": 12,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "guideline_title": "ADA 2024 Diabetes",
+        },
+        {
+            "seq": 13,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendation_id": "rec:ada-statin-diabetes",
+            "recommendation_title": "Statin for diabetes",
+            "evidence_grade": "A",
+            "intent": "treatment",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 14,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendation_id": "rec:ada-statin-diabetes",
+            "status": "not_applicable",
+            "evidence_grade": "A",
+            "reason": "Patient does not have diabetes",
+            "offered_strategies": [],
+        },
+        {
+            "seq": 15,
+            "type": "guideline_exited",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendations_emitted": 1,
+        },
+        {"seq": 16, "type": "evaluation_completed", "guideline_id": None},
+    ],
+}
+
+
+class TestClassifyGuidelineRelevance:
+    """Tests for classify_guideline_relevance (F57)."""
+
+    def test_four_guidelines_two_irrelevant(self):
+        """ADA is irrelevant (all recs not_applicable). Others are relevant."""
+        result = classify_guideline_relevance(FOUR_GUIDELINE_SCOPING_TRACE)
+        assert "guideline:uspstf-statin-2022" in result["relevant"]
+        assert "guideline:acc-aha-cholesterol-2018" in result["relevant"]
+        assert "guideline:kdigo-ckd-2024" in result["relevant"]
+        assert "guideline:ada-diabetes-2024" in result["irrelevant"]
+
+    def test_exit_condition_is_relevant(self):
+        """A guideline with exit_condition_triggered but no rec emitted is relevant."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "guideline_entered",
+                    "guideline_id": "guideline:kdigo-ckd-2024",
+                    "guideline_title": "KDIGO 2024 CKD",
+                },
+                {
+                    "seq": 2,
+                    "type": "exit_condition_triggered",
+                    "guideline_id": "guideline:kdigo-ckd-2024",
+                    "recommendation_id": "rec:kdigo-statin-for-ckd",
+                    "exit": "no_ckd_diagnosis",
+                    "rationale": "Patient does not have CKD",
+                },
+            ]
+        }
+        result = classify_guideline_relevance(trace)
+        assert "guideline:kdigo-ckd-2024" in result["relevant"]
+        assert "guideline:kdigo-ckd-2024" not in result["irrelevant"]
+
+    def test_cross_guideline_match_keeps_both_relevant(self):
+        """A guideline in a cross_guideline_match is never filtered out."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "guideline_entered",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "guideline_title": "ADA 2024 Diabetes",
+                },
+                # ADA has no recs emitted (would be irrelevant)
+                # But it appears in a cross_guideline_match
+                {
+                    "seq": 2,
+                    "type": "cross_guideline_match",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "source_guideline_id": "guideline:ada-diabetes-2024",
+                    "target_guideline_id": "guideline:acc-aha-cholesterol-2018",
+                    "nature": "reinforcing",
+                    "note": "Both recommend statins",
+                },
+            ]
+        }
+        result = classify_guideline_relevance(trace)
+        assert "guideline:ada-diabetes-2024" in result["relevant"]
+        assert "guideline:acc-aha-cholesterol-2018" in result["relevant"]
+
+    def test_not_applicable_only_is_irrelevant(self):
+        """A guideline with only not_applicable recs is irrelevant."""
+        trace = {
+            "events": [
+                {
+                    "seq": 1,
+                    "type": "guideline_entered",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "guideline_title": "ADA 2024 Diabetes",
+                },
+                {
+                    "seq": 2,
+                    "type": "recommendation_emitted",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "recommendation_id": "rec:ada-statin-diabetes",
+                    "status": "not_applicable",
+                    "evidence_grade": "A",
+                    "reason": "No diabetes",
+                    "offered_strategies": [],
+                },
+            ]
+        }
+        result = classify_guideline_relevance(trace)
+        assert "guideline:ada-diabetes-2024" in result["irrelevant"]
+
+    def test_empty_trace(self):
+        result = classify_guideline_relevance({"events": []})
+        assert result["relevant"] == set()
+        assert result["irrelevant"] == set()
+
+    def test_all_relevant_no_irrelevant(self):
+        """When all guidelines fire, irrelevant set is empty."""
+        result = classify_guideline_relevance(MULTI_GUIDELINE_TRACE)
+        assert len(result["irrelevant"]) == 0
+
+
+class TestSerializationScoping:
+    """Tests for build_arm_c_context with scoping (F57)."""
+
+    def test_irrelevant_guideline_filtered_from_context(self):
+        """build_arm_c_context should exclude ADA from serialized context
+        when ADA is irrelevant (all recs not_applicable)."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_SCOPING_TRACE)
+
+        # ADA should NOT appear in rendered prose
+        prose = ctx["subgraph"]["rendered_prose"]
+        assert "ADA 2024" not in prose
+
+        # ADA recs should not be in matched_recs
+        rec_guidelines = {
+            r.get("guideline_id") for r in ctx["trace_summary"]["matched_recs"]
+        }
+        assert "guideline:ada-diabetes-2024" not in rec_guidelines
+
+        # ADA should not appear in negative evidence
+        neg_guidelines = {
+            n["guideline_id"] for n in ctx["negative_evidence"]
+        }
+        assert "guideline:ada-diabetes-2024" not in neg_guidelines
+
+    def test_relevant_guidelines_preserved(self):
+        """USPSTF, ACC/AHA, and KDIGO should all still appear in context."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_SCOPING_TRACE)
+        prose = ctx["subgraph"]["rendered_prose"]
+
+        assert "USPSTF 2022" in prose
+        # KDIGO exit should appear
+        assert "no_ckd_diagnosis" in prose
+
+    def test_context_mentions_only_relevant_guidelines(self):
+        """The full prompt should only reference relevant guidelines."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_SCOPING_TRACE)
+        prompt = get_prompt({"demographics": {"age": 55}}, ctx)
+
+        assert "USPSTF" in prompt
+        # ADA content should be absent from the prompt
+        assert "ADA 2024 Diabetes" not in prompt
+
+    def test_no_filtering_when_all_relevant(self):
+        """When all guidelines are relevant, context is unchanged."""
+        ctx_unscoped = build_arm_c_context(MULTI_GUIDELINE_TRACE)
+        # All 3 guidelines fire recs, so none should be filtered
+        rec_count = len(ctx_unscoped["trace_summary"]["matched_recs"])
+        assert rec_count == 4  # 1 USPSTF + 1 ACC/AHA + 2 KDIGO
+
+    def test_deterministic(self):
+        """Same trace = same scoped context."""
+        ctx1 = build_arm_c_context(FOUR_GUIDELINE_SCOPING_TRACE)
+        ctx2 = build_arm_c_context(FOUR_GUIDELINE_SCOPING_TRACE)
+        assert ctx1 == ctx2

@@ -11,8 +11,11 @@ from harness.arms.graph_context import (
 )
 from harness.serialization import (
     _filter_trace_by_relevance,
+    _render_compressed_matched_recs,
+    _render_compressed_prose,
     build_arm_c_context,
     classify_guideline_relevance,
+    COMPRESSION_THRESHOLD,
     serialize_convergence_summary,
     serialize_negative_evidence,
     serialize_satisfied_strategies,
@@ -1604,3 +1607,506 @@ class TestSerializationScoping:
         ctx1 = build_arm_c_context(FOUR_GUIDELINE_SCOPING_TRACE)
         ctx2 = build_arm_c_context(FOUR_GUIDELINE_SCOPING_TRACE)
         assert ctx1 == ctx2
+
+
+# --- F58: Compression test traces ---
+
+# 2-guideline trace: should NOT trigger compression
+TWO_GUIDELINE_TRACE = {
+    "envelope": {"spec_tag": "test", "graph_version": "test", "evaluator_version": "test"},
+    "events": [
+        {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+        {
+            "seq": 2,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "guideline_title": "USPSTF 2022 Statin Primary Prevention",
+        },
+        {
+            "seq": 3,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "recommendation_title": "Initiate statin (Grade B)",
+            "evidence_grade": "B",
+            "intent": "primary_prevention",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 4,
+            "type": "risk_score_lookup",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "score_name": "ascvd_10yr",
+            "resolution": "supplied",
+            "supplied_value": 12.4,
+        },
+        {
+            "seq": 5,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "strategy_id": "strategy:statin-moderate-intensity",
+            "strategy_name": "Moderate-intensity statin therapy",
+        },
+        {
+            "seq": 6,
+            "type": "action_checked",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "strategy_id": "strategy:statin-moderate-intensity",
+            "action_node_id": "med:atorvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 7,
+            "type": "strategy_resolved",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "strategy_id": "strategy:statin-moderate-intensity",
+            "satisfied": False,
+        },
+        {
+            "seq": 8,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "status": "due",
+            "evidence_grade": "B",
+            "reason": "Patient eligible, no strategy satisfied",
+            "offered_strategies": ["strategy:statin-moderate-intensity"],
+        },
+        # ACC/AHA guideline
+        {
+            "seq": 9,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "guideline_title": "ACC/AHA 2018 Cholesterol",
+        },
+        {
+            "seq": 10,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "recommendation_title": "Statin for primary prevention",
+            "evidence_grade": "COR I, LOE A",
+            "intent": "primary_prevention",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 11,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "strategy_id": "strategy:accaha-moderate-intensity",
+            "strategy_name": "Moderate-intensity statin therapy",
+        },
+        {
+            "seq": 12,
+            "type": "action_checked",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "strategy_id": "strategy:accaha-moderate-intensity",
+            "action_node_id": "med:atorvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 13,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-primary-prevention",
+            "status": "due",
+            "evidence_grade": "COR I, LOE A",
+            "reason": "Patient eligible, no strategy satisfied",
+            "offered_strategies": ["strategy:accaha-moderate-intensity"],
+        },
+        {"seq": 14, "type": "evaluation_completed", "guideline_id": None},
+    ],
+}
+
+# 4-guideline trace: all relevant, should trigger compression
+FOUR_GUIDELINE_ALL_RELEVANT_TRACE = {
+    "envelope": {"spec_tag": "test", "graph_version": "test", "evaluator_version": "test"},
+    "events": [
+        {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+        # USPSTF
+        {
+            "seq": 2,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "guideline_title": "USPSTF 2022 Statin Primary Prevention",
+        },
+        {
+            "seq": 3,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "recommendation_title": "Initiate statin (Grade B)",
+            "evidence_grade": "B",
+            "intent": "primary_prevention",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 4,
+            "type": "risk_score_lookup",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "score_name": "ascvd_10yr",
+            "resolution": "supplied",
+            "supplied_value": 12.4,
+        },
+        {
+            "seq": 5,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "strategy_id": "strategy:uspstf-moderate-intensity",
+            "strategy_name": "Moderate-intensity statin therapy",
+        },
+        {
+            "seq": 6,
+            "type": "action_checked",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "strategy_id": "strategy:uspstf-moderate-intensity",
+            "action_node_id": "med:atorvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 7,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:uspstf-statin-2022",
+            "recommendation_id": "rec:statin-initiate-grade-b",
+            "status": "due",
+            "evidence_grade": "B",
+            "reason": "Patient eligible, no strategy satisfied",
+            "offered_strategies": ["strategy:uspstf-moderate-intensity"],
+        },
+        # ACC/AHA
+        {
+            "seq": 8,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "guideline_title": "ACC/AHA 2018 Cholesterol",
+        },
+        {
+            "seq": 9,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-high-intensity",
+            "recommendation_title": "High-intensity statin",
+            "evidence_grade": "COR I, LOE A",
+            "intent": "secondary_prevention",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 10,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-high-intensity",
+            "strategy_id": "strategy:accaha-high-intensity",
+            "strategy_name": "High-intensity statin therapy",
+        },
+        {
+            "seq": 11,
+            "type": "action_checked",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-high-intensity",
+            "strategy_id": "strategy:accaha-high-intensity",
+            "action_node_id": "med:atorvastatin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 12,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "recommendation_id": "rec:accaha-statin-high-intensity",
+            "status": "due",
+            "evidence_grade": "COR I, LOE A",
+            "reason": "ASCVD patient, high-intensity indicated",
+            "offered_strategies": ["strategy:accaha-high-intensity"],
+        },
+        # Preemption: ACC/AHA preempts USPSTF
+        {
+            "seq": 13,
+            "type": "preemption_resolved",
+            "guideline_id": None,
+            "preempted_recommendation_id": "rec:statin-initiate-grade-b",
+            "preempting_recommendation_id": "rec:accaha-statin-high-intensity",
+            "edge_priority": 200,
+            "reason": "ACC/AHA more specific for ASCVD",
+        },
+        # KDIGO
+        {
+            "seq": 14,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "guideline_title": "KDIGO 2024 CKD",
+        },
+        {
+            "seq": 15,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-ckd-monitoring",
+            "recommendation_title": "CKD monitoring",
+            "evidence_grade": "1B",
+            "intent": "monitoring",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 16,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-ckd-monitoring",
+            "strategy_id": "strategy:kdigo-monitoring",
+            "strategy_name": "CKD monitoring protocol",
+        },
+        {
+            "seq": 17,
+            "type": "action_checked",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-ckd-monitoring",
+            "strategy_id": "strategy:kdigo-monitoring",
+            "action_node_id": "obs:egfr",
+            "action_entity_type": "Observation",
+            "satisfied": False,
+        },
+        {
+            "seq": 18,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "recommendation_id": "rec:kdigo-ckd-monitoring",
+            "status": "due",
+            "evidence_grade": "1B",
+            "reason": "eGFR + urine ACR monitoring needed",
+            "offered_strategies": ["strategy:kdigo-monitoring"],
+        },
+        # Modifier: KDIGO modifies ACC/AHA
+        {
+            "seq": 19,
+            "type": "cross_guideline_match",
+            "guideline_id": "guideline:kdigo-ckd-2024",
+            "source_guideline_id": "guideline:kdigo-ckd-2024",
+            "target_guideline_id": "guideline:acc-aha-cholesterol-2018",
+            "nature": "intensity_reduction",
+            "note": "KDIGO recommends moderate-intensity statin for eGFR < 60",
+        },
+        # ADA
+        {
+            "seq": 20,
+            "type": "guideline_entered",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "guideline_title": "ADA 2024 Diabetes",
+        },
+        {
+            "seq": 21,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendation_id": "rec:ada-metformin-first-line",
+            "recommendation_title": "Metformin first-line",
+            "evidence_grade": "A",
+            "intent": "treatment",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 22,
+            "type": "strategy_considered",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendation_id": "rec:ada-metformin-first-line",
+            "strategy_id": "strategy:ada-metformin",
+            "strategy_name": "Metformin therapy",
+        },
+        {
+            "seq": 23,
+            "type": "action_checked",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendation_id": "rec:ada-metformin-first-line",
+            "strategy_id": "strategy:ada-metformin",
+            "action_node_id": "med:metformin",
+            "action_entity_type": "Medication",
+            "satisfied": False,
+        },
+        {
+            "seq": 24,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendation_id": "rec:ada-metformin-first-line",
+            "status": "due",
+            "evidence_grade": "A",
+            "reason": "Metformin indicated for T2DM",
+            "offered_strategies": ["strategy:ada-metformin"],
+        },
+        {
+            "seq": 25,
+            "type": "recommendation_considered",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendation_id": "rec:ada-sglt2i",
+            "recommendation_title": "SGLT2i for CKD/HF",
+            "evidence_grade": "A",
+            "intent": "treatment",
+            "trigger": "patient_state",
+        },
+        {
+            "seq": 26,
+            "type": "recommendation_emitted",
+            "guideline_id": "guideline:ada-diabetes-2024",
+            "recommendation_id": "rec:ada-sglt2i",
+            "status": "due",
+            "evidence_grade": "A",
+            "reason": "SGLT2i indicated for CKD benefit",
+            "offered_strategies": ["strategy:ada-sglt2i"],
+        },
+        {"seq": 27, "type": "evaluation_completed", "guideline_id": None},
+    ],
+}
+
+
+class TestSerializationCompression:
+    """Tests for F58 serialization compression."""
+
+    def test_two_guideline_trace_not_compressed(self):
+        """A 2-guideline trace should use the full format (compressed=False)."""
+        ctx = build_arm_c_context(TWO_GUIDELINE_TRACE)
+        assert ctx["compressed"] is False
+
+    def test_three_guideline_trace_compressed(self):
+        """A 3-guideline trace (at threshold) should use compressed format."""
+        ctx = build_arm_c_context(MULTI_GUIDELINE_TRACE)
+        assert ctx["compressed"] is True
+
+    def test_four_guideline_trace_compressed(self):
+        """A 4-guideline trace should use compressed format."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert ctx["compressed"] is True
+
+    def test_full_format_has_json_matched_recs(self):
+        """Full format (2 guidelines) should have JSON-formatted matched_recs in prompt."""
+        ctx = build_arm_c_context(TWO_GUIDELINE_TRACE)
+        prompt = get_prompt({"demographics": {"age": 55}}, ctx)
+        # JSON format includes braces/brackets
+        assert '"recommendation_id"' in prompt
+
+    def test_compressed_format_has_table_matched_recs(self):
+        """Compressed format should have markdown table matched_recs in prompt."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        prompt = get_prompt({"demographics": {"age": 62}}, ctx)
+        # Table format
+        assert "| Guideline |" in prompt
+        assert "|-----------|" in prompt
+
+    def test_compressed_prose_one_line_per_guideline(self):
+        """Compressed prose should have one line per guideline."""
+        prose = ctx_four = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        rendered = ctx_four["subgraph"]["rendered_prose"]
+        lines = [l for l in rendered.split("\n") if l.strip()]
+        # 4 guidelines → 4 lines
+        assert len(lines) == 4
+
+    def test_compressed_prose_mentions_all_guidelines(self):
+        """Each guideline should appear in the compressed prose."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        prose = ctx["subgraph"]["rendered_prose"]
+        assert "USPSTF" in prose
+        assert "ACC/AHA" in prose
+        assert "KDIGO" in prose
+        assert "ADA" in prose
+
+    def test_compressed_preserves_all_rec_ids(self):
+        """Compressed format must preserve all recommendation IDs."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        rec_ids = {r["recommendation_id"] for r in ctx["trace_summary"]["matched_recs"]}
+        assert "rec:statin-initiate-grade-b" in rec_ids
+        assert "rec:accaha-statin-high-intensity" in rec_ids
+        assert "rec:kdigo-ckd-monitoring" in rec_ids
+        assert "rec:ada-metformin-first-line" in rec_ids
+        assert "rec:ada-sglt2i" in rec_ids
+
+    def test_compressed_preserves_evidence_grades(self):
+        """Compressed format must preserve all evidence grades."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        grades = {r["evidence_grade"] for r in ctx["trace_summary"]["matched_recs"]}
+        assert "B" in grades
+        assert "COR I, LOE A" in grades
+        assert "1B" in grades
+        assert "A" in grades
+
+    def test_compressed_preserves_statuses(self):
+        """Compressed format must preserve all recommendation statuses."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        statuses = {r["status"] for r in ctx["trace_summary"]["matched_recs"]}
+        assert "due" in statuses
+
+    def test_compressed_preserves_convergence(self):
+        """Convergence data should be unchanged in compressed mode."""
+        ctx = build_arm_c_context(MULTI_GUIDELINE_TRACE)
+        assert ctx["compressed"] is True
+        conv = ctx["convergence_summary"]
+        assert len(conv["shared_actions"]) > 0
+        assert conv["convergence_prose"] != ""
+
+    def test_compressed_preserves_interactions(self):
+        """Preemption and modifier prose should be unchanged in compressed mode."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert len(ctx["trace_summary"]["preemption_events"]) == 1
+        assert len(ctx["trace_summary"]["modifier_events"]) == 1
+        assert ctx["trace_summary"]["preemption_prose"] != ""
+        assert ctx["trace_summary"]["modifier_prose"] != ""
+
+    def test_full_format_has_strategy_details_in_prose(self):
+        """Full format prose should include strategy details."""
+        ctx = build_arm_c_context(TWO_GUIDELINE_TRACE)
+        prose = ctx["subgraph"]["rendered_prose"]
+        assert "Strategy" in prose or "strategy" in prose
+
+    def test_compressed_prose_omits_strategy_details(self):
+        """Compressed prose should NOT include per-strategy detail lines."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        prose = ctx["subgraph"]["rendered_prose"]
+        # Should not have "Strategy strategy:" or "Offered strategies:" lines
+        assert "Offered strategies:" not in prose
+        assert "Strategy strategy:" not in prose
+
+    def test_compressed_deterministic(self):
+        """Same trace = same compressed output."""
+        ctx1 = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        ctx2 = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert ctx1 == ctx2
+
+    def test_render_compressed_matched_recs_table(self):
+        """_render_compressed_matched_recs should produce a valid markdown table."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        table = _render_compressed_matched_recs(summary)
+        lines = table.split("\n")
+        # Header + separator + at least 1 data row
+        assert len(lines) >= 3
+        assert lines[0].startswith("| Guideline")
+        assert lines[1].startswith("|---")
+        # Each data row should have the right number of pipes
+        for line in lines[2:]:
+            assert line.count("|") >= 6  # 5 columns = 6 pipes
+
+    def test_render_compressed_matched_recs_empty(self):
+        """Empty recs should produce a message, not a table."""
+        table = _render_compressed_matched_recs({"matched_recs": []})
+        assert table == "No matched recommendations."
+
+    def test_compressed_prompt_shorter_than_full(self):
+        """Compressed prompt should be significantly shorter than if it were full format."""
+        ctx_compressed = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        prompt_compressed = get_prompt({"demographics": {"age": 62}}, ctx_compressed)
+
+        # Build what the full format prompt would look like for comparison
+        # (check that compressed is shorter by looking at matched_recs)
+        import json
+        full_recs = json.dumps(ctx_compressed["trace_summary"]["matched_recs"], indent=2)
+        compressed_recs = _render_compressed_matched_recs(ctx_compressed["trace_summary"])
+
+        assert len(compressed_recs) < len(full_recs)
+
+    def test_risk_score_in_compressed_prose(self):
+        """Risk scores should appear in compressed prose."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        prose = ctx["subgraph"]["rendered_prose"]
+        assert "ascvd_10yr 12.4%" in prose

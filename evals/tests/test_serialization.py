@@ -11,7 +11,7 @@ from harness.arms.graph_context import (
 )
 from harness.serialization import (
     _filter_trace_by_relevance,
-    _render_compressed_matched_recs,
+    render_compressed_matched_recs,
     _render_compressed_prose,
     build_arm_c_context,
     classify_guideline_relevance,
@@ -2077,7 +2077,7 @@ class TestSerializationCompression:
     def test_render_compressed_matched_recs_table(self):
         """_render_compressed_matched_recs should produce a valid markdown table."""
         summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
-        table = _render_compressed_matched_recs(summary)
+        table = render_compressed_matched_recs(summary)
         lines = table.split("\n")
         # Header + separator + at least 1 data row
         assert len(lines) >= 3
@@ -2089,7 +2089,7 @@ class TestSerializationCompression:
 
     def test_render_compressed_matched_recs_empty(self):
         """Empty recs should produce a message, not a table."""
-        table = _render_compressed_matched_recs({"matched_recs": []})
+        table = render_compressed_matched_recs({"matched_recs": []})
         assert table == "No matched recommendations."
 
     def test_compressed_prompt_shorter_than_full(self):
@@ -2101,7 +2101,7 @@ class TestSerializationCompression:
         # (check that compressed is shorter by looking at matched_recs)
         import json
         full_recs = json.dumps(ctx_compressed["trace_summary"]["matched_recs"], indent=2)
-        compressed_recs = _render_compressed_matched_recs(ctx_compressed["trace_summary"])
+        compressed_recs = render_compressed_matched_recs(ctx_compressed["trace_summary"])
 
         assert len(compressed_recs) < len(full_recs)
 

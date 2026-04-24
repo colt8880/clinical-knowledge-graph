@@ -872,7 +872,7 @@ def _render_compressed_prose(trace: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def _render_compressed_matched_recs(
+def render_compressed_matched_recs(
     trace_summary: dict[str, Any],
 ) -> str:
     """Render matched recs as a markdown table instead of JSON.

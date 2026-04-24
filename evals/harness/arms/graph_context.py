@@ -103,8 +103,8 @@ def get_prompt(
     rendered_prose = subgraph.get("rendered_prose", "No evaluation results available.")
 
     if compressed:
-        from harness.serialization import _render_compressed_matched_recs
-        matched_recs_text = _render_compressed_matched_recs(trace_summary)
+        from harness.serialization import render_compressed_matched_recs
+        matched_recs_text = render_compressed_matched_recs(trace_summary)
     else:
         matched_recs_text = json.dumps(trace_summary.get("matched_recs", []), indent=2)
 

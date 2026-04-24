@@ -10,6 +10,7 @@ from harness.arms.graph_context import (
     get_prompt,
 )
 from harness.serialization import (
+    _filter_trace_by_relevance,
     build_arm_c_context,
     classify_guideline_relevance,
     serialize_convergence_summary,
@@ -1447,6 +1448,106 @@ class TestClassifyGuidelineRelevance:
         """When all guidelines fire, irrelevant set is empty."""
         result = classify_guideline_relevance(MULTI_GUIDELINE_TRACE)
         assert len(result["irrelevant"]) == 0
+
+
+class TestFilterTraceByRelevance:
+    """Tests for _filter_trace_by_relevance (F57)."""
+
+    def test_cross_guideline_event_preserved_for_irrelevant_guideline(self):
+        """A preemption_resolved event referencing an irrelevant guideline
+        should still pass through the filter (always_keep behavior)."""
+        trace = {
+            "events": [
+                {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+                {
+                    "seq": 2,
+                    "type": "guideline_entered",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "guideline_title": "ADA 2024 Diabetes",
+                },
+                # ADA rec (would be filtered)
+                {
+                    "seq": 3,
+                    "type": "recommendation_emitted",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "recommendation_id": "rec:ada-statin-diabetes",
+                    "status": "not_applicable",
+                    "evidence_grade": "A",
+                    "reason": "No diabetes",
+                    "offered_strategies": [],
+                },
+                # Preemption event with ADA's guideline_id — must be preserved
+                {
+                    "seq": 4,
+                    "type": "preemption_resolved",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "preempted_recommendation_id": "rec:ada-statin-diabetes",
+                    "preempting_recommendation_id": "rec:accaha-statin-primary-prevention",
+                    "edge_priority": 200,
+                    "reason": "ACC/AHA more specific",
+                },
+                {"seq": 5, "type": "evaluation_completed", "guideline_id": None},
+            ]
+        }
+        irrelevant = {"guideline:ada-diabetes-2024"}
+        filtered = _filter_trace_by_relevance(trace, irrelevant)
+
+        event_types = [e["type"] for e in filtered["events"]]
+        # preemption_resolved should be preserved
+        assert "preemption_resolved" in event_types
+        # recommendation_emitted from ADA should be filtered
+        assert "recommendation_emitted" not in event_types
+        # bookend events preserved
+        assert "evaluation_started" in event_types
+        assert "evaluation_completed" in event_types
+
+    def test_cross_guideline_match_preserved_for_irrelevant_guideline(self):
+        """A cross_guideline_match event should be preserved even if its
+        guideline_id is in the irrelevant set."""
+        trace = {
+            "events": [
+                {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+                {
+                    "seq": 2,
+                    "type": "cross_guideline_match",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "source_guideline_id": "guideline:ada-diabetes-2024",
+                    "target_guideline_id": "guideline:acc-aha-cholesterol-2018",
+                    "nature": "reinforcing",
+                    "note": "test",
+                },
+                {"seq": 3, "type": "evaluation_completed", "guideline_id": None},
+            ]
+        }
+        irrelevant = {"guideline:ada-diabetes-2024"}
+        filtered = _filter_trace_by_relevance(trace, irrelevant)
+        event_types = [e["type"] for e in filtered["events"]]
+        assert "cross_guideline_match" in event_types
+
+    def test_empty_irrelevant_returns_unchanged(self):
+        """No irrelevant guidelines → trace returned unchanged."""
+        trace = {"events": [{"seq": 1, "type": "evaluation_started", "guideline_id": None}]}
+        filtered = _filter_trace_by_relevance(trace, set())
+        assert filtered is trace  # Same object, not a copy
+
+    def test_guideline_entered_filtered_for_irrelevant(self):
+        """guideline_entered event should be dropped for irrelevant guidelines."""
+        trace = {
+            "events": [
+                {"seq": 1, "type": "evaluation_started", "guideline_id": None},
+                {
+                    "seq": 2,
+                    "type": "guideline_entered",
+                    "guideline_id": "guideline:ada-diabetes-2024",
+                    "guideline_title": "ADA 2024 Diabetes",
+                },
+                {"seq": 3, "type": "evaluation_completed", "guideline_id": None},
+            ]
+        }
+        irrelevant = {"guideline:ada-diabetes-2024"}
+        filtered = _filter_trace_by_relevance(trace, irrelevant)
+        event_types = [e["type"] for e in filtered["events"]]
+        assert "guideline_entered" not in event_types
 
 
 class TestSerializationScoping:

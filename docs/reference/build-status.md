@@ -95,8 +95,8 @@ Adds ADA 2024 Diabetes as a 4th guideline, connects via clinician-reviewed cross
 | 53  | ADA cross-guideline edges                       | graph, docs             | shipped | 52 + clinician review | [53](../../docs/build/53-ada-cross-guideline-edges.md)       | [#51](../../pull/51) |
 | 54  | Multi-morbidity fixtures                        | evals, docs             | shipped | 53                    | [54](../../docs/build/54-multi-morbidity-fixtures.md)        | [#52](../../pull/52) |
 | 55  | v2 Phase 2 thesis run                           | evals, docs             | shipped | 54                    | [55](../../docs/build/55-v2-phase2-thesis-run.md)            | [#53](../../pull/53) |
-| 56  | Harness retry logic + clean re-run              | evals, docs             | in-progress | 55                | [56](../../docs/build/56-harness-retry-logic.md)             | [#54](../../pull/54) |
-| 57  | Serialization scoping (filter irrelevant guidelines) | evals, api, docs   | pending | 56                    | [57](../../docs/build/57-serialization-scoping.md)           | —   |
+| 56  | Harness retry logic + clean re-run              | evals, docs             | shipped | 55                | [56](../../docs/build/56-harness-retry-logic.md)             | [#54](../../pull/54) |
+| 57  | Serialization scoping (filter irrelevant guidelines) | evals, api, docs   | in-progress | 56                    | [57](../../docs/build/57-serialization-scoping.md)           | [#55](../../pull/55) |
 | 58  | Serialization compression for 3+ guidelines      | evals, docs             | pending | 57                    | [58](../../docs/build/58-serialization-compression.md)       | —   |
 
 ## Archived

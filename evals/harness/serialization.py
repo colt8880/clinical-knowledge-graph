@@ -698,17 +698,106 @@ def serialize_negative_evidence(trace: dict[str, Any]) -> list[dict[str, Any]]:
     return result
 
 
+def classify_guideline_relevance(trace: dict[str, Any]) -> dict[str, set[str]]:
+    """Classify each guideline in the trace as relevant or irrelevant.
+
+    A guideline is **relevant** if any of these hold:
+    1. It has a recommendation_emitted event with status != 'not_applicable'.
+    2. It has an exit_condition_triggered event (clinically meaningful exit).
+    3. It appears in a cross_guideline_match event as source or target.
+
+    A guideline is **irrelevant** if it was entered but none of the above
+    conditions hold — all its recs were not_applicable, no exit, no cross-match.
+
+    Returns:
+        {"relevant": set of guideline_ids, "irrelevant": set of guideline_ids}
+    """
+    events = trace.get("events", [])
+
+    entered: set[str] = set()
+    relevant: set[str] = set()
+
+    for event in events:
+        event_type = event.get("type")
+        gid = event.get("guideline_id", "")
+
+        if event_type == "guideline_entered" and gid:
+            entered.add(gid)
+
+        elif event_type == "recommendation_emitted" and gid:
+            if event.get("status") != "not_applicable":
+                relevant.add(gid)
+
+        elif event_type == "exit_condition_triggered" and gid:
+            relevant.add(gid)
+
+        elif event_type == "cross_guideline_match":
+            source = event.get("source_guideline_id", "")
+            target = event.get("target_guideline_id", "")
+            if source:
+                relevant.add(source)
+            if target:
+                relevant.add(target)
+
+    irrelevant = entered - relevant
+
+    return {"relevant": relevant, "irrelevant": irrelevant}
+
+
+def _filter_trace_by_relevance(
+    trace: dict[str, Any], irrelevant_ids: set[str]
+) -> dict[str, Any]:
+    """Return a new trace with events from irrelevant guidelines removed.
+
+    Preserves:
+    - Events with no guideline_id (evaluation_started, evaluation_completed).
+    - Cross-guideline interaction events (preemption_resolved, cross_guideline_match)
+      even if they reference an irrelevant guideline.
+    """
+    if not irrelevant_ids:
+        return trace
+
+    # Event types that are always preserved regardless of guideline_id
+    always_keep = {
+        "evaluation_started",
+        "evaluation_completed",
+        "preemption_resolved",
+        "cross_guideline_match",
+    }
+
+    filtered_events = []
+    for event in trace.get("events", []):
+        event_type = event.get("type", "")
+        gid = event.get("guideline_id", "")
+
+        if event_type in always_keep:
+            filtered_events.append(event)
+        elif gid and gid in irrelevant_ids:
+            continue  # Drop events from irrelevant guidelines
+        else:
+            filtered_events.append(event)
+
+    return {**trace, "events": filtered_events}
+
+
 def build_arm_c_context(trace: dict[str, Any]) -> dict[str, Any]:
     """Build the full Arm C context object from an EvalTrace.
 
     This is the frozen output shape injected into the graph-context arm's
     prompt alongside the PatientContext.
+
+    Applies serialization scoping (F57): classifies each guideline as
+    relevant or irrelevant based on trace events, then filters irrelevant
+    guidelines from the serialized context to reduce noise.
     """
-    subgraph = serialize_subgraph(trace)
+    relevance = classify_guideline_relevance(trace)
+    scoped_trace = _filter_trace_by_relevance(trace, relevance["irrelevant"])
+
+    subgraph = serialize_subgraph(scoped_trace)
     return {
-        "trace_summary": serialize_trace_summary(trace),
+        "trace_summary": serialize_trace_summary(scoped_trace),
         "subgraph": subgraph,
-        "convergence_summary": serialize_convergence_summary(trace, subgraph),
-        "satisfied_strategies": serialize_satisfied_strategies(trace),
-        "negative_evidence": serialize_negative_evidence(trace),
+        "convergence_summary": serialize_convergence_summary(scoped_trace, subgraph),
+        "satisfied_strategies": serialize_satisfied_strategies(scoped_trace),
+        "negative_evidence": serialize_negative_evidence(scoped_trace),
     }

@@ -85,6 +85,10 @@ The v2-phase2 thesis run appeared to have 15 missing entries but post-run diagno
 
 Adding ADA Diabetes as the 4th guideline degraded Arm C's completeness and prioritization scores even on existing fixtures that don't involve diabetes. The serialization context grows linearly with guideline count, and the ADA subgraph content appears in Arm C's context even for non-diabetic patients. Two potential fixes: (1) scope serialization to only guidelines relevant to the patient's conditions, (2) compress the serialization more aggressively when 4+ guidelines are active.
 
+## Case-15 reproducible catastrophic failure
+
+Cross-domain case-15 (3-guideline patient) has scored 1.000 across all four dimensions in three consecutive runs (F55, F56, F57). Arms A and B score 2.75-3.50 on the same fixture, confirming the patient context is workable. The failure is specific to Arm C's serialization — either the serialized context for this patient is malformed, exceeds a token limit, or triggers an edge case in the LLM's output parsing. Root cause investigation deferred; likely addressed by F58 (serialization compression) or requires fixture-specific debugging.
+
 ## Cleanup
 
 - Delete `/diagrams/crc-graph.html` and the `/diagrams` directory once UI Explore tab ships (backlog #05). Interim artifact superseded by live Explore.

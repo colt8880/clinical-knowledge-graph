@@ -385,12 +385,19 @@ def _denormalize_score(val: float) -> float:
     return (val * 4) + 1
 
 
-def fetch_from_braintrust(run_name: str) -> list[list[dict[str, Any]]]:
+def fetch_from_braintrust(
+    run_name: str,
+    verbose: bool = False,
+) -> list[list[dict[str, Any]]]:
     """Fetch results from Braintrust experiments and convert to run_results format.
 
     Looks for experiments named '{run_name}-arm-{a,b,c}'. Each experiment
     may have multiple trials (from trial_count). Returns one run_results list
     per trial.
+
+    Note: init_experiment(open=True) may return rows from prior experiment
+    versions with the same name. Rows without scores (stale or errored) are
+    dropped. Use verbose=True to see fetch diagnostics.
     """
     import braintrust
 
@@ -408,7 +415,13 @@ def fetch_from_braintrust(run_name: str) -> list[list[dict[str, Any]]]:
             print(f"Warning: could not load experiment '{experiment_name}': {e}")
             continue
 
+        total_rows = 0
+        scored_rows = 0
+        dropped_no_scores = 0
+        dropped_no_fixture = 0
+
         for row in experiment.fetch():
+            total_rows += 1
             # fixture_id may be in top-level metadata or nested in input.metadata
             fixture_id = (row.get("metadata") or {}).get("fixture_id", "")
             if not fixture_id:
@@ -416,7 +429,13 @@ def fetch_from_braintrust(run_name: str) -> list[list[dict[str, Any]]]:
                 fixture_id = (inp.get("metadata") or {}).get("fixture_id", "")
             scores = row.get("scores") or {}
             if not scores:
-                continue  # Skip rows with no scores (errors, etc.)
+                dropped_no_scores += 1
+                continue  # Skip rows with no scores (stale versions or errors)
+            if not fixture_id:
+                dropped_no_fixture += 1
+                continue
+
+            scored_rows += 1
 
             # Denormalize from 0-1 back to 1-5
             rubric_scores: dict[str, Any] = {}
@@ -432,6 +451,14 @@ def fetch_from_braintrust(run_name: str) -> list[list[dict[str, Any]]]:
                 "composite": rubric_scores["composite"],
                 "scores": {"rubric_scores": rubric_scores},
             })
+
+        if verbose:
+            print(
+                f"[fetch] {experiment_name}: "
+                f"{total_rows} total, {scored_rows} scored, "
+                f"{dropped_no_scores} dropped (no scores), "
+                f"{dropped_no_fixture} dropped (no fixture_id)"
+            )
 
     if not all_entries:
         return []

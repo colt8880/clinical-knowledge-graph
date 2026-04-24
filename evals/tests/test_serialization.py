@@ -12,10 +12,13 @@ from harness.arms.graph_context import (
 from harness.serialization import (
     _filter_trace_by_relevance,
     render_compressed_matched_recs,
+    render_compact_strategy_summary,
     _render_compressed_prose,
     build_arm_c_context,
     classify_guideline_relevance,
     COMPRESSION_THRESHOLD,
+    INTENT_PRIORITY,
+    EVIDENCE_GRADE_SORT,
     serialize_convergence_summary,
     serialize_negative_evidence,
     serialize_satisfied_strategies,
@@ -2075,17 +2078,17 @@ class TestSerializationCompression:
         assert ctx1 == ctx2
 
     def test_render_compressed_matched_recs_table(self):
-        """_render_compressed_matched_recs should produce a valid markdown table."""
+        """render_compressed_matched_recs should produce a valid markdown table with # column."""
         summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
         table = render_compressed_matched_recs(summary)
         lines = table.split("\n")
         # Header + separator + at least 1 data row
         assert len(lines) >= 3
-        assert lines[0].startswith("| Guideline")
+        assert lines[0].startswith("| # |")
         assert lines[1].startswith("|---")
         # Each data row should have the right number of pipes
         for line in lines[2:]:
-            assert line.count("|") >= 6  # 5 columns = 6 pipes
+            assert line.count("|") >= 7  # 6 columns = 7 pipes
 
     def test_render_compressed_matched_recs_empty(self):
         """Empty recs should produce a message, not a table."""
@@ -2110,3 +2113,215 @@ class TestSerializationCompression:
         ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
         prose = ctx["subgraph"]["rendered_prose"]
         assert "ascvd_10yr 12.4%" in prose
+
+
+# --- F59: Compression quality fixes tests ---
+
+
+class TestCompressedKeyAction:
+    """F59 Fix 1: Key Action column shows strategy name, not reason."""
+
+    def test_key_action_shows_strategy_name(self):
+        """Compressed recs table should show strategy name in Key Action column."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        table = render_compressed_matched_recs(summary)
+        # Strategy names from the trace, not evaluator reasons
+        assert "High-intensity statin therapy" in table
+        assert "Moderate-intensity statin therapy" in table
+        assert "CKD monitoring protocol" in table
+        assert "Metformin therapy" in table
+
+    def test_key_action_not_reason(self):
+        """Key Action should NOT contain evaluator reasoning text."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        table = render_compressed_matched_recs(summary)
+        assert "Patient eligible, no strategy satisfied" not in table
+        assert "ASCVD patient, high-intensity indicated" not in table
+
+    def test_key_action_falls_back_to_reason_when_no_strategy(self):
+        """When no offered_strategies, fall back to reason."""
+        summary = {
+            "matched_recs": [{
+                "recommendation_id": "rec:test",
+                "guideline_id": "guideline:uspstf-statin-2022",
+                "status": "due",
+                "evidence_grade": "B",
+                "reason": "Fallback reason text",
+                "offered_strategies": [],
+            }],
+            "strategy_names": {},
+            "rec_intents": {},
+            "preemption_events": [],
+        }
+        table = render_compressed_matched_recs(summary)
+        assert "Fallback reason text" in table
+
+    def test_strategy_names_in_trace_summary(self):
+        """serialize_trace_summary should include strategy_names lookup."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert "strategy_names" in summary
+        assert "strategy:accaha-high-intensity" in summary["strategy_names"]
+        assert summary["strategy_names"]["strategy:accaha-high-intensity"] == "High-intensity statin therapy"
+
+    def test_rec_intents_in_trace_summary(self):
+        """serialize_trace_summary should include rec_intents lookup."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert "rec_intents" in summary
+        assert summary["rec_intents"]["rec:accaha-statin-high-intensity"] == "secondary_prevention"
+        assert summary["rec_intents"]["rec:kdigo-ckd-monitoring"] == "monitoring"
+
+
+class TestCompressedPriorityOrdering:
+    """F59 Fix 2: Recs sorted by clinical priority."""
+
+    def test_preempted_rec_sorted_last(self):
+        """A preempted rec should appear at the bottom of the table."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        table = render_compressed_matched_recs(summary)
+        lines = table.split("\n")
+        data_lines = lines[2:]  # skip header + separator
+        # Last line should be the preempted rec (USPSTF statin-initiate-grade-b)
+        last_line = data_lines[-1]
+        assert "preempted" in last_line
+        assert "statin-initiate-grade-b" in last_line
+
+    def test_secondary_prevention_before_primary(self):
+        """Secondary prevention recs should come before primary prevention."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        table = render_compressed_matched_recs(summary)
+        lines = table.split("\n")
+        data_lines = lines[2:]
+        # Find positions
+        secondary_pos = None
+        monitoring_pos = None
+        for i, line in enumerate(data_lines):
+            if "accaha-statin-high-intensity" in line:
+                secondary_pos = i
+            if "kdigo-ckd-monitoring" in line:
+                monitoring_pos = i
+        assert secondary_pos is not None
+        assert monitoring_pos is not None
+        assert secondary_pos < monitoring_pos
+
+    def test_intent_hierarchy_respected(self):
+        """Full ordering: secondary > primary > treatment > monitoring."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        table = render_compressed_matched_recs(summary)
+        lines = table.split("\n")
+        data_lines = lines[2:]
+        # Non-preempted recs should be ordered by intent
+        non_preempted = [l for l in data_lines if "preempted" not in l]
+        rec_ids = []
+        for line in non_preempted:
+            # Extract rec ID from the table row
+            parts = [p.strip() for p in line.split("|") if p.strip()]
+            if len(parts) >= 3:
+                rec_ids.append(parts[2])  # Rec column is 3rd (after #, Guideline)
+
+        # Expected order by intent: secondary(accaha-high) > treatment(ada-metformin, ada-sglt2i) > monitoring(kdigo-monitoring)
+        # (no primary_prevention in non-preempted — USPSTF is preempted)
+        assert "accaha-statin-high-intensity" in rec_ids[0]
+        # monitoring should be last among non-preempted
+        assert "kdigo-ckd-monitoring" in rec_ids[-1]
+
+    def test_priority_column_present(self):
+        """Each data row should have a numeric priority in the # column."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        table = render_compressed_matched_recs(summary)
+        lines = table.split("\n")
+        data_lines = lines[2:]
+        for i, line in enumerate(data_lines, 1):
+            parts = [p.strip() for p in line.split("|") if p.strip()]
+            assert parts[0] == str(i)
+
+    def test_preempted_status_shown(self):
+        """Preempted recs should show 'preempted' in Status column."""
+        summary = serialize_trace_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        table = render_compressed_matched_recs(summary)
+        # USPSTF rec is preempted by ACC/AHA
+        assert "| preempted |" in table
+
+
+class TestCompactStrategySummary:
+    """F59 Fix 3: Compact strategy summary in compressed mode."""
+
+    def test_strategy_summary_in_compressed_context(self):
+        """build_arm_c_context should include strategy_summary in compressed mode."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert ctx["compressed"] is True
+        assert "strategy_summary" in ctx
+        assert "Key Therapies" in ctx["strategy_summary"]
+
+    def test_strategy_summary_empty_for_uncompressed(self):
+        """2-guideline trace should have empty strategy_summary."""
+        ctx = build_arm_c_context(TWO_GUIDELINE_TRACE)
+        assert ctx["compressed"] is False
+        assert ctx["strategy_summary"] == ""
+
+    def test_strategy_summary_lists_strategy_names(self):
+        """Summary should list strategy names with action options."""
+        summary = render_compact_strategy_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert "High-intensity statin therapy" in summary
+        assert "CKD monitoring protocol" in summary
+        assert "Metformin therapy" in summary
+
+    def test_strategy_summary_lists_actions(self):
+        """Each line should include action node IDs."""
+        summary = render_compact_strategy_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert "med:atorvastatin" in summary
+        assert "obs:egfr" in summary
+        assert "med:metformin" in summary
+
+    def test_strategy_summary_omits_preempted_recs(self):
+        """Preempted recs should not appear in the strategy summary."""
+        summary = render_compact_strategy_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        # USPSTF statin-initiate-grade-b is preempted — its strategy should not appear
+        # (the "Moderate-intensity statin therapy" from USPSTF)
+        # Check by confirming USPSTF guideline label is not in the summary
+        assert "USPSTF 2022 Statin" not in summary
+
+    def test_strategy_summary_includes_guideline_and_grade(self):
+        """Each line should include guideline label and evidence grade."""
+        summary = render_compact_strategy_summary(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert "ACC/AHA 2018 Cholesterol" in summary
+        assert "COR I, LOE A" in summary
+        assert "KDIGO 2024 CKD" in summary
+        assert "1B" in summary
+
+    def test_strategy_summary_in_prompt(self):
+        """The strategy summary should appear in the compressed prompt."""
+        ctx = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        prompt = get_prompt({"demographics": {"age": 62}}, ctx)
+        assert "Key Therapies" in prompt
+        assert "High-intensity statin therapy" in prompt
+
+    def test_strategy_summary_not_in_uncompressed_prompt(self):
+        """The strategy summary should NOT appear in uncompressed prompts."""
+        ctx = build_arm_c_context(TWO_GUIDELINE_TRACE)
+        prompt = get_prompt({"demographics": {"age": 55}}, ctx)
+        assert "Key Therapies" not in prompt
+
+    def test_two_guideline_trace_unchanged(self):
+        """A 2-guideline trace should produce identical output to pre-F59."""
+        ctx = build_arm_c_context(TWO_GUIDELINE_TRACE)
+        assert ctx["compressed"] is False
+        # Strategy summary empty
+        assert ctx["strategy_summary"] == ""
+        # Matched recs still in JSON format (no table)
+        prompt = get_prompt({"demographics": {"age": 55}}, ctx)
+        assert '"recommendation_id"' in prompt
+        assert "| # |" not in prompt
+
+    def test_deterministic(self):
+        """Same trace = same output for all three fixes."""
+        ctx1 = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        ctx2 = build_arm_c_context(FOUR_GUIDELINE_ALL_RELEVANT_TRACE)
+        assert ctx1 == ctx2
+
+        prompt1 = get_prompt({"demographics": {"age": 62}}, ctx1)
+        prompt2 = get_prompt({"demographics": {"age": 62}}, ctx2)
+        assert prompt1 == prompt2
+
+    def test_empty_trace_no_summary(self):
+        """Empty trace should produce empty strategy summary."""
+        assert render_compact_strategy_summary({"events": []}) == ""

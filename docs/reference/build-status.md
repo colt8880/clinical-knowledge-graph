@@ -98,6 +98,7 @@ Adds ADA 2024 Diabetes as a 4th guideline, connects via clinician-reviewed cross
 | 56  | Harness retry logic + clean re-run              | evals, docs             | shipped | 55                | [56](../../docs/build/56-harness-retry-logic.md)             | [#54](../../pull/54) |
 | 57  | Serialization scoping (filter irrelevant guidelines) | evals, api, docs   | shipped | 56                    | [57](../../docs/build/57-serialization-scoping.md)           | [#55](../../pull/55) |
 | 58  | Serialization compression for 3+ guidelines      | evals, docs             | shipped | 57                    | [58](../../docs/build/58-serialization-compression.md)       | [#56](../../pull/56) |
+| 59  | Compressed serialization quality fixes             | evals, docs             | shipped | 58                    | [59](../../docs/build/59-compression-quality-fixes.md)       | [#57](../../pull/57)   |
 
 ## Archived
 
